@@ -1,0 +1,38 @@
+/*
+  Darkly Pygments Theme
+  (c) 2014 Sourcey
+  http://sourcey.com
+*/
+
+pre {
+  white-space: pre;
+  overflow: auto;
+  word-wrap: normal;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 20px;
+  color: #C1C2C3;
+  background-color: #100;
+  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,
+              DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace;
+}
+pre .gd { color: #2e3436; background-color: #0e1416; }
+pre .gr { color: #eeeeec; background-color: #c00; }
+pre .gi { color: #babdb6; background-color: #1f2b2d; }
+pre .go { color: #2c3032; background-color: #2c3032; }
+pre .kt { color: #e3e7df; }
+pre .ni { color: #888a85; }
+pre .c,pre .cm,pre .c1,pre .cs { color: #8D9684; }
+pre .err,pre .g,pre .l,pre .n,pre .x,pre .p,pre .ge,
+pre .gp,pre .gs,pre .gt,pre .ld,pre .nc,pre .nd,
+pre .ne,pre .nl,pre .nn,pre .nx,pre .py,pre .ow,pre .w,pre .sb { color: #C1C2C3; }
+pre .sc,pre .sd,pre .s2,pre .se,pre .sh,pre .si,pre .sx,pre .sr,
+pre .s1,pre .s,pre .ss,pre .bp { color: #b8ff60 ;}
+pre .k,pre .kc,pre .kd,pre .kn,pre .kp,pre .kr,
+pre .nt { color: #729fcf; }
+pre .cp,pre .gh,pre .gu,pre .na,pre .nf { color: #E9A94B ; }
+pre .m,pre .nb,pre .no,pre .mf,pre .mh,pre .mi,pre .mo,
+pre .il { color: #8ae234; }
+pre .o { color: #989DAA; }
+pre .nv,pre .vc,pre .vg,pre .vi { color: #ffffff; }
