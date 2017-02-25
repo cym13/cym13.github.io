@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Shell streams and redirections</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Shell streams and redirections</h1>
+    <section id="piping">
+        <h2>Piping</h2>
+        <p>This should be well-known already, it allows sending the output of a program to the input of another.</p>
+        <pre data-language="bash"><span></span>$ ls
+abc
+bcd
+cde
+
+$ ls <span class="p">|</span> grep b
+abc
+bcd</pre>
+    </section>
+    <section id="write-to-file">
+        <h2>Write to file</h2>
+        <p>One can write to a file using '&gt;'. In that case the content is dropped beforehand:</p>
+        <pre data-language="bash"><span></span>$ ls &gt; myfile.txt
+
+$ cat myfile.txt
+abc
+bcd
+cde
+
+$ <span class="nb">echo</span> <span class="s2">&quot;Cat attack!&quot;</span> &gt; myfile.txt
+
+$ cat myfile.txt
+Cat attack!</pre>
+        <p>Want to still get an output while writing to a file? Use tee!</p>
+        <pre data-language="bash"><span></span>$ ls <span class="p">|</span> tee myfile.txt
+abc
+bcd
+cde
+myfile.txt
+
+$ cat myfile.txt
+abc
+bcd
+cde
+myfile.txt</pre>
+        <p>One can also append to a file using '&gt;&gt;':</p>
+        <pre data-language="bash"><span></span>$ <span class="nb">echo</span> <span class="s2">&quot;Return of the evil cat!&quot;</span> &gt;&gt; myfile.txt
+
+$ cat myfile.txt
+abc
+bcd
+cde
+myfile.txt
+Return of the evil cat!</pre>
+        <p>Of course, tee also works for appending with -a or --append:</p>
+        <pre data-language="bash"><span></span>$ <span class="nb">echo</span> <span class="s2">&quot;Cats everywhere!&quot;</span> <span class="p">|</span> tee -a myfile.txt
+Cats everywhere!
+
+$ cat myfile.txt
+abc
+bcd
+cde
+myfile.txt
+Return of the evil cat!
+Cats everywhere!</pre>
+    </section>
+    <section id="read-from-file">
+        <h2>Read from file</h2>
+        <p>One can read from a file using '&lt;', the content of the file is written to the program's standard input.</p>
+        <pre data-language="bash"><span></span>$ grep a &lt;myfile.txt
+abc
+Return of the evil cat!
+Cats everywhere!</pre>
+        <p>Ok, here it is not very useful... But there are cute and useful patterns using it:</p>
+        <pre data-language="bash"><span></span>$ <span class="k">while</span> <span class="nb">read</span> line <span class="p">;</span> <span class="k">do</span>
+.    <span class="nb">echo</span> <span class="s2">&quot;Ninja cat </span><span class="nv">$line</span><span class="s2">&quot;</span>
+. <span class="k">done</span> &lt; myfile.txt
+Ninja cat abc
+Ninja cat bcd
+Ninja cat cde
+Ninja cat myfile.txt
+Ninja cat Return of the evil cat!
+Ninja cat Cats everywhere!</pre>
+        <p>Note also that '&lt;' like other redirection symbol can be used anywhere on the line (shell-dependant, but true for most):</p>
+        <pre data-language="bash"><span></span>$ &lt;myfile.txt <span class="k">while</span> <span class="nb">read</span> line <span class="p">;</span> <span class="k">do</span>
+.    <span class="nb">echo</span> <span class="s2">&quot;Ninja kitty </span><span class="nv">$line</span><span class="s2">&quot;</span>
+. <span class="k">done</span>
+Ninja kitty abc
+Ninja kitty bcd
+Ninja kitty cde
+Ninja kitty myfile.txt
+Ninja kitty Return of the evil cat!
+Ninja kitty Cats everywhere!</pre>
+    </section>
+    <section id="read-from-standard-input">
+        <h2>Read from standard input</h2>
+        <p>You want to write multiple lines to a program's standard input without pain ? Use '&lt;&lt;':</p>
+        <pre data-language="bash"><span></span>$ grep kitten <span class="s">&lt;&lt;EOF</span>
+<span class="s">. A kitten</span>
+<span class="s">. Another kitten</span>
+<span class="s">. Another kitten</span>
+<span class="s">. It keeps going</span>
+<span class="s">. EOF</span>
+A kitten
+Another kitten
+Another kitten</pre>
+        <p>Here, EOF is the terminator, the shell keeps reading until it sees it, then it sends all output to the program. Still not really useful as it is, but it can come in handy sometimes, like when needing to write a small file (real programmers use cat by the way):</p>
+        <pre data-language="bash"><span></span>$ cat &gt;truth.sh <span class="s">&lt;&lt;EOF</span>
+<span class="s">. #!/bin/sh</span>
+<span class="s">. while [ 42 ] ; do</span>
+<span class="s">.     echo &quot;KITTENS!!!&quot;</span>
+<span class="s">.     echo &quot;KITTENS EVERYWHERE!!!&quot;</span>
+<span class="s">. done</span>
+<span class="s">. EOF</span>
+
+$ cat truth.sh
+<span class="c1">#!/bin/sh</span>
+<span class="k">while</span> <span class="o">[</span> <span class="m">42</span> <span class="o">]</span> <span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="s2">&quot;KITTENS!!!&quot;</span>
+    <span class="nb">echo</span> <span class="s2">&quot;KITTENS EVERYWHERE!!!&quot;</span>
+<span class="k">done</span></pre>
+    </section>
+    <section id="read-from-a-text-ugh-wut">
+        <h2>Read from a text (Ugh… wut?)</h2>
+        <p>Sometimes, we just want to pass a single line, a variable for example. Let's do that with '&lt;&lt;&lt;':</p>
+        <pre data-language="bash"><span></span>$ cat <span class="o">&lt;&lt;&lt;</span><span class="s2">&quot;I&#39;m a hipster, echo is so mainstream!&quot;</span>
+I<span class="err">&#39;</span>m a hipster, <span class="nb">echo</span> is so mainstream!</pre>
+    </section>
+    <section id="ok-but-what-if-my-data-isn-t-suitable-for-stdin">
+        <h2>Ok... But what if my data isn't suitable for stdin?</h2>
+        <p>It happens sometimes, you have a nice data set that just isn't formated the right way. In such situations, xargs often comes in handy.</p>
+        <pre data-language="bash"><span></span>$ ls <span class="p">|</span> grep a
+abc
+bcd
+cde</pre>
+        <p>We want to do "ls -l" on each of these files to get more information... The naive solution would be:</p>
+        <pre data-language="bash"><span></span><span class="c1"># Novice: &quot;Hey! I know that trick!&quot;</span>
+$ ls <span class="p">|</span> grep a <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line <span class="p">;</span> <span class="k">do</span> ls -l <span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span> <span class="p">;</span> <span class="k">done</span>
+...</pre>
+        <p>But the best would be to do:</p>
+        <pre data-language="bash"><span></span><span class="c1"># Master: &quot;Don&#39;t solve the problem, find another one&quot;</span>
+$ ls <span class="p">|</span> grep a <span class="p">|</span> xargs ls -l
+...</pre>
+        <p>How does it work? What xargs does is that it takes each line and calls its arguments with those lines as arguments. The two following expressions are indeed equivalent:</p>
+        <pre data-language="bash"><span></span>$ xargs ls -l <span class="s">&lt;&lt;EOF</span>
+<span class="s">. abc</span>
+<span class="s">. bcd</span>
+<span class="s">. cde</span>
+<span class="s">. EOF</span>
+...
+
+$ ls -l abc bcd cde
+...</pre>
+    </section>
+    <footer>Generated on: 2017-02-25 00:36 UTC. </footer>
+
+    </div>
+  </body>
+</html>

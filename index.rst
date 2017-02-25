@@ -1,8 +1,35 @@
-===============
+========
+Welcome!
+========
+
+This blog is about software security, cryptography, software engineering,
+ponies and whatever lies in between.
+
 Recent articles
 ===============
+
+`Exploiting Gource <article/exploiting_gource.html>`_:
+    Improvised code review of the Gource git repository viewer. It is meant
+    as a way to show how one can perform quick and targeted code reviews.
+
+`Let's build an Object System! <article/object-system.html>`_:
+    What makes an object system tick? What does it mean to be object
+    oriented? What are classes really?
 
 `Mail.local et TOCTTOU <article/mail_local_tocttou.html>`_:
     Une explication détaillée d'exploitation de programme SUID root via une
     TOCTTOU pour obtenir une élévation de privilège.
 
+`Strace output explained <article/strace_who.html>`_:
+    Strace is a powerful tool but its output can be quite difficult to
+    decipher. Here we strace the "who" command to explain how to better use
+    it.
+
+`Introduction à l'éditeur de texte ed <article/introduction_ed.html>`_:
+    Ed est un éditeur puissant mais terriblement déconcertant au premier
+    abord. Cet article présente les commandes essentielles et un peu plus
+    pour bien débuter avec l'Éditeur.
+
+`Shell streams and redirections <article/shell_streams_and_redirections.html>`_:
+    Shell streams are the most powerful feature of bash. Knowing about
+    redirections is a capital step toward an efficient use of command-line.

@@ -1,0 +1,434 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Let's build an object system!</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Let's build an object system!</h1>
+    <section id="after-thougt-warning">
+        <h2>After-thougt warning</h2>
+        <p>If you are seeking a read-only article that will expose how things work in reality, you are at the wrong place. Honestly, I think that if you fully understand everything just by reading this, you didn't have anything to learn in the first place.</p>
+        <p>This is a story of experimentation. It is meant as a guide to experimentation, for you to try your own things and come with your own conclusions with only a little push of mine. I can't (and wouldn't) force you to try those things while reading, but I sure advise you to do so.</p>
+    </section>
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Hey, I sort of feel like building an object system, so let's do it together! It will be in python for a high-level language is well suited to that kind of experimentations. And as this is somewhat improvised, I hope it won't be too messy.</p>
+        <p>We first need a subject, so let's talk about cats. That's not because animals are the classical subject for object oriented programming, but mostly because they are just damn too cute.</p>
+    </section>
+    <section id="first-approach">
+        <h2>First approach</h2>
+        <p>What do we want to talk about... A name, an age, a color and a breed should do it. We also want him to mew and purr. Let's be naive:</p>
+        <pre data-language="python"><span></span><span class="n">age</span>   <span class="o">=</span> <span class="mi">3</span>
+<span class="n">name</span>  <span class="o">=</span> <span class="s2">&quot;Kitty&quot;</span>
+<span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+<span class="n">breed</span> <span class="o">=</span> <span class="s2">&quot;russian blue&quot;</span>
+
+<span class="k">def</span> <span class="nf">mew</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></pre>
+        <p>That's great, everything is easy to access and modify. But it will soon be a mess if we need a second cat. We could end each variable name with _1 or _2 but what about when we want to have an infinite number of cats (because who doesn't want a universe full of cats)?</p>
+        <p>For this reason, we need a way to structure things, to say that they are linked together, to manipulate them accordingly and to create them easily. That's what an object system is.</p>
+    </section>
+    <section id="structuring-things">
+        <h2>Structuring things</h2>
+        <p>We're in python where the list is the most common data structure, so it seems logic to give it a try. We will base our system on a convention. First the age, then the name etc...</p>
+        <pre data-language="python"><span></span><span class="n">mycat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></pre>
+        <p>That definitely looks better, but relying on a convention can be hard if another programmer has to look at your code.</p>
+        <p>Also, the actions are left alone... We're in python, a function can be put in a list too!</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+<span class="n">mycat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">,</span> <span class="n">mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
+
+<span class="n">mycat</span><span class="p">[</span><span class="mi">4</span><span class="p">](</span><span class="n">mycat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1">#&gt; Kitty mews!</span></pre>
+        <p>The advantage is that one can change how a cat mews without changing every cat:</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+<span class="n">kitty</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">,</span> <span class="n">mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+
+<span class="n">nyoron</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
+
+<span class="n">kitty</span><span class="p">[</span><span class="mi">4</span><span class="p">](</span><span class="n">kitty</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">nyoron</span><span class="p">[</span><span class="mi">4</span><span class="p">]()</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+        <p>The problem is that it lacks a common interface, with that structure you can't know in advance how to make a cat mew... Let's solve this:</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="n">cat</span><span class="p">[</span><span class="mi">4</span><span class="p">](</span><span class="n">cat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="n">cat</span><span class="p">[</span><span class="mi">5</span><span class="p">](</span><span class="n">cat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">,</span> <span class="n">default_mew</span><span class="p">,</span> <span class="n">default_purr</span><span class="p">]</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">,</span>      <span class="n">nyoron_mew</span><span class="p">,</span>  <span class="n">default_purr</span><span class="p">]</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+        <p>Nice isn't it ? If all we want to do is making them mew or purr we don't even need to know how they are implemented. It would be nice to have the same thing at creation...</p>
+    </section>
+    <section id="constructor">
+        <h2>Constructor</h2>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+    <span class="n">cat</span> <span class="o">=</span> <span class="p">[</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">,</span> <span class="n">default_mew</span><span class="p">,</span> <span class="n">default_purr</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cat</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron mews!</span></pre>
+        <p>Shit, we forgot to change Nyoron's mewing... But how can we do it without knowing how it is implemented? We need a special function for that.</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+    <span class="n">cat</span> <span class="o">=</span> <span class="p">[</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">,</span> <span class="n">default_mew</span><span class="p">,</span> <span class="n">default_purr</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cat</span>
+
+<span class="k">def</span> <span class="nf">change_mew</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">new_mew</span><span class="p">):</span>
+    <span class="n">cat</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_mew</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+
+<span class="n">change_mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+        <p>That's better! Now we have a nice layer of abstraction and can change how a cat is represented without breaking everything. But we need a function to change or get the value of each attribute of our cat... Maybe lists aren't the way to go.</p>
+    </section>
+    <section id="dictionaries">
+        <h2>Dictionaries</h2>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+    <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
+           <span class="s1">&#39;name&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+           <span class="s1">&#39;breed&#39;</span><span class="p">:</span> <span class="n">breed</span><span class="p">,</span>
+           <span class="s1">&#39;mew&#39;</span><span class="p">:</span>   <span class="n">default_mew</span><span class="p">,</span>
+           <span class="s1">&#39;purr&#39;</span><span class="p">:</span>  <span class="n">default_purr</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">cat</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+
+<span class="n">nyoron</span><span class="p">[</span><span class="s1">&#39;mew&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nyoron_mew</span>
+
+<span class="n">kitty</span><span class="p">[</span><span class="s1">&#39;mew&#39;</span><span class="p">]()</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">nyoron</span><span class="p">[</span><span class="s1">&#39;mew&#39;</span><span class="p">]()</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+        <p>That's nice, really nice! We can do a lot with that! It seems so easy, of course dictionaries were the way to go!</p>
+        <p>For information python and javascript object systems are built on this very principle with just a little syntactic sugar to make it nicer. If you don't trust me, you could do (in python):</p>
+        <pre data-language="python"><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="c1">#&gt; {&#39;value&#39;: 42}</span></pre>
+    </section>
+    <section id="layers-of-abstraction-comeback">
+        <h2>Layers of abstraction: comeback</h2>
+        <p>Note that we lost a bit of portability by using the dictionary directly: if we want to change the internal name for mewing, we can't without changing all calls to that method.</p>
+        <p>This is easily solved with a method that we saw before.</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+    <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
+           <span class="s1">&#39;name&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+           <span class="s1">&#39;breed&#39;</span><span class="p">:</span> <span class="n">breed</span><span class="p">,</span>
+           <span class="s1">&#39;mew&#39;</span><span class="p">:</span>   <span class="n">default_mew</span><span class="p">,</span>
+           <span class="s1">&#39;purr&#39;</span><span class="p">:</span>  <span class="n">default_purr</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">cat</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
+
+<span class="c1"># We will do generic functions. They are simple now, but give us the</span>
+<span class="c1"># possibility to change things later by gluing code together.</span>
+
+<span class="k">def</span> <span class="nf">getatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">setatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<span class="c1"># Some specific functions, that&#39;s just syntactic sugar</span>
+<span class="c1"># Note that as we don&#39;t know the function, we take every precaution</span>
+<span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">getatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;mew&#39;</span><span class="p">)()</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">getatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;purr&#39;</span><span class="p">)()</span>
+
+
+<span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Nyoron says nya!&#39;</span><span class="p">)</span>
+
+<span class="n">setatt</span><span class="p">(</span><span class="n">nyoron</span><span class="p">,</span> <span class="s1">&#39;mew&#39;</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+    </section>
+    <section id="a-proper-class">
+        <h2>A proper class</h2>
+        <p>Ok, so now we have a simplistic yet working object system. However, did you notice the nice circle we just did? We started with an object system because we had functions and variables everywhere and now we have functions everywhere all over again!</p>
+        <p>The solution is easy: let's make an object that manages other objects! That's what a class is.</p>
+        <p>So, we learned our lesson, we need a constructor, getters, setters and some internal organisation convention. Some sugar would be cool too! We will skip some of those here because most of the time a class isn't instanciated more than once, but if you know how to implement it if you need to.</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat_class</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+        <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
+               <span class="s1">&#39;name&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+               <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+               <span class="s1">&#39;breed&#39;</span><span class="p">:</span> <span class="n">breed</span><span class="p">,</span>
+               <span class="s1">&#39;mew&#39;</span><span class="p">:</span>   <span class="n">default_mew</span><span class="p">,</span>
+               <span class="s1">&#39;purr&#39;</span><span class="p">:</span>  <span class="n">default_purr</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">cat</span>
+
+    <span class="k">def</span> <span class="nf">getatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="n">cat_class</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">make_cat</span><span class="p">,</span>
+                 <span class="s2">&quot;get&quot;</span><span class="p">:</span> <span class="n">getatt</span><span class="p">,</span>
+                 <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="n">setatt</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">cat_class</span>
+
+
+<span class="n">cat</span> <span class="o">=</span> <span class="n">make_cat_class</span><span class="p">()</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">](</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span>  <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">](</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;mew&#39;</span><span class="p">)()</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;purr&#39;</span><span class="p">)()</span>
+
+<span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Nyoron says nya!&#39;</span><span class="p">)</span>
+
+<span class="n">cat</span><span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">](</span><span class="n">nyoron</span><span class="p">,</span> <span class="s1">&#39;mew&#39;</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron says nya!</span></pre>
+        <p>This seems tedious... We will see later that this method has its advantages, but for now you may like to know that python's designers thought that it was tedious too. That's why instead of implementing it with special functions they used special keywords ("class") and conventional function names such as __init__() for the constructor. Those magic names are called automatically by python itself when creating a new object.</p>
+        <p>That also means something really interesting: a class is just an object! That's not true for every object system but it is for most, and python is one of them:</p>
+        <pre data-language="python"><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="c1">#&gt;{&#39;__module__&#39;: &#39;__console__&#39;,</span>
+<span class="c1">#  &#39;__init__&#39;: &lt;function A.__init__ at 0x7fc88f053a60&gt;,</span>
+<span class="c1">#  &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;A&#39; objects&gt;,</span>
+<span class="c1">#  &#39;__wea kref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;A&#39; objects&gt;,</span>
+<span class="c1">#  &#39;__doc__&#39;: None,</span>
+<span class="c1">#  &#39;__getattribute__&#39;: &lt;slot wrapper &#39;__getattribute__&#39; of &#39;object&#39; objects&gt;</span>
+<span class="c1"># }</span></pre>
+    </section>
+    <section id="subclassing">
+        <h2>Subclassing</h2>
+        <p>If you come from C, nothing we have done so far should have impressed you. In fact, you must be laughing at how hard it seems to do in python what you would have easily done using a structure with some function pointers. Well, you would be laughing if you didn't know that this is a very unpythonic way to do things. But we will see something that is hard to do beautifully in C with structure: subclassing and inheritance.</p>
+        <p>We saw before that a nice side effect of our tiny object system is that it makes dealing with special cases easier (what we did with mew() for Nyoron). We also saw that, at least in our system, a class is just some special object.</p>
+        <p>Let's specialize then! We could say for example that all bobtail cats are japanese (they are not called "japanese bobtail" for nothing after all) and that their default mewing is "Nya!". They also give luck.</p>
+        <pre data-language="python"><span></span><span class="k">def</span> <span class="nf">make_cat_class</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+        <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
+               <span class="s1">&#39;name&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+               <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+               <span class="s1">&#39;breed&#39;</span><span class="p">:</span> <span class="n">breed</span><span class="p">,</span>
+               <span class="s1">&#39;mew&#39;</span><span class="p">:</span>   <span class="n">default_mew</span><span class="p">,</span>
+               <span class="s1">&#39;purr&#39;</span><span class="p">:</span>  <span class="n">default_purr</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">cat</span>
+
+    <span class="k">def</span> <span class="nf">getatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setatt</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">cat</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="n">cat_class</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">make_cat</span><span class="p">,</span>
+                 <span class="s2">&quot;get&quot;</span><span class="p">:</span> <span class="n">getatt</span><span class="p">,</span>
+                 <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="n">setatt</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">cat_class</span>
+
+
+<span class="k">def</span> <span class="nf">make_japanese_cat_class</span><span class="p">():</span>
+    <span class="c1"># We don&#39;t need to redefine everything, just what we want to change</span>
+    <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;says nya!&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">give_luck</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;gives you luck!&quot;</span><span class="p">)</span>
+
+        <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;age&#39;</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
+               <span class="s1">&#39;name&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+               <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+               <span class="s1">&#39;breed&#39;</span><span class="p">:</span> <span class="s1">&#39;bobtail&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;mew&#39;</span><span class="p">:</span>   <span class="n">default_mew</span><span class="p">,</span>
+               <span class="s1">&#39;purr&#39;</span><span class="p">:</span>  <span class="n">default_purr</span><span class="p">,</span>
+               <span class="s1">&#39;luck&#39;</span><span class="p">:</span>  <span class="n">give_luck</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">cat</span>
+
+    <span class="n">cat</span> <span class="o">=</span> <span class="n">make_cat_class</span><span class="p">()</span>
+    <span class="n">cat</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_cat</span>
+    <span class="k">return</span> <span class="n">cat</span>
+
+<span class="n">cat</span> <span class="o">=</span> <span class="n">make_cat_class</span><span class="p">()</span>
+<span class="n">jap</span> <span class="o">=</span> <span class="n">make_japanese_cat_class</span><span class="p">()</span>
+
+<span class="n">kitty</span>  <span class="o">=</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">](</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span>  <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">)</span>
+<span class="n">nyoron</span> <span class="o">=</span> <span class="n">jap</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">](</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;mew&#39;</span><span class="p">)()</span>
+
+<span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;purr&#39;</span><span class="p">)()</span>
+
+<span class="k">def</span> <span class="nf">luck</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s2">&quot;luck&quot;</span><span class="p">)()</span>
+
+<span class="n">mew</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Kitty mews!</span>
+<span class="n">mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron says nya!</span>
+
+<span class="n">luck</span><span class="p">(</span><span class="n">nyoron</span><span class="p">)</span>
+<span class="c1">#&gt; Nyoron gives you luck!</span>
+<span class="n">luck</span><span class="p">(</span><span class="n">kitty</span><span class="p">)</span>
+<span class="c1">#&gt; Traceback (most recent call last):</span>
+<span class="c1">#  File &quot;&lt;input&gt;&quot;, line 1, in &lt;module&gt;</span>
+<span class="c1">#  KeyError: &#39;luck&#39;</span></pre>
+        <p>As we can see, it is quite easy to define new classes based on the existing. As it is our system doesn't allow us to reliably inherite from many classes, we would have to add some way to merge two classes without getting any name clash while still having all the functionalities. You could try as an exercise, it is not an easy problem but it is an interesting one.</p>
+        <p>Also, as we can see from the last line we have no way to tell what the type of a given object is right now. It is not hard to get this done, we just need to add a name attribute to our class and a class method to check wether an object is of this class or not.</p>
+        <p>Another strategy is to build on the error that was raised when we executed the last line. Following the principle that asking for forgiveness is better than asking for permission, we can just try the method on the object at hand and see if it works. If it works, then the object had a method of this name, good for us (checking the result would be a good idea though). If we get an error, that's okay, it just means that it wasn't the right object.</p>
+        <p>This strategy is known as duck-typing: "If it floats and quacks as a duck, it may not be a duck but it sure is close enough for it to be my diner". This powerful strategy is not without link with the java adage "program to an interface, not an implementation". I say java because it was popularised in this context, but it really is a good general advice.</p>
+        <p>Subclassing is a very important feature of object oriented programming, and in many high-level languages today everything is object by subclassing. Confused? Look back at our previous example with the A class:</p>
+        <pre data-language="python"><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="c1">#&gt;{&#39;__module__&#39;: &#39;__console__&#39;,</span>
+<span class="c1">#  &#39;__init__&#39;: &lt;function A.__init__ at 0x7fc88f053a60&gt;,</span>
+<span class="c1">#  &#39;__dict__&#39;: &lt;attribute &#39;__dict__&#39; of &#39;A&#39; objects&gt;,</span>
+<span class="c1">#  &#39;__wea kref__&#39;: &lt;attribute &#39;__weakref__&#39; of &#39;A&#39; objects&gt;,</span>
+<span class="c1">#  &#39;__doc__&#39;: None,</span>
+<span class="c1">#  &#39;__getattribute__&#39;: &lt;slot wrapper &#39;__getattribute__&#39; of &#39;object&#39; objects&gt;</span>
+<span class="c1"># }</span></pre>
+        <p>Did you notice that appart from the constructor __init__ everything is alien in this dictionary? Where do they come from? Actually, in python as in java, every class inherits from a single class: Object. This class defines methods that every class should implement and attributes that every class should have, such as __dict__ in python that gives the dictionary representation of an object.</p>
+    </section>
+    <section id="a-point-on-the-vocabulary">
+        <h2>A point on the vocabulary</h2>
+        <p>So, all we had so far were regular lists, functions, variables and dictionaries. Where are all those magical class, objects, methods, attributes and so on?</p>
+        <p>The fact is that those are not magical at all. An object is an abstract concept ; it is the group of things that forms a coherent set. A specific set of data in memory that implements an object is called an instance. A class is the structural convention of how we represent a specific kind of object. It is a map of how to build (instantiate) an object.</p>
+        <p>A function that is linked to an object is called a method. That's all. It is a regular function (at least in our system) but it is useful to have a name for that kind of functions, and method it is.</p>
+        <p>A function that acts on a class can be considered a method too. After all, it is part of the family of functions that are bound to something. But as they are effective on any object of the class we give them a special name: a class method.</p>
+        <p>In the same way, a variable that is linked to an object is called an attribute. One can access attributes directly, but in many languages like java it means that you can't change how the object is implemented afterward. That's why, in java or C++, one uses special functions to get or set attributes. In python you have a system of properties: you can transparently put a function in place of an attribute in order to change the inner structure without breaking any code.</p>
+        <p>We didn't really talk about constructors and destructors. Those are the name of the methods used to create or destroy an instance. In most language they are called automatically, but that is just syntaxic sugar like most "object-oriented features".</p>
+        <p>Ok, I'll admit that this section may be a little confusing, just remember that everything is easy and that you can code it in a few lines, it will be easier.</p>
+    </section>
+    <section id="conclusion">
+        <h2>Conclusion</h2>
+        <p>There are many things to say about object systems and object oriented programming. I won't explain here how to actually use an object system, others have done it many times. But I think that it was worth the effort to build an object system from scratch and see how those functionalities can be made from simple tools and data structures.</p>
+        <p>Of course, many things can be added to this simplistic system, and it actually is a fun exercise that I encourage you to do very much.</p>
+    </section>
+    <footer>Generated on: 2017-02-25 00:36 UTC. </footer>
+
+    </div>
+  </body>
+</html>
