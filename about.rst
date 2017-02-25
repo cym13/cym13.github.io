@@ -19,6 +19,14 @@ Why does this website look odd?
 Well, I'm no web developper and I like the feeling of raw HTML/CSS. And
 orange. I like orange a lot.
 
+Why is it on github.io? Isn't centralization bad?
+=================================================
+
+Github provides a very good service without taking control over my code. If
+they decide to shut my blog down I can just repost it somewhere else. While I
+like self-hosting I know that I don't want to take the time to manage a full
+web server from scratch.
+
 I like what you do, can I take it, change it, repost it?
 ========================================================
 
