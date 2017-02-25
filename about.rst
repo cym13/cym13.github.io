@@ -19,6 +19,13 @@ Why does this website look odd?
 Well, I'm no web developper and I like the feeling of raw HTML/CSS. And
 orange. I like orange a lot.
 
+I like what you do, can I take it, change it, repost it?
+========================================================
+
+Sure, just indicate where you took that from and what you changed. Any
+original content on this blog is under the `creative common 3.0 unported
+<https://creativecommons.org/licenses/by/3.0/>`_ license.
+
 I'd like to talk, can I contact you?
 ====================================
 
