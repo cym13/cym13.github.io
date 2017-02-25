@@ -19,7 +19,7 @@ surtout comment réutiliser le concept ailleurs.
 
 Et maintenant, voyons cette course !
 
-.. image:: https://derpicdn.net/img/view/2012/1/15/299__safe_rainbow+dash_pinkie+pie_applejack_vector_wallpaper_pony_race_jet_running+of+the+leaves.png
+.. image:: ../image/mlp_jet_race.png
     :width: 100%
 
 .. raw:: pdf
