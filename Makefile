@@ -11,10 +11,10 @@ article/puppy_writeup.html
 
 all: index.html about.html $(articles)
 
-index.html:
+index.html: index.rst
 	rst2html5 -t --template template/base.tpl "index.rst" > "index.html"
 
-about.html:
+about.html: about.rst
 	rst2html5 -t --template template/base.tpl "about.rst" > "about.html"
 
 article/%.html: source/%.rst
