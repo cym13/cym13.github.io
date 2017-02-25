@@ -16,7 +16,7 @@ Recent articles
     Improvised code review of the Gource git repository viewer. It is meant
     as a way to show how one can perform quick and targeted code reviews.
 
-`Let's build an Object System! <article/object-system.html>`_:
+`Let's build an Object System! <article/object_system.html>`_:
     What makes an object system tick? What does it mean to be object
     oriented? What are classes really?
 
