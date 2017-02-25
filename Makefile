@@ -12,14 +12,13 @@ article/crypter_writeup.html
 
 all: index.html about.html $(articles)
 
-index.html: index.rst
-	rst2html5 -t --template template/base.tpl "index.rst" > "index.html"
-
-about.html: about.rst
-	rst2html5 -t --template template/base.tpl "about.rst" > "about.html"
-
 article/%.html: source/%.rst
 	rst2html5 -t --template template/article.tpl $< > $@
+	chmod -w $@
+
+%.html: %.rst
+	rst2html5 -t --template template/base.tpl $< > $@
+	chmod -w $@
 
 clean:
 	find . -iname "*.html" -type f -delete
