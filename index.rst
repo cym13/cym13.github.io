@@ -25,6 +25,10 @@ Recent articles
     decipher. Here we strace the "who" command to explain how to better use
     it.
 
+`Puppy writeup <article/puppy_writeup.html>`_:
+    Quelqu'un sur irc a proposé hier un petit challenge de steganographie. La
+    victime du jour ? Un chiot qui renferme, nous dit-on, des secrets.
+
 `Introduction à l'éditeur de texte ed <article/introduction_ed.html>`_:
     Ed est un éditeur puissant mais terriblement déconcertant au premier
     abord. Cet article présente les commandes essentielles et un peu plus

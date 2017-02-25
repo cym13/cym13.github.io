@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Puppy writeup</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Puppy writeup</h1>
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Quelqu'un sur irc hier a proposé un <a href="http://imgur.com/pb2jkGn">petit challenge de steganographie</a> pas méchant. La victime du jour ? Un chiot qui renferme, nous dit-on, des secrets.</p>
+        <p><strong>puppy.png</strong></p>
+        <img src="../image/puppy.png" />
+    </section>
+    <section id="a-la-recherche-d-un-texte-cache">
+        <h2>À la recherche d'un texte caché</h2>
+        <p>Les deux formes les plus courantes d'information cachées dans une image sont:</p>
+        <ul>
+            <li>Du texte sous forme de commentaire ou autre</li>
+            <li>Une autre image</li>
+        </ul>
+        <p>Commençons par le texte. L'utilitaire <code>strings</code> permet de récupérer les chaines de caractère présentes dans un binaire. La plupart sont le fruit de coïncidences mais s'il y a du texte légitime non chiffré on devrait pouvoir le retrouver.</p>
+        <pre data-language="bash"><span></span>$ strings puppy.png
+
+IHDR
+sRGB
+
+...
+
+<span class="o">)</span>2DE2b
+__MACOSX/UX
+__MACOSX/Secret/UX
+__MACOSX/Secret/._skull.jpgUX
+cg<span class="sb">`</span>b<span class="sb">`</span>
+<span class="m">100</span>.
+20h<span class="p">&amp;</span>
+QRR<span class="sb">`</span>
+L_7?
+KMS<span class="se">\</span>
+Secret/Untitled.rtfUX
+__MACOSX/Secret/._Untitled.rtfUX
+cg<span class="sb">`</span>b<span class="sb">`</span>
+<span class="m">2</span>+0tA
+Secret/UX
+Secret/skull.jpgUX
+__MACOSX/UX
+__MACOSX/Secret/UX
+__MACOSX/Secret/._skull.jpgUX
+Secret/Untitled.rtfUX
+__MACOSX/Secret/._Untitled.rtfUX</pre>
+        <p>Visiblement ça n'a pas été inutile, on voit clairement des chemins de fichiers présents dans l'image, et il semble que celle-ci ai été faite avec un mac. On dirait que tout les chemins finissent par UX... Cela s'expliquera sans doute par la suite. Avant cela, récupéront une liste plus propre:</p>
+        <pre data-language="bash"><span></span>$ strings puppy.png <span class="p">|</span> grep -e Secret -e MACOS
+
+Secret/UX
+Secret/skull.jpgUX
+__MACOSX/UX
+__MACOSX/Secret/UX
+__MACOSX/Secret/._skull.jpgUX
+Secret/Untitled.rtfUX
+__MACOSX/Secret/._Untitled.rtfUX
+Secret/UX
+Secret/skull.jpgUX
+__MACOSX/UX
+__MACOSX/Secret/UX
+__MACOSX/Secret/._skull.jpgUX
+Secret/Untitled.rtfUX
+__MACOSX/Secret/._Untitled.rtfUX</pre>
+    </section>
+    <section id="a-la-recherche-d-un-fichier-cache">
+        <h2>À la recherche d'un fichier caché</h2>
+        <p>Regardons la liste de fichier que l'on a trouvé (moins les <code>UX</code> qui ne semblent pas en faire partie au regard des extensions que l'on identifie).</p>
+        <pre>__MACOSX/
+__MACOSX/
+__MACOSX/Secret/
+__MACOSX/Secret/
+__MACOSX/Secret/._skull.jpg
+__MACOSX/Secret/._skull.jpg
+__MACOSX/Secret/._Untitled.rtf
+__MACOSX/Secret/._Untitled.rtf
+Secret/
+Secret/Untitled.rtf
+Secret/Untitled.rtf
+Secret/skull.jpg</pre>
+        <p>Qu'est-ce qui pourrait motiver le fait d'avoir les différents noms de fichiers et même de dossier ? Qu'est-ce qui a besoin de toute une structure de fichier comme ça ? Peut-être un système de fichier. Ça pourrait être une partition cachée qu'il faudrait extraire et monter... Ou alors une archive, qu'il faudrait extraire et décompresser.</p>
+        <p>Il y a différents moyens de savoir, on se base généralement sur des calculs d'entropie (l'idée étant qu'un fichier compressée va avoir une entropie proche de 8 bits par octet alors que du texte non compressé en aura une plus faible) mais c'est ici inutile. En effet, on voit que l'on cherche un fichier jpg et un fichier rtf.</p>
+        <p>Le <a href="https://en.wikipedia.org/wiki/Rich_Text_Format">format RTF</a> est un format textuel, donc si son contenu n'apparait pas dans strings c'est qu'il est compressé. Ça pourrait être une archive compressée dans un système de fichier, mais dans ce cas le nom de l'archive serait visible parmi les fichiers trouvé et ce n'est pas le cas.</p>
+        <p>On est donc à la recherche d'une archive contenant une image et un texte.</p>
+    </section>
+    <section id="a-la-recherche-de-l-archive-cachee">
+        <h2>À la recherche de l'archive cachée</h2>
+        <p>Nous devons identifier l'archive parmi les informations binaires de l'image et l'en séparer. Le soucis est que l'on ne sait pas où elle se trouve ni de quel type d'archive il s'agit (tar.gz, zip, tar.bz2, ax, xz, 7z...).</p>
+        <p>Mais chaque chose en son temps : commençons par trouver ce fichier. Ici j'ai continué l'analyse en utilisant l'outil de reverse engineering radare2. Cependant j'aimerais montrer qu'il est possible de le faire avec des outils plus communs. En contrepartie ça ne sera pas forcément aussi agréable qu'avec des outils spécifiques.</p>
+        <p>Si l'on reprend le résultat original de <code>strings</code> on voit que le premier nom de fichier était <code>Secret/</code>. Cherchons où il se trouve. <code>strings</code> peut donner les offsets des résultats avec <code>--radix=x</code>.</p>
+        <pre data-language="bash"><span></span>$ strings --radix<span class="o">=</span>x puppy.png <span class="p">|</span> grep Secret/ <span class="p">|</span> head -1
+
+  3d04d Secret/UX</pre>
+        <p>Allons voir ce qui se trouve du côté de l'offset 0x3d04d du coup :</p>
+        <p>On peut utiliser hexdump ou xxd (qui vient avec vim) pour obtenir une représentation mi-hexadécimale, mi-ascii du contenu du fichier. Je vais utiliser xxd ici.</p>
+        <pre data-language="bash"><span></span>$ xxd puppy.png <span class="p">|</span> head
+
+<span class="m">00000000</span>: <span class="m">8950</span> 4e47 0d0a 1a0a <span class="m">0000</span> 000d <span class="m">4948</span> <span class="m">4452</span>  .PNG........IHDR
+<span class="m">00000010</span>: <span class="m">0000</span> <span class="m">0215</span> <span class="m">0000</span> <span class="m">0190</span> <span class="m">0802</span> <span class="m">0000</span> <span class="m">0096</span> <span class="m">1305</span>  ................
+<span class="m">00000020</span>: df00 <span class="m">0000</span> <span class="m">0173</span> <span class="m">5247</span> <span class="m">4200</span> aece 1ce9 <span class="m">0000</span>  .....sRGB.......
+<span class="m">00000030</span>: <span class="m">0009</span> <span class="m">7048</span> <span class="m">5973</span> <span class="m">0000</span> 0b13 <span class="m">0000</span> 0b13 <span class="m">0100</span>  ..pHYs..........
+<span class="m">00000040</span>: 9a9c <span class="m">1800</span> <span class="m">0040</span> <span class="m">0049</span> <span class="m">4441</span> <span class="m">5478</span> 018c bd09  .....@.IDATx....
+<span class="m">00000050</span>: <span class="m">9264</span> 3b92 5de9 <span class="m">5344</span> fe4c <span class="m">9242</span> 11ee ba17  .d<span class="p">;</span>.<span class="o">]</span>.SD.L.B....
+<span class="m">00000060</span>: d04b e8d5 b548 8b90 95ac fae1 639f 7b0f  .K...H......c.<span class="o">{</span>.
+<span class="m">00000070</span>: a00f 661e 3f8b 1a1e <span class="m">3085</span> 8e17 0a3c bcc1  ..f.?...0....&lt;..
+<span class="m">00000080</span>: ccdc 1fff afff fbff 797e 7e7e <span class="m">7878</span> f80c  ........y~~~xx..
+<span class="m">00000090</span>: bdc3 3c3e 3e7e 7d7d 3d7e 7e3d 3d3d d185  ..&lt;&gt;&gt;~<span class="o">}}=</span>~~<span class="o">===</span>..</pre>
+        <p>On veut les lignes autour de notre offset, en sachant que ces derniers sont alignés sur 16 octets (donc finissent par un 0). On veut donc la ligne commençant par l'offset 0003d040.</p>
+        <pre data-language="bash"><span></span><span class="c1"># -B2 et -A2 pour avoir 2 lignes avant et après le résultat</span>
+
+$ xxd puppy.png <span class="p">|</span> grep -B2 -A2 <span class="s2">&quot;3d040:&quot;</span>
+
+0003d020: <span class="m">3040</span> <span class="m">5060</span> <span class="m">7080</span> <span class="m">8887</span> <span class="m">8685</span> <span class="m">8483</span> <span class="m">8281</span> ff50  <span class="m">0</span>@P<span class="sb">`</span>p..........P
+0003d030: 4b03 040a <span class="m">0000</span> <span class="m">0000</span> 00fb 081c <span class="m">4700</span> <span class="m">0000</span>  K...........G...
+0003d040: <span class="m">0000</span> <span class="m">0000</span> <span class="m">0000</span> <span class="m">0000</span> <span class="m">0007</span> <span class="m">0010</span> <span class="m">0053</span> <span class="m">6563</span>  .............Sec
+0003d050: <span class="m">7265</span> 742f <span class="m">5558</span> 0c00 378a df55 3a8a df55  ret/UX..7..U:..U
+0003d060: f501 <span class="m">1400</span> 504b <span class="m">0304</span> <span class="m">1400</span> <span class="m">0800</span> <span class="m">0800</span> 9b92  ....PK..........</pre>
+        <p>Si on a pas un peu l'habitude de regarder des fichiers binaires, on peut passer à côté du caractère assez spécifique de ces quelques lignes. Il est rare en effet de trouver autant d'octets nuls côte à côte au beau milieu d'un fichier, et juste avant une chaîne de caractère ça fait fortement penser à un header. Il semble que l'on ai trouvé un début, mais le début de quoi...</p>
+        <p>La plupart des headers commencent par une séquence bien définie à l'instar du <code>8950 4e47 0d0a -&gt; .PNG..</code> des fichiers PNG que l'on peut voir sur notre première utilisation de xxd. Cela permet de savoir à quel type de fichier on a affaire. Ce numéro d'identification est souvent appelé <strong>Magic Number</strong>.</p>
+        <p>Allons faire un petit tour sur wikipedia pour voir les formats d'archive compressés les plus communs et les nombres magiques correspondant.</p>
+        <p>Pour gzip, rien sur wikipedia, mais le lien vers la <a href="https://tools.ietf.org/html/rfc1952">RFC</a> correspondante nous ammène à trouver que le fichier doit commencer par <code>1f8b</code>. On ne retrouve pas cela dans notre header.</p>
+        <p>Pour le format <a href="https://en.wikipedia.org/wiki/Zip_(file_format)">zip</a> on peut lire :</p>
+        <pre>Most of the signatures end with the short integer 0x4b50, which is stored
+in little-endian ordering. Viewed as an ASCII string this reads "PK", the
+initials of the inventor Phil Katz. Thus, when a .ZIP file is viewed in a
+text editor the first two bytes of the file are usually "PK".</pre>
+        <p>Voilà qui est intéressant ! À l'offset 0x3d02f on voit effectivement PK ! Ce serait donc le début d'une archive zip ? On va la séparer du fichier pour voir.</p>
+    </section>
+    <section id="a-la-recherche-du-fichier-zip">
+        <h2>À la recherche du fichier zip</h2>
+        <p>On sait où le ficher commence mais pas où il termine. On va déjà enlever le début. Pour cela, on va utiliser <code>dd</code>. Cet utilitaire permet de faire des copie binaires. On va lui dire d'écrire la fin du fichier <strong>puppy.png</strong> dans le fichier <strong>out.zip</strong> en sautant 0x3d02f=249903 blocs de 1 octet.</p>
+        <pre data-language="bash"><span></span>$ dd <span class="k">if</span><span class="o">=</span>puppy.png <span class="nv">skip</span><span class="o">=</span><span class="m">249903</span> <span class="nv">bs</span><span class="o">=</span><span class="m">1</span> <span class="nv">of</span><span class="o">=</span>out.zip
+
+<span class="m">154934</span>+0 records in
+<span class="m">154934</span>+0 records out
+<span class="m">154934</span> bytes <span class="o">(</span><span class="m">155</span> kB<span class="o">)</span> copied, <span class="m">0</span>.157568 s, <span class="m">983</span> kB/s
+
+$ file out.zip
+
+out.zip: Zip archive data, at least v1.0 to extract</pre>
+        <p>Testons ?</p>
+        <pre data-language="bash"><span></span>$ unzip out.zip
+
+Archive:  out.zip
+   creating: Secret/
+  inflating: Secret/skull.jpg
+   creating: __MACOSX/
+   creating: __MACOSX/Secret/
+  inflating: __MACOSX/Secret/._skull.jpg
+  inflating: Secret/Untitled.rtf
+  inflating: __MACOSX/Secret/._Untitled.rtf</pre>
+        <p>On dirait que ça a marché :) Si on regarde dans l'archive on trouve bien une image (qui ne contient rien d'autre... à moins que ? :p ) et un fichier rtf:</p>
+        <p><strong>Secret/Untitled.rtf</strong></p>
+        <pre data-language="postscript"><span></span><span class="p">{</span><span class="nf">\rtf1\ansi\ansicpg1252\cocoartf1389</span>
+<span class="p">{</span><span class="nf">\fonttbl\f0\fswiss\fcharset0</span> <span class="nf">Helvetica;</span><span class="p">}</span>
+<span class="p">{</span><span class="nf">\colortbl;\red255\green255\blue255;</span><span class="p">}</span>
+<span class="nf">\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0</span>
+<span class="nf">\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669</span> <span class="nf">\</span>
+<span class="nf">\tx6236\tx6803\pardirnatural\partightenfactor0</span>
+
+<span class="nf">\f0\fs24</span> <span class="nf">\cf0</span> <span class="nf">The</span> <span class="nf">Codeword</span> <span class="nf">is:\</span>
+<span class="nf">\</span>
+<span class="nf">hunter2</span><span class="p">}</span></pre>
+        <p>Et voici le flag ! <strong>hunter2</strong></p>
+        <img width="50%" src="../image/secret_skull.jpg" />
+    </section>
+    <section id="a-la-recherche-de-la-methode-employee">
+        <h2>À la recherche de la méthode employée</h2>
+        <p>Comment est-il possible de mettre une archive ZIP dans un PNG sans endommager ce dernier ? Comme souvent, la solution se trouve sur wikipedia, dans la <a href="https://en.wikipedia.org/wiki/PNG_(file_format)">spécification du format PNG</a></p>
+        <p>On y apprend que ce format est constitué de sections juxtaposées, certaines ayant un sens particulier signalées par un identificateur tel que <code>IHDR</code> ou <code>IDAT</code>, la plupart comportant une partie de l'image à proprement parler. Ces deux headers sont bien visibles dans notre première utilisation de xxd qui montrait le début du fichier <strong>puppy.png</strong>. On y voit notamment <code>IHDR</code> qui débute le header du fichier et <code>IDAT</code> qui correspond au début de la liste de sections de données.</p>
+        <p>Wikipedia nous apprend également que le header PNG ne comporte pas la taille du fichier. Pour savoir où se trouve la fin, le format PNG utilise une section spéciale dont l'identificateur est <code>IEND</code>, tout ce qui est après est ignoré. Où se trouve cette balise ?</p>
+        <pre data-language="bash"><span></span><span class="c1"># -B2 et -A2 pour avoir 2 lignes avant et après le résultat</span>
+
+$ xxd puppy.png <span class="p">|</span> grep -B2 -A2 <span class="s2">&quot;IEND&quot;</span>
+
+0003cff0: <span class="m">4226</span> 8e55 656c 13c5 8e0c <span class="m">6383</span> dc06 49f4  B<span class="p">&amp;</span>.Uel....c...I.
+0003d000: 0d4a 0b89 0c31 e0ff <span class="m">0112</span> a1e6 4b9d 14ec  .J...1......K...
+0003d010: f000 <span class="m">0000</span> <span class="m">0049</span> 454e 44ae <span class="m">4260</span> <span class="m">8200</span> <span class="m">1020</span>  .....IEND.B<span class="sb">`</span>...
+0003d020: <span class="m">3040</span> <span class="m">5060</span> <span class="m">7080</span> <span class="m">8887</span> <span class="m">8685</span> <span class="m">8483</span> <span class="m">8281</span> ff50  <span class="m">0</span>@P<span class="sb">`</span>p..........P
+0003d030: 4b03 040a <span class="m">0000</span> <span class="m">0000</span> 00fb 081c <span class="m">4700</span> <span class="m">0000</span>  K...........G...</pre>
+        <p>On voit qu'il y a environ 20 octets entre le <code>IEND</code> et l'offset 0x3d02f où commence notre fichier ZIP avec <code>PK</code>. Ces octets ne semblent pas avoir de raison d'être ici, c'est sans doute du bruit placé là pour séparer les deux fichiers. On en a la confirmation si on observe attentivement là séquence commençant à 0x3d01d : 0x00, 0x10, 0x20, ... 0x80 puis 0x88, 0x87, 0x86 ... 0x81 et finalement 0xff qui vient finir cette section de bruit. Bien trop peu aléatoire pour être un hasard si vous voulez mon avis !</p>
+        <p>Ainsi ce challenge tire parti du fait que le format PNG ignore tout ce qui se trouve après une balise <code>IEND</code> pour, tout simplement, placer un fichier supplémentaire (en laissant un peu d'espace, sans doute pour faciliter la manipulation).</p>
+        <p>On peut reproduire la manipulation avec un simple cat:</p>
+        <pre data-language="bash"><span></span>$ cat image_normale.png fichier.zip &gt; image_truquée.png</pre>
+    </section>
+    <section id="aurait-on-pu-aller-plus-vite">
+        <h2>Aurait-on pu aller plus vite ?</h2>
+        <p>Oui. Dès que l'on a eu l'idée que le fichier caché puisse être un fichier ZIP nous aurions pu lancer sans plus de civilités :</p>
+        <pre data-language="bash"><span></span>$ unzip puppy.png
+
+Archive:  puppy.png
+warning <span class="o">[</span>puppy.png<span class="o">]</span>:  <span class="m">249903</span> extra bytes at beginning or within zipfile
+  <span class="o">(</span>attempting to process anyway<span class="o">)</span>
+   creating: Secret/
+  inflating: Secret/skull.jpg
+   creating: __MACOSX/
+   creating: __MACOSX/Secret/
+  inflating: __MACOSX/Secret/._skull.jpg
+  inflating: Secret/Untitled.rtf
+  inflating: __MACOSX/Secret/._Untitled.rtf</pre>
+        <p>Comment cela est-il possible ? De la même manière que le format PNG indique son commencement par la séquence d'octets <code>8950 4e47 0d0a</code> soit <code>.PNG..</code> le format ZIP commence par la séquence <code>504b 0304</code>. Dans le cas où cette séquence n'apparaît pas au début du fichier, <code>unzip</code> va la chercher puis ignorer tout ce qui se trouve avant pour essayer de décompresser la suite. Comme (c'est un hasard) cette séquence n'apparait pas dans l'image, lancer unzip sur l'image directement suffit à décompresser les fichiers.</p>
+        <p>Voilà qui conclue cette étude d'un challenge qui sans être particulièrement difficile permet de mettre en évidence des techniques intéressantes.</p>
+    </section>
+    <footer>Generated on: 2017-02-25 00:51 UTC. </footer>
+
+    </div>
+  </body>
+</html>
