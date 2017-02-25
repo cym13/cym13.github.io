@@ -8,6 +8,10 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+`Crypter writeup <article/crypter_writeup.html>`_:
+    "A file was encrypted. You have the encryption software and an encrypted
+    file. Decrypt that file." Detailed writeup using radare2.
+
 `Exploiting Gource <article/exploiting_gource.html>`_:
     Improvised code review of the Gource git repository viewer. It is meant
     as a way to show how one can perform quick and targeted code reviews.
