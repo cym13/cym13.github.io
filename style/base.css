@@ -26,6 +26,12 @@ a {
     font-size: 40px;
 }
 
+.content img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .site-title {
     width: 100%;
     padding: 20px 40px;
