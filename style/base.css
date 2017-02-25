@@ -32,6 +32,13 @@ a {
     margin-right: auto;
 }
 
+.note {
+    border-style: solid;
+    border-color: #ff4422;
+    font-size: 20px;
+    text-align: center;
+}
+
 .site-title {
     width: 100%;
     padding: 20px 40px;
