@@ -397,7 +397,7 @@ So, what should we do?
 ======================
 
 For cryptographic purpose use a cryptographically secure random number
-generator like /dev/random on Linux, the more recent getrandom system call or
+generator like /dev/urandom on Linux, the more recent getrandom system call or
 CryptGenRandom on Windows. Non-cryptographic PRNG like MinstdRand0 here are
 designed to have a good spectral repartition, not to be unpredictable.
 
