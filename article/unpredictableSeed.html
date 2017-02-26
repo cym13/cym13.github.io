@@ -1,0 +1,271 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>How secure is unpredictableSeed?</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>How secure is unpredictableSeed?</h1>
+    <section id="tl-dr">
+        <h2>tl;dr</h2>
+        <ul>
+            <li>D's unpredictableSeed isn't unpredictable enough for cryptographic purpose</li>
+            <li>We'll crack a pseudo-random generator to crack a (fictive) website</li>
+            <li>To know what to do about it, jump at the end</li>
+        </ul>
+    </section>
+    <section id="the-origins-of-the-problem">
+        <h2>The origins of the problem</h2>
+        <p>I like <a href="https://dlang.org/">D</a> very much. It is a great, powerful and safe language. While it may be a tad complex at times it does a good job at providing a language that works, is fast and does not let you screw things up as fast and easily as C.</p>
+        <p>This is why I find myself recommanding to use it (or Rust, or Go, or Python, or Java, anything with at least bound-checking really) for all new projects involving user data.</p>
+        <p>A common class of projects using user data is web programming. We do a lot to protect our users and website informations. Many protections are based on some kind of randomness: generating random passwords, hashing salts, cookie access tokens, mail validation tokens.</p>
+        <p>However D doesn't have a standard Cryptographically Secure Pseudo-Random Number Generator (CSPRNG) yet. A common way within the community to secure the PRNG is to reseed it regularly using an <a href="https://dlang.org/library/std/random/unpredictable_seed.html">unpredictableSeed</a>. Actually I even see many projects re-seeding their PRNG at each use.</p>
+        <p>The problem with constant reseeding is apparent if you imagine that only three possible seeds are possible. Given the following code, how many different tokens can you generate?</p>
+        <pre data-language="java"><span></span><span class="n">uint</span> <span class="nf">mockUnpredictableSeed</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">std.random</span><span class="o">:</span> <span class="n">uniform</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">uniform</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">3</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">auto</span> <span class="nf">newToken</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">auto</span> <span class="n">rnd</span> <span class="o">=</span> <span class="n">Random</span><span class="o">(</span><span class="n">mockUnpredictableSeed</span><span class="o">());</span>
+    <span class="k">return</span> <span class="n">rnd</span><span class="o">.</span><span class="na">front</span><span class="o">;</span>
+<span class="o">}</span></pre>
+        <p>Right, as for each seed the first output value is deterministic only three tokens can be generated. By constantly reseeding you are delegating any random-generation work to the seed generation algorithm. The PRNG you actually use doesn't matter the slightest.</p>
+        <p>But this is no problem in practice right? Surely there is more than three possible seeds. Well it is time to have a real look at how secure those "unpredictable seeds" are.</p>
+    </section>
+    <section id="randomness-evaluation">
+        <h2>Randomness evaluation</h2>
+        <p>I first generated a random sample. Raw bytes are easier to reason about than integers in this case:</p>
+        <pre data-language="java"><span></span><span class="cm">/* gen_stream_1.d */</span>
+<span class="kt">void</span> <span class="nf">main</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="o">:</span> <span class="n">writef</span><span class="o">;</span>
+    <span class="kn">import</span> <span class="nn">std.random</span><span class="o">:</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">uint</span> <span class="n">s</span> <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="n">writef</span><span class="o">(</span><span class="s">&quot;%c&quot;</span><span class="o">,</span> <span class="n">cast</span><span class="o">(</span><span class="kt">char</span><span class="o">)(</span><span class="n">s</span> <span class="o">&gt;&gt;</span> <span class="mf">8.</span><span class="n">i</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></pre>
+        <p>A bit of dd and we had a 20M file to play with:</p>
+        <pre data-language="sh"><span></span>rdmd gen_stream_1.d <span class="p">|</span> dd <span class="nv">bs</span><span class="o">=</span><span class="m">2048</span> <span class="nv">count</span><span class="o">=</span><span class="m">10240</span> <span class="nv">of</span><span class="o">=</span>test_1.raw</pre>
+        <p>The first thing I do when evaluating randomness is plot a graph of the sample. I like <a href="https://codisec.com/veles/">Veles</a> very much for that. It is a tool that allows you to generate digrams and trigrams of data in order to see it under different angles (quite literraly). Any kind of schema would imply a correletation between bytes that are supposed not to have any (that is the most basic definition of random).</p>
+        <p>I won't go into much details about how these representations work because <a href="http://codisec.com/binary-visualization-explained/">they do it better than me</a>, but it is necessary to understand the basics to interpret what is at play.</p>
+        <p>Veles proposes three kinds of representations:</p>
+        <ul>
+            <li>Digrams: Take bytes two by two, plot the point on a orthogonal plane, the first byte being the x coordinate and the other one the y.</li>
+            <li>Trigram: Take bytes three by three, plot the point in space. Different coordinate systems are proposed but we'll stick with the good old orthogonal one.</li>
+            <li>Layered Digram: Chunk your input, for each chunk draw the digram, then superpose all digrams to build a cube.</li>
+        </ul>
+        <p>The layered digram is especially interesting because it combines the simplicity of the digram with a "temporal" approach: if the first half of the file is made of 1 and the second half is made of 0 a digram would just show us two dots while a layered digram would show us two broken lines, one at the start of the file for 1, the other at the end for 0.</p>
+        <p>It's easier with images so let's get to it ;) I used plain screenshots because I found that even the simplest crop was generating unwanted patterns. I advise opening the images in other tabs in order to see for yourself the patterns that may grow from the noise.</p>
+        <section id="digram">
+            <h3>Digram</h3>
+            <p>The digram is fine, exactly what we would expect from such a random distribution: no value or set of value seems less used than another.</p>
+            <img src="../image/test_1_digram.png" />
+        </section>
+        <section id="trigram">
+            <h3>Trigram</h3>
+            <p>The trigram looks also fine at first but with some specific angle we can see a cross dividing the cube's face into four squares... It is very faint, but maybe with another representation...</p>
+            <img src="../image/test_1_trigram.png" />
+        </section>
+        <section id="layered-digram">
+            <h3>Layered digram</h3>
+            <p>Yes, there is definitely a pattern there.</p>
+            <img src="../image/test_1_ldigram_2.png" />
+            <p>And things go even worse when rotating the cube: there is a clear layer that has a different repartition. Both layers look fine independently but such a pattern indicates a real bias in randomness.</p>
+            <img src="../image/test_1_ldigram.png" />
+            <p>So it's not as random as it was expected to be, but by how much?</p>
+        </section>
+    </section>
+    <section id="stepping-through-the-code">
+        <h2>Stepping through the code</h2>
+        <p>unpredictableSeed is defined in std.random:</p>
+        <pre data-language="java"><span></span><span class="cm">/**</span>
+<span class="cm">A &quot;good&quot; seed for initializing random number engines. Initializing</span>
+<span class="cm">with $(D_PARAM unpredictableSeed) makes engines generate different</span>
+<span class="cm">random number sequences every run.</span>
+
+<span class="cm">Returns:</span>
+<span class="cm">A single unsigned integer seed value, different on each successive call</span>
+<span class="cm">*/</span>
+<span class="nd">@property</span> <span class="n">uint</span> <span class="nf">unpredictableSeed</span><span class="o">()</span> <span class="nd">@trusted</span>
+<span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">core.thread</span> <span class="o">:</span> <span class="n">Thread</span><span class="o">,</span> <span class="n">getpid</span><span class="o">,</span> <span class="n">MonoTime</span><span class="o">;</span>
+    <span class="kd">static</span> <span class="n">bool</span> <span class="n">seeded</span><span class="o">;</span>
+    <span class="kd">static</span> <span class="n">MinstdRand0</span> <span class="n">rand</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">seeded</span><span class="o">)</span>
+    <span class="o">{</span>
+        <span class="n">uint</span> <span class="n">threadID</span> <span class="o">=</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="n">cast</span><span class="o">(</span><span class="kt">void</span><span class="o">*)</span> <span class="n">Thread</span><span class="o">.</span><span class="na">getThis</span><span class="o">();</span>
+        <span class="n">rand</span><span class="o">.</span><span class="na">seed</span><span class="o">((</span><span class="n">getpid</span><span class="o">()+</span><span class="n">threadID</span><span class="o">)</span> <span class="o">^</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span><span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">);</span>
+        <span class="n">seeded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">rand</span><span class="o">.</span><span class="na">popFront</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="o">(</span><span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span> <span class="o">^</span> <span class="n">rand</span><span class="o">.</span><span class="na">front</span><span class="o">);</span>
+<span class="o">}</span></pre>
+        <p>As we can see it embeds the Minimal Standard RNG (MinstdRand0) seeded it with the time and other process-specific values. Each unpredictableSeed is just a random number from this PRNG xored with the current time.</p>
+        <p>For general purpose it is fine. But used directly for cryptographic purposes it is catastrophic because it is entirely predictable: any value is just the previous one times 16807 modulo 2147483647.</p>
+        <aside class="note">In other word if the attacker is able to find one output of the PRNG any further output is just a multiplication away.</aside>
+        <p>Still, it can't be that bad right? After all we are not presenting the raw output of the PRNG, we xor it with the current time and pass it through another PRNG before presenting it to the user right?</p>
+        <p>We'll deal with each of these issues in a moment, but first let's illustrate more litterally the relation between MinstdRand0 and unpredictableSeed using the same visualizations as before on a raw MinstdRand0 PRNG:</p>
+        <pre data-language="java"><span></span><span class="nd">@property</span> <span class="n">uint</span> <span class="nf">rand</span><span class="o">()</span> <span class="nd">@trusted</span>
+<span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">std.random</span><span class="o">:</span> <span class="n">MinstdRand0</span><span class="o">;</span>
+    <span class="kn">import</span> <span class="nn">core.thread</span> <span class="o">:</span> <span class="n">Thread</span><span class="o">,</span> <span class="n">getpid</span><span class="o">,</span> <span class="n">MonoTime</span><span class="o">;</span>
+    <span class="kd">static</span> <span class="n">bool</span> <span class="n">seeded</span><span class="o">;</span>
+    <span class="kd">static</span> <span class="n">MinstdRand0</span> <span class="n">rand</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">seeded</span><span class="o">)</span>
+    <span class="o">{</span>
+        <span class="n">uint</span> <span class="n">threadID</span> <span class="o">=</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="n">cast</span><span class="o">(</span><span class="kt">void</span><span class="o">*)</span> <span class="n">Thread</span><span class="o">.</span><span class="na">getThis</span><span class="o">();</span>
+        <span class="n">rand</span><span class="o">.</span><span class="na">seed</span><span class="o">((</span><span class="n">getpid</span><span class="o">()+</span><span class="n">threadID</span><span class="o">)</span> <span class="o">^</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span><span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">);</span>
+        <span class="n">seeded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">rand</span><span class="o">.</span><span class="na">popFront</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="n">rand</span><span class="o">.</span><span class="na">front</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="o">:</span> <span class="n">writef</span><span class="o">;</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">uint</span> <span class="n">s</span> <span class="o">=</span> <span class="n">rand</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span> <span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span> <span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="n">writef</span><span class="o">(</span><span class="s">&quot;%c&quot;</span><span class="o">,</span> <span class="n">cast</span><span class="o">(</span><span class="kt">char</span><span class="o">)(</span><span class="n">s</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="o">*</span><span class="n">i</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></pre>
+        <section id="id1">
+            <h3>Digram</h3>
+            <p>The bias is clearly visible here.</p>
+            <img src="../image/test_2_digram.png" />
+        </section>
+        <section id="id2">
+            <h3>Trigram</h3>
+            <p>The cross is easier to see.</p>
+            <img src="../image/test_2_trigram.png" />
+        </section>
+        <section id="id3">
+            <h3>Layered digram</h3>
+            <p>And of course the result is also visible on the layered diagram.</p>
+            <img src="../image/test_2_ldigram.png" />
+            <p>However the sample doesn't exhibit the same temporal layers as before. What we get from that is that when it comes to spectral repartition alone xoring the current time does provide some entropy (the crosses are almost blurred away). But it also added another strong temporal bias that we saw on the first layered diagram.</p>
+        </section>
+    </section>
+    <section id="breaking-the-prng-obfuscation">
+        <h2>Breaking the PRNG obfuscation</h2>
+        <p>The first problem we'll tackle is that of the second PRNG that makes it impossible to know the raw output of unpredictableSeed. As unpredictableSeed is just an uint we have 2³² possibilities. On a modern computer it is a matter of minutes to try all possibilities to find which seed gave us which random number. The following code finds it in the brutest possible way:</p>
+        <pre data-language="java"><span></span><span class="kn">import</span> <span class="nn">std.stdio</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">std.random</span><span class="o">;</span>
+
+<span class="n">auto</span> <span class="nf">copyState</span><span class="o">(</span><span class="n">uint</span> <span class="n">origin</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">uint</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="o">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">origin</span> <span class="o">==</span> <span class="n">Random</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">front</span><span class="o">)</span>
+            <span class="k">return</span> <span class="n">origin</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">string</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">auto</span> <span class="n">seed</span>    <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+    <span class="n">auto</span> <span class="n">jackpot</span> <span class="o">=</span> <span class="n">Random</span><span class="o">(</span><span class="n">unpredictableSeed</span><span class="o">).</span><span class="na">front</span><span class="o">;</span>
+
+    <span class="n">auto</span> <span class="n">found</span> <span class="o">=</span> <span class="n">jackpot</span><span class="o">.</span><span class="na">copyState</span><span class="o">;</span>
+    <span class="k">assert</span><span class="o">(</span><span class="n">found</span> <span class="o">==</span> <span class="n">seed</span><span class="o">);</span>
+<span class="o">}</span></pre>
+        <p>Done, and independently of the actual PRNG used.</p>
+    </section>
+    <section id="breaking-time">
+        <h2>Breaking time</h2>
+        <p>So we are able to get the unpredictableSeed, but how do we go from there to the actual state of MinstdRand0?</p>
+        <p>Well, there's nothing more predictable than the flow of time so we'll just bruteforce it.</p>
+        <p>Let's imagine that we have a website that allows you to recover your password by sending you a token by email.</p>
+        <pre data-language="java"><span></span><span class="kd">class</span> <span class="nc">Website</span> <span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">std.random</span><span class="o">:</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+
+    <span class="n">ulong</span> <span class="n">tries</span><span class="o">;</span>
+    <span class="n">uint</span>  <span class="n">privateToken</span><span class="o">;</span>
+
+    <span class="k">this</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">getPublicToken</span><span class="o">;</span> <span class="c1">// Seed unpredictableSeed</span>
+    <span class="o">}</span>
+
+    <span class="n">auto</span> <span class="nf">check</span><span class="o">(</span><span class="n">uint</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">tries</span><span class="o">++;</span>
+        <span class="k">return</span> <span class="n">privateToken</span> <span class="o">==</span> <span class="n">token</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="n">auto</span> <span class="nf">getPublicToken</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kt">void</span> <span class="nf">setPrivateToken</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">privateToken</span> <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></pre>
+        <p>Here we recover exactly one token for ourselves before asking for the token of another account that we never get of course. But we can try any number of tokens until we find it and get access to the account.</p>
+        <p>We know that the time used to generate the unpredictableSeed is somewhere between the time of the first call and the result of the second. We just have to try any time inbetween and see where that leads us by trying any time after that for the second token.</p>
+        <p>The following code demonstrates roughly the idea.</p>
+        <pre data-language="java"><span></span><span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">string</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kn">import</span> <span class="nn">core.time</span><span class="o">;</span>
+    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="o">;</span>
+    <span class="kn">import</span> <span class="nn">std.random</span><span class="o">:</span> <span class="n">MinstdRand0</span><span class="o">;</span>
+
+    <span class="n">auto</span> <span class="n">ws</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Website</span><span class="o">();</span>
+
+    <span class="n">auto</span> <span class="n">before</span>    <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>
+    <span class="n">auto</span> <span class="n">token</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="na">getPublicToken</span><span class="o">;</span>
+    <span class="n">auto</span> <span class="n">inbetween</span> <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>
+    <span class="n">ws</span><span class="o">.</span><span class="na">setPrivateToken</span><span class="o">;</span>
+    <span class="n">auto</span> <span class="n">after</span>     <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>
+
+    <span class="n">foreach</span><span class="o">(</span><span class="n">baseTime</span> <span class="o">;</span> <span class="n">before</span> <span class="o">..</span> <span class="n">inbetween</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">uint</span> <span class="n">originalSeed</span> <span class="o">=</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="o">(</span><span class="n">baseTime</span> <span class="o">^</span> <span class="n">token</span><span class="o">);</span>
+        <span class="n">auto</span> <span class="n">rnd</span> <span class="o">=</span> <span class="n">MinstdRand0</span><span class="o">(</span><span class="n">originalSeed</span><span class="o">);</span>
+
+        <span class="n">foreach</span> <span class="o">(</span><span class="n">nextTime</span> <span class="o">;</span> <span class="n">inbetween</span> <span class="o">..</span> <span class="n">after</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">uint</span> <span class="n">expectedOutput</span> <span class="o">=</span> <span class="n">cast</span><span class="o">(</span><span class="n">uint</span><span class="o">)</span> <span class="o">(</span><span class="n">rnd</span><span class="o">.</span><span class="na">front</span> <span class="o">^</span> <span class="n">nextTime</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">ws</span><span class="o">.</span><span class="na">check</span><span class="o">(</span><span class="n">expectedOutput</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">writeln</span><span class="o">(</span><span class="s">&quot;Got it! &quot;</span><span class="o">,</span> <span class="n">expectedOutput</span><span class="o">,</span>
+                        <span class="s">&quot; in &quot;</span><span class="o">,</span> <span class="n">ws</span><span class="o">.</span><span class="na">tries</span><span class="o">,</span> <span class="s">&quot; tries&quot;</span><span class="o">);</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="n">writeln</span><span class="o">(</span><span class="s">&quot;Missed it...&quot;</span><span class="o">);</span>
+<span class="o">}</span></pre>
+        <p>There we go. On my computer I generally get the right token after something like 30000 tries. It is a lot but not so much that it can't be done in practice, especially since things like password recovery services generally don't have any kind of limit.</p>
+        <p>Of course this isn't real life. In real life we get delay, we don't get the exact output, we need to deal with the other PRNG that I conveniently left out there as we already showed that it only adds time without adding complexity.</p>
+        <p>But I hope this shows that it is a very dangerous thing to let your system's security relie on such a mecanism. We are not talking about google cracking SHA-1 with his supercomputers, but of cracking any account with only a few hundred thousand requests. If the user of the account or a timeout mecanism doesn't invalidate the token this attack can even be spread along a week or so, making only a few thousand requests at a time.</p>
+    </section>
+    <section id="so-what-should-we-do">
+        <h2>So, what should we do?</h2>
+        <p><strong>For cryptographic purpose use a cryptographically secure random number generator like /dev/random on Linux, the more recent getrandom system call or CryptGenRandom on Windows</strong>. Non-cryptographic PRNG like MinstdRand0 here are designed to have a good spectral repartition, not to be unpredictable.</p>
+        <p>What is a cryptographic purpose? It's actually easy: <strong>any random number that is used as a secret has a cryptographic purpose</strong>.</p>
+        <p>Also as we showed reseeding at each call is only making your actual random number generator useless. A good rule of thumb is that if you want to generate <em>n</em> values you need a PRNG with a period of at least <em>n²</em>. This also means that <strong>if you have a PRNG with a period of *n²* you need to reseed it about every *n* values</strong> to perpetuate its randomness properties.</p>
+        <p>I hope this helps push things in the good direction in the future.</p>
+    </section>
+    <footer>Generated on: 2017-02-26 17:48 UTC. </footer>
+
+    </div>
+  </body>
+</html>
