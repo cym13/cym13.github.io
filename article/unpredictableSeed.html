@@ -254,17 +254,17 @@
     <span class="n">writeln</span><span class="o">(</span><span class="s">&quot;Missed it...&quot;</span><span class="o">);</span>
 <span class="o">}</span></pre>
         <p>There we go. On my computer I generally get the right token after something like 30000 tries. It is a lot but not so much that it can't be done in practice, especially since things like password recovery services generally don't have any kind of limit.</p>
-        <p>Of course this isn't real life. In real life we get delay, we don't get the exact output, we need to deal with the other PRNG that I conveniently left out there as we already showed that it only adds time without adding complexity.</p>
+        <p>Of course this isn't real life. In real life we get delay, we don't get the exact output, we need to deal with the other PRNG that I conveniently left out there as we already showed that it only adds time without adding complexity. Also we measured ticks and not all computers tick the same way. And ticks represent uptime, not actual time, so we'd have to find that out to go from one to the other. There are lots of mitigation in real life.</p>
         <p>But I hope this shows that it is a very dangerous thing to let your system's security relie on such a mecanism. We are not talking about google cracking SHA-1 with his supercomputers, but of cracking any account with only a few hundred thousand requests. If the user of the account or a timeout mecanism doesn't invalidate the token this attack can even be spread along a week or so, making only a few thousand requests at a time.</p>
     </section>
     <section id="so-what-should-we-do">
         <h2>So, what should we do?</h2>
-        <p><strong>For cryptographic purpose use a cryptographically secure random number generator like /dev/random on Linux, the more recent getrandom system call or CryptGenRandom on Windows</strong>. Non-cryptographic PRNG like MinstdRand0 here are designed to have a good spectral repartition, not to be unpredictable.</p>
-        <p>What is a cryptographic purpose? It's actually easy: <strong>any random number that is used as a secret has a cryptographic purpose</strong>.</p>
-        <p>Also as we showed reseeding at each call is only making your actual random number generator useless. A good rule of thumb is that if you want to generate <em>n</em> values you need a PRNG with a period of at least <em>n²</em>. This also means that <strong>if you have a PRNG with a period of n² you need to reseed it about every n values</strong> to perpetuate its randomness properties.</p>
+        <p>For cryptographic purpose use a cryptographically secure random number generator like /dev/random on Linux, the more recent getrandom system call or CryptGenRandom on Windows. Non-cryptographic PRNG like MinstdRand0 here are designed to have a good spectral repartition, not to be unpredictable.</p>
+        <p>What is a cryptographic purpose? It's actually easy: any random number that is used as a secret has a cryptographic purpose.</p>
+        <p>Also as we showed reseeding at each call is only making your actual random number generator useless. A good rule of thumb is that if you want to generate <em>n</em> values you need a PRNG with a period of at least <em>n²</em>. This also means that if you have a PRNG with a period of <em>n²</em> you need to reseed it about every <em>n</em> values to perpetuate its randomness properties.</p>
         <p>I hope this helps push things in the good direction in the future.</p>
     </section>
-    <footer>Generated on: 2017-02-26 17:54 UTC. </footer>
+    <footer>Generated on: 2017-02-26 18:11 UTC. </footer>
 
     </div>
   </body>

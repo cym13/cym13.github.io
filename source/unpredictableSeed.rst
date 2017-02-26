@@ -382,7 +382,9 @@ don't have any kind of limit.
 Of course this isn't real life. In real life we get delay, we don't get the
 exact output, we need to deal with the other PRNG that I conveniently left
 out there as we already showed that it only adds time without adding
-complexity.
+complexity. Also we measured ticks and not all computers tick the same way.
+And ticks represent uptime, not actual time, so we'd have to find that out to
+go from one to the other. There are lots of mitigation in real life.
 
 But I hope this shows that it is a very dangerous thing to let your system's
 security relie on such a mecanism. We are not talking about google cracking
@@ -394,18 +396,18 @@ so, making only a few thousand requests at a time.
 So, what should we do?
 ======================
 
-**For cryptographic purpose use a cryptographically secure random number
+For cryptographic purpose use a cryptographically secure random number
 generator like /dev/random on Linux, the more recent getrandom system call or
-CryptGenRandom on Windows**. Non-cryptographic PRNG like MinstdRand0 here are
+CryptGenRandom on Windows. Non-cryptographic PRNG like MinstdRand0 here are
 designed to have a good spectral repartition, not to be unpredictable.
 
-What is a cryptographic purpose? It's actually easy: **any random number that
-is used as a secret has a cryptographic purpose**.
+What is a cryptographic purpose? It's actually easy: any random number that
+is used as a secret has a cryptographic purpose.
 
 Also as we showed reseeding at each call is only making your actual random
 number generator useless. A good rule of thumb is that if you want to
 generate *n* values you need a PRNG with a period of at least *n²*. This also
-means that **if you have a PRNG with a period of  n²  you need to reseed it
-about every n values** to perpetuate its randomness properties.
+means that if you have a PRNG with a period of *n²* you need to reseed it
+about every *n* values to perpetuate its randomness properties.
 
 I hope this helps push things in the good direction in the future.
