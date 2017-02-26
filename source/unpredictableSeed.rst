@@ -405,7 +405,7 @@ is used as a secret has a cryptographic purpose**.
 Also as we showed reseeding at each call is only making your actual random
 number generator useless. A good rule of thumb is that if you want to
 generate *n* values you need a PRNG with a period of at least *n²*. This also
-means that **if you have a PRNG with a period of *n²* you need to reseed it
-about every *n* values** to perpetuate its randomness properties.
+means that **if you have a PRNG with a period of  n²  you need to reseed it
+about every n values** to perpetuate its randomness properties.
 
 I hope this helps push things in the good direction in the future.
