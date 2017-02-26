@@ -24,10 +24,10 @@ Recent articles
     Une explication détaillée d'exploitation de programme SUID root via une
     TOCTTOU pour obtenir une élévation de privilège.
 
-`Strace output explained <article/strace_who.html>`_:
-    Strace is a powerful tool but its output can be quite difficult to
-    decipher. Here we strace the "who" command to explain how to better use
-    it.
+`Comment who fonctionne-t-il ? <article/strace_who.html>`_:
+    Strace est un outil puissant mais qui peut être difficile à manipuler.
+    Nous voyons donc un cas concret en étudiant le fonctionnement de la
+    commande "who".
 
 `Puppy writeup <article/puppy_writeup.html>`_:
     Quelqu'un sur irc a proposé hier un petit challenge de steganographie. La
@@ -41,3 +41,4 @@ Recent articles
 `Shell streams and redirections <article/shell_streams_and_redirections.html>`_:
     Shell streams are the most powerful feature of bash. Knowing about
     redirections is a capital step toward an efficient use of command-line.
+

@@ -153,7 +153,7 @@ exit_group<span class="o">(</span><span class="m">0</span><span class="o">)</spa
         <p>La partie véritablement intéressante arrive à peine quelques lignes avant la fin:</p>
         <pre data-language="C"><span></span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="n">Hello</span> <span class="n">World</span><span class="o">!</span>
 <span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span></pre>
-        <p>Voilà. On a écrit "Hello World!n" sur la sortie standard. Tout ça pour ça. Les lignes suivantes ne servent qu'à remballer. La raison pour laquelle cette ligne semble cassée c'est qu'en fait les deux sorties (standard et erreur) sont mélangées, mais on a bien deux lignes différentes en fait:</p>
+        <p>Voilà. On a écrit "Hello World!\n" sur la sortie standard. Tout ça pour ça. Les lignes suivantes ne servent qu'à remballer. La raison pour laquelle cette ligne semble cassée c'est qu'en fait les deux sorties (standard et erreur) sont mélangées, mais on a bien deux lignes différentes en fait:</p>
         <pre data-language="C"><span></span><span class="cp"># stderr</span>
 <span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span>
 
@@ -250,7 +250,7 @@ DESCRIPTION
             <p>Voilà, je pense que ça ira pour cette fois. On a pu voir que <strong>strace</strong> même utilisé naïvement sans options aucunes peut être utilisé pour comprendre comment les choses marchent et on en a profité pour apprendre les principes fondamentaux derrière <strong>who</strong>. Strace est un outil très puissant qui a beaucoup de possibilités, n'hésitez pas à en manger !</p>
         </section>
     </section>
-    <footer>Generated on: 2017-02-25 00:36 UTC. </footer>
+    <footer>Generated on: 2017-02-26 10:00 UTC. </footer>
 
     </div>
   </body>

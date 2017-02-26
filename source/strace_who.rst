@@ -226,7 +226,7 @@ fin:
     write(1, "Hello World!\n", 13Hello World!
     )          = 13
 
-Voilà. On a écrit "Hello World!\n" sur la sortie standard. Tout ça pour ça.
+Voilà. On a écrit "Hello World!\\n" sur la sortie standard. Tout ça pour ça.
 Les lignes suivantes ne servent qu'à remballer. La raison pour laquelle cette
 ligne semble cassée c'est qu'en fait les deux sorties (standard et erreur)
 sont mélangées, mais on a bien deux lignes différentes en fait:
