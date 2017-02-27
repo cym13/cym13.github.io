@@ -180,7 +180,7 @@
 <span class="n">auto</span> <span class="nf">copyState</span><span class="o">(</span><span class="n">uint</span> <span class="n">origin</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">for</span> <span class="o">(</span><span class="n">uint</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="o">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">origin</span> <span class="o">==</span> <span class="n">Random</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">front</span><span class="o">)</span>
-            <span class="k">return</span> <span class="n">origin</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">i</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
 <span class="o">}</span>
@@ -264,7 +264,7 @@
         <p>Also as we showed reseeding at each call is only making your actual random number generator useless. A good rule of thumb is that if you want to generate <em>n</em> values you need a PRNG with a period of at least <em>n²</em>. This also means that if you have a PRNG with a period of <em>n²</em> you need to reseed it about every <em>n</em> values to perpetuate its randomness properties.</p>
         <p>I hope this helps push things in the good direction in the future.</p>
     </section>
-    <footer>Generated on: 2017-02-26 19:01 UTC. </footer>
+    <footer>Generated on: 2017-02-27 06:16 UTC. </footer>
 
     </div>
   </body>

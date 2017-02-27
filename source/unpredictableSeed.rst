@@ -279,7 +279,7 @@ random number. The following code finds it in the brutest possible way:
     auto copyState(uint origin) {
         for (uint i=1; i>0; i++) {
             if (origin == Random(i).front)
-                return origin;
+                return i;
         }
         return 0;
     }
