@@ -4,12 +4,12 @@
  <title>Breakpoint</title>
  <description>Stepping through security</description>
  <link></link>
- <lastBuildDate>Tue, 28 Feb 2017 00:43:41 +0100</lastBuildDate>
- <pubDate>Tue, 28 Feb 2017 00:43:41 +0100</pubDate>
+ <lastBuildDate>Sat, 04 Mar 2017 21:02:35 +0100</lastBuildDate>
+ <pubDate>Sat, 04 Mar 2017 21:02:35 +0100</pubDate>
  <ttl>7200</ttl>
  <item>
    <title>How secure is unpredictableSeed?</title>
-   <description>D's unpredictableSeed is sometimes used to paliate to the lack of a CSPRNG in the standard library. But how secure is that really?</description>
+   <description>D's unpredictableSeed is sometimes used to compensate for the lack of a CSPRNG in the standard library. But how secure is that really?</description>
    <link>https://cym13.github.io/article/unpredictableSeed.html</link>
    <pubDate>Mon, 27 Feb 2017 07:16:36 +0100</pubDate>
  </item>

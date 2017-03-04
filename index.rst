@@ -12,7 +12,7 @@ February 2017
 -------------
 
 `How secure is unpredictableSeed? <article/unpredictableSeed.html>`_
-    D's unpredictableSeed is sometimes used to paliate to the lack of a
+    D's unpredictableSeed is sometimes used to compensate for the lack of a
     CSPRNG in the standard library. But how secure is that really?
 
 ________________________________________________________________________________
