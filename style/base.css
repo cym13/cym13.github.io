@@ -30,6 +30,11 @@ li {
     font-size: 40px;
 }
 
+.content h2 {
+    margin-top: 50px;
+    font-size: 30px;
+}
+
 .content img {
     display: block;
     margin-left: auto;
