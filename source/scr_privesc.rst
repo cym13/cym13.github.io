@@ -183,9 +183,14 @@ ambiguity... or is there? Let's decompose the reasoning of Windows to find
 what to execute:
 
 1) There is a space after Super, it must be the name of the program
-2) Does C:\Super.exe exist? Nope.
+2) Does C:\\Super.exe exist? Nope.
 3) Then it must be a folder. Does "Super Calc" exist?
-4) Yes, execute "C:\Super Calc\calc++.exe".
+4) Yes, execute "C:\\Super Calc\\calc++.exe".
+
+This means that if an attacker has the right to create a file in C: he can
+create the file "C:\\Super.exe" and this file will be executed instead of
+"C:\\Super Calc\\calc++.exe" by the script. If the script isn't run with the
+same privileges as the attacker it is a privilege escalation.
 
 This unquoted path vulnerability is a great example of what can go wrong when
 relying on smart systems.

@@ -112,10 +112,11 @@ C<span class="p">:</span><span class="nl">\Super</span><span class="c1"> Calc\ca
         <p>Straight and forward, this executes the program with a full path to avoid any ambiguity... or is there? Let's decompose the reasoning of Windows to find what to execute:</p>
         <ol suffix=")" type="1">
             <li>There is a space after Super, it must be the name of the program</li>
-            <li>Does C:Super.exe exist? Nope.</li>
+            <li>Does C:\Super.exe exist? Nope.</li>
             <li>Then it must be a folder. Does "Super Calc" exist?</li>
-            <li>Yes, execute "C:Super Calccalc++.exe".</li>
+            <li>Yes, execute "C:\Super Calc\calc++.exe".</li>
         </ol>
+        <p>This means that if an attacker has the right to create a file in C: he can create the file "C:\Super.exe" and this file will be executed instead of "C:\Super Calc\calc++.exe" by the script. If the script isn't run with the same privileges as the attacker it is a privilege escalation.</p>
         <p>This unquoted path vulnerability is a great example of what can go wrong when relying on smart systems.</p>
         <pre>Keywords: path import loadlibrary filename dll so</pre>
     </section>
@@ -157,7 +158,7 @@ C<span class="p">:</span><span class="nl">\Super</span><span class="c1"> Calc\ca
             </ul>
         </section>
     </section>
-    <footer>Generated on: 2017-03-22 00:10 UTC. </footer>
+    <footer>Generated on: 2017-03-22 16:46 UTC. </footer>
 
     </div>
   </body>

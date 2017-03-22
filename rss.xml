@@ -4,14 +4,14 @@
  <title>Breakpoint</title>
  <description>Stepping through security</description>
  <link></link>
- <lastBuildDate>Wed, 22 Mar 2017 01:12:36 +0100</lastBuildDate>
- <pubDate>Wed, 22 Mar 2017 01:12:36 +0100</pubDate>
+ <lastBuildDate>Wed, 22 Mar 2017 17:46:45 +0100</lastBuildDate>
+ <pubDate>Wed, 22 Mar 2017 17:46:45 +0100</pubDate>
  <ttl>7200</ttl>
  <item>
    <title>Privilege Escalations</title>
    <description>How to identify flawed resource management leading to privilege escalation. Part of the Fast Security Source Code Review series.</description>
    <link>https://cym13.github.io/article/scr_privesc.html</link>
-   <pubDate>Wed, 22 Mar 2017 01:04:12 +0100</pubDate>
+   <pubDate>Wed, 22 Mar 2017 17:46:41 +0100</pubDate>
  </item>
  <item>
    <title>Fast Security Source Code Review</title>
