@@ -141,7 +141,7 @@ time frame as he only needs to win the race once.
 
 The solution would be to:
 
-1) open the file
+1) open both files
 2) check that none is a link
 3) read/write the files
 
@@ -243,5 +243,3 @@ Image sources
 
 - `http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)
   <http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)>`_
-
-- http://engagementrings.hairbumpsrelief.com/rainbow-dash-message-ringtone/
