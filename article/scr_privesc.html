@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Privilege escalations</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Privilege escalations</h1>
+    <p>This post is part of the <a href="source_code_review.html">Source Code Review</a> series.</p>
+    <hr />
+    <p>Privilege escalations lie in the mist of process permissions.</p>
+    <p>The idea of a privilege escalation is to gain more rights than you have by getting a privileged process to some execute code on your behalf. This can be done legitimately as with sudo on GNU/Linux systems. It can also be done by finding a password in a log file. But those aren't worth an article. Let's talk about when it's done unknowingly of the privileged process by exploiting some flashy bug.</p>
+    <p>We will concentrate on one type of privilege escalation that involves no memory corruption (although it is interesting to note that what is done with such corruption is very similar but with memory addresses instead of files).</p>
+    <img width="60%" src="../image/rainbowdash_and_scootaloo_flying.png" />
+    <section id="missing-verification">
+        <h2>Missing verification</h2>
+        <p>The easiest case is when there is no verification at all:</p>
+        <pre data-language="python"><span></span><span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list&quot;</span>
+<span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list.bkp&quot;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></pre>
+        <p>Let's assume that this code is ran as a high-privileged process as a scheduled job and that the files always exist. We will also suppose for simplification that the rights over <em>/tmp/mytmp</em> allow any user to delete or create any file in that directory, but the two files can't be read or modified by anybody but the privileged process.</p>
+        <p>Any user could remove the files and replace them by symbolic links to other files. Doing so the attacker would get at the same time an arbitrary read of any file by copying them elsewhere, or an arbitrary write which he could use to overwrite the content of sudo for example.</p>
+        <pre>Keywords: open write read chmod rename chdir</pre>
+    </section>
+    <section id="race-condition">
+        <h2>Race condition</h2>
+        <p>It is not always as clear as in the previous snippet. It can happen as a race condition:</p>
+        <pre data-language="python"><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo &#39;Harmless script&#39;&quot;</span><span class="p">)</span>
+
+<span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></pre>
+        <p>When programming, we tend to see our code as one continuous flow of execution. That's not the case: the OS can stop our program at any time to execute someone else's code. Here one could swap the file by another between the moment when the file is written and the call to Popen.</p>
+    </section>
+    <section id="failed-exception">
+        <h2>Failed exception</h2>
+        <p>Another case is the bogus exception:</p>
+        <pre data-language="python"><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo &#39;Harmless script&#39;&quot;</span><span class="p">)</span>
+
+<span class="k">except</span><span class="p">:</span> <span class="c1"># TODO: handle error</span>
+    <span class="k">pass</span>
+
+<span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></pre>
+        <p>This makes the problem way easier for an attacker: just create a file <em>/tmp/mytmp/tmp.sh</em> that has no execution rights. The call to <strong>open</strong> will raise an exception, the <strong>write</strong> will never be executed and the program will gracefully continue its execution.</p>
+        <p>Any time an error is ignored it is important to understand what is really ignored and what it could mean to an attacker.</p>
+        <pre>Keywords: catch(Exception) except:  "return true;"</pre>
+    </section>
+    <section id="time-of-check-to-time-of-use">
+        <h2>Time Of Check To Time Of Use</h2>
+        <p>TOCTTOUs are a special case of race condition. They happen when a program first checks a property and then uses a resource on the assumption of the first property.</p>
+        <pre data-language="python"><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list&quot;</span>
+<span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list.bkp&quot;</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">destination</span><span class="p">):</span>
+    <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></pre>
+        <p>The code looks fine at first: by checking that the argument is a real file and not some link we avoid the risk of the user maliciously putting a symbolic link to change the actual file used. However, with a closer look it is vulnerable to a TOCTTOU.</p>
+        <p>As the check happens before the file is opened it is possible for an attacker to swap the file for a malicious link between the call to <strong>islink</strong> and the call to <strong>open</strong>.</p>
+        <p>Of course the time frame is narrow but privilege escalations have a huge advantage over remote exploits: the attacker already has a foot on the system. He can try as long as he wants before finally getting into the time frame as he only needs to win the race once.</p>
+        <img width="40%" src="../image/rainbowdash-running.png" />
+        <p>The solution would be to:</p>
+        <ol suffix=")" type="1">
+            <li>open the file</li>
+            <li>check that none is a link</li>
+            <li>read/write the files</li>
+        </ol>
+        <pre>Keywords: isfile islink exists stat symlink</pre>
+    </section>
+    <section id="unsafe-paths">
+        <h2>Unsafe paths</h2>
+        <p>When executing a file, if a path isn't explicitly given, it is inferred from a list of directories containing common executables: the PATH.</p>
+        <p>When calling <strong>ls</strong> which is used? What program is really being used? What if another executable with the same name was created in another directory of the PATH?</p>
+        <p>While this doesn't happen much with common PATHs because creating files in the first PATH directories generally needs many privileges, it is quite common to have similar flaws with programs that rely on deduction for paths or use custom PATH variables.</p>
+        <p>This can also touch libraries of course, it doesn't have to be an executable. In python importing a file is done by executing it. On windows LoadLibrary loads a DLL, but if only the name is given then it starts its search in the executable directory (which may very well be the web download directory).</p>
+        <p>There is also a special case for Windows unquoted paths. Let's imagine a batch script with the following content:</p>
+        <pre data-language="batch"><span></span><span class="p">@</span><span class="k">echo</span> off
+C<span class="p">:</span><span class="nl">\Super</span><span class="c1"> Calc\calc++.exe</span></pre>
+        <p>Straight and forward, this executes the program with a full path to avoid any ambiguity... or is there? Let's decompose the reasoning of Windows to find what to execute:</p>
+        <ol suffix=")" type="1">
+            <li>There is a space after Super, it must be the name of the program</li>
+            <li>Does C:Super.exe exist? Nope.</li>
+            <li>Then it must be a folder. Does "Super Calc" exist?</li>
+            <li>Yes, execute "C:Super Calccalc++.exe".</li>
+        </ol>
+        <p>This unquoted path vulnerability is a great example of what can go wrong when relying on smart systems.</p>
+        <pre>Keywords: path import loadlibrary filename dll so</pre>
+    </section>
+    <section id="conclusion">
+        <h2>Conclusion</h2>
+        <p>This covers the most common issues leading to privilege escalations. We talked a great deal about files because that's a common point of failure but note that it could very well be any other kind of resource.</p>
+        <p>Privilege escalations based on memory corruption generally happen the same way: some privileged thread or process executes a function pointer that the attacker swaps with his own using a bug such as a buffer overflow or a use-after-free.</p>
+        <p>Here are some good examples of privilege escalations on real software:</p>
+        <ul>
+            <li>
+                <dl>
+                    <dt><a href="https://c0d.ist/cve-2016-8856-foxit-reader-local-privilege-escalation-writeup/">Local privilege escalation in Foxit Reader</a></dt>
+                    <dd>Very simple file based privilege escalation.</dd>
+                </dl>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <dl>
+                    <dt><a href="http://akat1.pl/?id=2">Spawn your shell like it's 90s again!</a></dt>
+                    <dd>TOCTTOU in mail.local. See also <a href="mail_local_tocttou.html">this</a> article for an overview of the same bug in French.</dd>
+                </dl>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <dl>
+                    <dt><a href="http://perception-point.io/2016/01/14/analysis-and-exploitation-of-a-linux-kernel-vulnerability-cve-2016-0728/">Analysis and Exploitation of a Linux Kernel Vulnerability</a></dt>
+                    <dd>Advanced. Example of a memory corruption based privilege escalation through the exploitation of a use-after-free.</dd>
+                </dl>
+            </li>
+        </ul>
+        <section id="image-sources">
+            <h3>Image sources</h3>
+            <ul>
+                <li><a href="http://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876">http://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876</a></li>
+                <li><a href="http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)">http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)</a></li>
+                <li><a href="http://engagementrings.hairbumpsrelief.com/rainbow-dash-message-ringtone/">http://engagementrings.hairbumpsrelief.com/rainbow-dash-message-ringtone/</a></li>
+            </ul>
+        </section>
+    </section>
+    <footer>Generated on: 2017-03-22 00:04 UTC. </footer>
+
+    </div>
+  </body>
+</html>
