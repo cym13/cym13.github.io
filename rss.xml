@@ -4,9 +4,21 @@
  <title>Breakpoint</title>
  <description>Stepping through security</description>
  <link></link>
- <lastBuildDate>Wed, 22 Mar 2017 00:12:28 +0100</lastBuildDate>
- <pubDate>Wed, 22 Mar 2017 00:12:28 +0100</pubDate>
+ <lastBuildDate>Wed, 22 Mar 2017 01:12:36 +0100</lastBuildDate>
+ <pubDate>Wed, 22 Mar 2017 01:12:36 +0100</pubDate>
  <ttl>7200</ttl>
+ <item>
+   <title>Privilege Escalations</title>
+   <description>How to identify flawed resource management leading to privilege escalation. Part of the Fast Security Source Code Review series.</description>
+   <link>https://cym13.github.io/article/scr_privesc.html</link>
+   <pubDate>Wed, 22 Mar 2017 01:04:12 +0100</pubDate>
+ </item>
+ <item>
+   <title>Fast Security Source Code Review</title>
+   <description>Introduction to the main concepts behind a fast security review. Intended for developers as well as pentesters.</description>
+   <link>https://cym13.github.io/article/source_code_review.html</link>
+   <pubDate>Wed, 22 Mar 2017 00:17:39 +0100</pubDate>
+ </item>
  <item>
    <title>How secure is unpredictableSeed?</title>
    <description>D's unpredictableSeed is sometimes used to compensate for the lack of a CSPRNG in the standard library. But how secure is that really?</description>

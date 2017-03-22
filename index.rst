@@ -8,6 +8,17 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+March 2017
+----------
+
+`Privilege Escalations <article/scr_privesc.html>`_
+    How to identify flawed resource management leading to privilege
+    escalation. Part of the Fast Security Source Code Review series.
+
+`Fast Security Source Code Review <article/source_code_review.html>`_
+    Introduction to the main concepts behind a fast security review.
+    Intended for developers as well as pentesters.
+
 February 2017
 -------------
 
