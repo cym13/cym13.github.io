@@ -7,12 +7,12 @@ header_fmt="$(cat <<EOF
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
- <title>Breakpoint</title>
- <description>Stepping through security</description>
- <link>${blogURl}</link>
- <lastBuildDate>${lastBuildDate}</lastBuildDate>
- <pubDate>${lastBuildDate}</pubDate>
- <ttl>7200</ttl>
+  <title>Breakpoint</title>
+  <description>Stepping through security</description>
+  <link>${blogURl}</link>
+  <lastBuildDate>${lastBuildDate}</lastBuildDate>
+  <pubDate>${lastBuildDate}</pubDate>
+  <ttl>7200</ttl>
 EOF
 )"
 
