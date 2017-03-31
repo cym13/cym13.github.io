@@ -4,14 +4,20 @@
  <title>Breakpoint</title>
  <description>Stepping through security</description>
  <link></link>
- <lastBuildDate>Wed, 22 Mar 2017 17:46:45 +0100</lastBuildDate>
- <pubDate>Wed, 22 Mar 2017 17:46:45 +0100</pubDate>
+ <lastBuildDate>Sat, 01 Apr 2017 00:28:44 +0200</lastBuildDate>
+ <pubDate>Sat, 01 Apr 2017 00:28:44 +0200</pubDate>
  <ttl>7200</ttl>
+ <item>
+   <title>Weaponizing Excel Webservice</title>
+   <description>Excel formula injections are common in programs generating XLS files, but otfen considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>
+   <link>https://cym13.github.io/article/excel_webservice.rst</link>
+   <pubDate>Sat, 01 Apr 2017 00:26:19 +0200</pubDate>
+ </item>
  <item>
    <title>Privilege Escalations</title>
    <description>How to identify flawed resource management leading to privilege escalation. Part of the Fast Security Source Code Review series.</description>
    <link>https://cym13.github.io/article/scr_privesc.html</link>
-   <pubDate>Wed, 22 Mar 2017 17:46:41 +0100</pubDate>
+   <pubDate>Wed, 22 Mar 2017 18:38:32 +0100</pubDate>
  </item>
  <item>
    <title>Fast Security Source Code Review</title>
