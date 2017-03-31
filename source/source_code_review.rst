@@ -50,16 +50,23 @@ vulnerabilities:
 Structural bugs
 ---------------
 
-They are bugs of design. The easiest bugs to find are part of this category
-because they are quite high-level, generally don't require to read much code
-if any, and don't require you to know the language used. You'll generally
-find them without any need for a specific analysis method, just putting
-yourself in the shoes of an attacker should do.
+They are bugs of design, where the programmer just didn't think of putting
+any security in place.
 
-Insecure direct object reference, security misconfiguration, sensitive data
-exposure, missing function level access control, using components with known
-vulnerabilities and unvalidated redirects and forwards are part of this
-category.
+The easiest bugs to find are part of this category because they are quite
+high-level, generally don't require to read much code if any. More
+importantly they don't require you to know the language used.  You'll
+generally find them without any need for a specific analysis method, just
+putting yourself in the shoes of an attacker should do.
+
+The following vulnerabilities are part of this category:
+
+- Insecure direct object reference
+- Security misconfiguration
+- Sensitive data exposure
+- Missing function level access control
+- Using components with known vulnerabilities
+- Unvalidated redirects and forwards
 
 This is more than half of our list. This essentially means more than half of
 the most common vulnerabilities are design mistakes and not programming ones.
@@ -68,14 +75,18 @@ Not all of them can easily be found during a static analysis though. While it
 is by no means impossible if you have access to the live application it is
 far easier to just try them directly and see the result.
 
-In this scenario source code analysis comes in second: if you find a
-vulnerability somewhere it is likely that it's not the only occurrence. In
-that situation you would identify the vulnerable part in the code and then
-look for similar structures elsewhere.
+It is great to test them dynamically. Where there's a number increment it.
+Decrement it. Replace it by a quote, some text. Where there's validation go
+through anyway and see where it leads you. It often happens that the security
+primitives aren't checked even if they're present.
+
+In this scenario source code analysis comes in second: find a bug dynamically
+first, then look in the source for similar patterns. Bugs often come in
+group.
 
 Some exceptions are the use of vulnerable components, bad cryptography which
 can lead to a number of the aforementioned cases and security
-misconfiguration are typically easier to see in the code.
+misconfiguration. Those are typically easier to see in the code.
 
 Generic bugs
 ------------
@@ -95,9 +106,10 @@ generic enough that we can devise a method to find them.
 Specific bugs
 -------------
 
-Those are the bugs that make the news. Subtle off-by-one errors like the
-`Cryptocat case <http://www.cryptofails.com/page/23>`_, slight indentation
-mistakes like
+Those are the bugs that make the news.
+
+Subtle off-by-one errors like the `Cryptocat case
+<http://www.cryptofails.com/page/23>`_, slight indentation mistakes like
 `Goto fail <https://www.imperialviolet.org/2014/02/22/applebug.html>`_,
 buffer overruns like `Heartbleed <https://xkcd.com/1354/>`_. They are often
 typos where a single character makes the difference. They don't span out of
@@ -230,7 +242,7 @@ Cryptography, the great forgotten
 =================================
 
 The last low fruit is cryptography. Cryptography has a reputation of being
-impossible to grasp while identifying flaws with it is often quite easy in
+impossible to grasp although identifying flaws is often quite easy in
 practice. It is easy to screw up, even security professionals generally shy
 away from it, finding common flaws is easy and if there's encryption there's
 definitely something worth finding.
@@ -360,7 +372,7 @@ time to search the same kind of operations.
 
 Also all languages have their specificities. Ruby is one of the only
 languages that uses multi-line regex by default for example. This means that
-their might be bugs if the programmer uses "^" and "$" instead of \\A and \\Z
+there might be bugs if the programmer uses "^" and "$" instead of \\A and \\Z
 to match the beginning and end of line. Similarly in Lua array indexing
 starts at 1 so subtracting one to the length of the list won't give the
 index of the last element, that could cause an off-by-one bug.

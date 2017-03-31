@@ -58,12 +58,22 @@
         </ol>
         <section id="structural-bugs">
             <h3>Structural bugs</h3>
-            <p>They are bugs of design. The easiest bugs to find are part of this category because they are quite high-level, generally don't require to read much code if any, and don't require you to know the language used. You'll generally find them without any need for a specific analysis method, just putting yourself in the shoes of an attacker should do.</p>
-            <p>Insecure direct object reference, security misconfiguration, sensitive data exposure, missing function level access control, using components with known vulnerabilities and unvalidated redirects and forwards are part of this category.</p>
+            <p>They are bugs of design, where the programmer just didn't think of putting any security in place.</p>
+            <p>The easiest bugs to find are part of this category because they are quite high-level, generally don't require to read much code if any. More importantly they don't require you to know the language used. You'll generally find them without any need for a specific analysis method, just putting yourself in the shoes of an attacker should do.</p>
+            <p>The following vulnerabilities are part of this category:</p>
+            <ul>
+                <li>Insecure direct object reference</li>
+                <li>Security misconfiguration</li>
+                <li>Sensitive data exposure</li>
+                <li>Missing function level access control</li>
+                <li>Using components with known vulnerabilities</li>
+                <li>Unvalidated redirects and forwards</li>
+            </ul>
             <p>This is more than half of our list. This essentially means more than half of the most common vulnerabilities are design mistakes and not programming ones.</p>
             <p>Not all of them can easily be found during a static analysis though. While it is by no means impossible if you have access to the live application it is far easier to just try them directly and see the result.</p>
-            <p>In this scenario source code analysis comes in second: if you find a vulnerability somewhere it is likely that it's not the only occurrence. In that situation you would identify the vulnerable part in the code and then look for similar structures elsewhere.</p>
-            <p>Some exceptions are the use of vulnerable components, bad cryptography which can lead to a number of the aforementioned cases and security misconfiguration are typically easier to see in the code.</p>
+            <p>It is great to test them dynamically. Where there's a number increment it. Decrement it. Replace it by a quote, some text. Where there's validation go through anyway and see where it leads you. It often happens that the security primitives aren't checked even if they're present.</p>
+            <p>In this scenario source code analysis comes in second: find a bug dynamically first, then look in the source for similar patterns. Bugs often come in group.</p>
+            <p>Some exceptions are the use of vulnerable components, bad cryptography which can lead to a number of the aforementioned cases and security misconfiguration. Those are typically easier to see in the code.</p>
         </section>
         <section id="generic-bugs">
             <h3>Generic bugs</h3>
@@ -73,7 +83,8 @@
         </section>
         <section id="specific-bugs">
             <h3>Specific bugs</h3>
-            <p>Those are the bugs that make the news. Subtle off-by-one errors like the <a href="http://www.cryptofails.com/page/23">Cryptocat case</a>, slight indentation mistakes like <a href="https://www.imperialviolet.org/2014/02/22/applebug.html">Goto fail</a>, buffer overruns like <a href="https://xkcd.com/1354/">Heartbleed</a>. They are often typos where a single character makes the difference. They don't span out of badly designed or uninformed decisions but are true genuine errors (or stealthy <a href="https://freedom-to-tinker.com/2013/10/09/the-linux-backdoor-attempt-of-2003/">backdoors</a> of course). This makes them both extremely dangerous and extremely hard to find. They are also often tightly tied to the language they're written in.</p>
+            <p>Those are the bugs that make the news.</p>
+            <p>Subtle off-by-one errors like the <a href="http://www.cryptofails.com/page/23">Cryptocat case</a>, slight indentation mistakes like <a href="https://www.imperialviolet.org/2014/02/22/applebug.html">Goto fail</a>, buffer overruns like <a href="https://xkcd.com/1354/">Heartbleed</a>. They are often typos where a single character makes the difference. They don't span out of badly designed or uninformed decisions but are true genuine errors (or stealthy <a href="https://freedom-to-tinker.com/2013/10/09/the-linux-backdoor-attempt-of-2003/">backdoors</a> of course). This makes them both extremely dangerous and extremely hard to find. They are also often tightly tied to the language they're written in.</p>
             <p>There are however a number of ways one can approach the code to unveil those and I might talk about them someday but none of them fits a <em>fast</em> code review so we won't focus too much on them.</p>
             <p>If you would like more information though I strongly recommend the book “A Bug Hunter's Diary” which is too awesome to be left out.</p>
         </section>
@@ -129,7 +140,7 @@
     </section>
     <section id="cryptography-the-great-forgotten">
         <h2>Cryptography, the great forgotten</h2>
-        <p>The last low fruit is cryptography. Cryptography has a reputation of being impossible to grasp while identifying flaws with it is often quite easy in practice. It is easy to screw up, even security professionals generally shy away from it, finding common flaws is easy and if there's encryption there's definitely something worth finding.</p>
+        <p>The last low fruit is cryptography. Cryptography has a reputation of being impossible to grasp although identifying flaws is often quite easy in practice. It is easy to screw up, even security professionals generally shy away from it, finding common flaws is easy and if there's encryption there's definitely something worth finding.</p>
         <p>This makes it the perfect think to look for in a FSSCR. I will dedicate a whole article to the subject but here are some starters:</p>
         <ul>
             <li>Missing encryption is worse than bad encryption. Is there any connection that should use HTTPS and isn't? Does the service allow us to bypass the encryption in any way? Is the original data really annihilated?</li>
@@ -176,7 +187,7 @@
         <section id="language-specifics">
             <h3>Language specifics</h3>
             <p>Of course this doesn't mean that the programming language doesn't matter. Some languages like Perl or Ruby strive on proposing many ways to do the same thing which complicates the analysis, contrary to languages like Python that try to propose one default way to do the work. Multiple syntaxes mean more time to search the same kind of operations.</p>
-            <p>Also all languages have their specificities. Ruby is one of the only languages that uses multi-line regex by default for example. This means that their might be bugs if the programmer uses "^" and "$" instead of \A and \Z to match the beginning and end of line. Similarly in Lua array indexing starts at 1 so subtracting one to the length of the list won't give the index of the last element, that could cause an off-by-one bug.</p>
+            <p>Also all languages have their specificities. Ruby is one of the only languages that uses multi-line regex by default for example. This means that there might be bugs if the programmer uses "^" and "$" instead of \A and \Z to match the beginning and end of line. Similarly in Lua array indexing starts at 1 so subtracting one to the length of the list won't give the index of the last element, that could cause an off-by-one bug.</p>
             <p>To find language specific bugs the experience you have with the language matters a lot. But to find the generic bugs we listed before, not so much actually.</p>
             <p>A shell injection will always be a shell injection, no matter what language it's written in. If you don't know the language just look up what functions and syntax can be used to perform shell execution and look for it. Most languages share the same names for common functions.</p>
         </section>
@@ -252,7 +263,7 @@
             </ul>
         </section>
     </section>
-    <footer>Generated on: 2017-03-21 23:28 UTC. </footer>
+    <footer>Generated on: 2017-03-31 22:46 UTC. </footer>
 
     </div>
   </body>
