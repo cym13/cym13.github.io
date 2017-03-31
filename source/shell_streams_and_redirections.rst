@@ -185,10 +185,9 @@ right way. In such situations, xargs often comes in handy.
 
 .. code:: bash
 
-    $ ls | grep a
+    $ ls | grep b
     abc
     bcd
-    cde
 
 We want to do "ls -l" on each of these files to get more information...
 The naive solution would be:
@@ -196,7 +195,7 @@ The naive solution would be:
 .. code:: bash
 
     # Novice: "Hey! I know that trick!"
-    $ ls | grep a | while read line ; do ls -l "$line" ; done
+    $ ls | grep b | while read line ; do ls -l "$line" ; done
     ...
 
 But the best would be to do:
@@ -204,7 +203,7 @@ But the best would be to do:
 .. code:: bash
 
     # Master: "Don't solve the problem, find another one"
-    $ ls | grep a | xargs ls -l
+    $ ls | grep b | xargs ls -l
     ...
 
 

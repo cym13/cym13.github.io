@@ -151,17 +151,16 @@ I<span class="err">&#39;</span>m a hipster, <span class="nb">echo</span> is so m
     <section id="ok-but-what-if-my-data-isn-t-suitable-for-stdin">
         <h2>Ok... But what if my data isn't suitable for stdin?</h2>
         <p>It happens sometimes, you have a nice data set that just isn't formated the right way. In such situations, xargs often comes in handy.</p>
-        <pre data-language="bash"><span></span>$ ls <span class="p">|</span> grep a
+        <pre data-language="bash"><span></span>$ ls <span class="p">|</span> grep b
 abc
-bcd
-cde</pre>
+bcd</pre>
         <p>We want to do "ls -l" on each of these files to get more information... The naive solution would be:</p>
         <pre data-language="bash"><span></span><span class="c1"># Novice: &quot;Hey! I know that trick!&quot;</span>
-$ ls <span class="p">|</span> grep a <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line <span class="p">;</span> <span class="k">do</span> ls -l <span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span> <span class="p">;</span> <span class="k">done</span>
+$ ls <span class="p">|</span> grep b <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line <span class="p">;</span> <span class="k">do</span> ls -l <span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span> <span class="p">;</span> <span class="k">done</span>
 ...</pre>
         <p>But the best would be to do:</p>
         <pre data-language="bash"><span></span><span class="c1"># Master: &quot;Don&#39;t solve the problem, find another one&quot;</span>
-$ ls <span class="p">|</span> grep a <span class="p">|</span> xargs ls -l
+$ ls <span class="p">|</span> grep b <span class="p">|</span> xargs ls -l
 ...</pre>
         <p>How does it work? What xargs does is that it takes each line and calls its arguments with those lines as arguments. The two following expressions are indeed equivalent:</p>
         <pre data-language="bash"><span></span>$ xargs ls -l <span class="s">&lt;&lt;EOF</span>
@@ -174,7 +173,7 @@ $ ls <span class="p">|</span> grep a <span class="p">|</span> xargs ls -l
 $ ls -l abc bcd cde
 ...</pre>
     </section>
-    <footer>Generated on: 2017-02-27 23:43 UTC. </footer>
+    <footer>Generated on: 2017-03-31 22:49 UTC. </footer>
 
     </div>
   </body>
