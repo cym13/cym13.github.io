@@ -4,13 +4,13 @@
  <title>Breakpoint</title>
  <description>Stepping through security</description>
  <link></link>
- <lastBuildDate>Sat, 01 Apr 2017 00:28:44 +0200</lastBuildDate>
- <pubDate>Sat, 01 Apr 2017 00:28:44 +0200</pubDate>
+ <lastBuildDate>Sat, 01 Apr 2017 00:49:08 +0200</lastBuildDate>
+ <pubDate>Sat, 01 Apr 2017 00:49:08 +0200</pubDate>
  <ttl>7200</ttl>
  <item>
    <title>Weaponizing Excel Webservice</title>
    <description>Excel formula injections are common in programs generating XLS files, but otfen considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>
-   <link>https://cym13.github.io/article/excel_webservice.rst</link>
+   <link>https://cym13.github.io/article/excel_webservice.html</link>
    <pubDate>Sat, 01 Apr 2017 00:26:19 +0200</pubDate>
  </item>
  <item>
@@ -23,7 +23,7 @@
    <title>Fast Security Source Code Review</title>
    <description>Introduction to the main concepts behind a fast security review. Intended for developers as well as pentesters.</description>
    <link>https://cym13.github.io/article/source_code_review.html</link>
-   <pubDate>Wed, 22 Mar 2017 00:17:39 +0100</pubDate>
+   <pubDate>Sat, 01 Apr 2017 00:46:36 +0200</pubDate>
  </item>
  <item>
    <title>How secure is unpredictableSeed?</title>
@@ -77,7 +77,7 @@
    <title>Shell streams and redirections</title>
    <description>Shell streams are the most powerful feature of bash. Knowing about redirections is a capital step toward an efficient use of command-line.</description>
    <link>https://cym13.github.io/article/shell_streams_and_redirections.html</link>
-   <pubDate>Thu, 02 Jul 2015 20:01:57 +0200</pubDate>
+   <pubDate>Sat, 01 Apr 2017 00:49:04 +0200</pubDate>
  </item>
 </channel>
 </rss>
