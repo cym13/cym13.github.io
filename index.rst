@@ -11,6 +11,11 @@ Recent articles
 April 2017
 ----------
 
+`Why we need authenticated cryptography <article/demo_bank.html>`_
+    Simple demonstration of how an attacker could tamper with an encrypted
+    message to his benefit without ever decrypting it in the absence of
+    message authentication.
+
 `Weaponizing Excel Webservice <article/excel_webservice.html>`_
     Excel formula injections are common in programs generating XLS files, but
     otfen considered harmless. This discusses a new technique that greatly

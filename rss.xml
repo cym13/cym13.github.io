@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
- <title>Breakpoint</title>
- <description>Stepping through security</description>
- <link></link>
- <lastBuildDate>Sat, 01 Apr 2017 00:49:08 +0200</lastBuildDate>
- <pubDate>Sat, 01 Apr 2017 00:49:08 +0200</pubDate>
- <ttl>7200</ttl>
+  <title>Breakpoint</title>
+  <description>Stepping through security</description>
+  <link></link>
+  <lastBuildDate>Sun, 02 Apr 2017 11:47:37 +0200</lastBuildDate>
+  <pubDate>Sun, 02 Apr 2017 11:47:37 +0200</pubDate>
+  <ttl>7200</ttl>
+ <item>
+   <title>Why we need authenticated cryptography</title>
+   <description>Simple demonstration of how an attacker could tamper with an encrypted message to his benefit without ever decrypting it in the absence of message authentication.</description>
+   <link>https://cym13.github.io/article/demo_bank.html</link>
+   <pubDate>Sun, 02 Apr 2017 11:44:27 +0200</pubDate>
+ </item>
  <item>
    <title>Weaponizing Excel Webservice</title>
    <description>Excel formula injections are common in programs generating XLS files, but otfen considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>

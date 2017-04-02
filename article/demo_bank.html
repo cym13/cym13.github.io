@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html >
+  <head> 
+    <title>Why we need authenticated cryptography</title>
+    <meta charset="utf-8" />
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <h1>Breakpoint</h1>
+        <h2>Stepping through security</h2>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      
+    <h1>Why we need authenticated cryptography</h1>
+    <section id="genesis">
+        <h2>Genesis</h2>
+        <p>I was asked the question "Can someone modify an encrypted document without ever decrypting it?". The answer is yes, although it is quite counter intuitive.</p>
+        <p>For that reason I recommand using the GCM mode which includes the messages authentication directly. If you are using another mode, for example CBC (which is what many libraries default to) you <strong>need</strong> to include a HMAC (Hash-based Message Authentication Code) after having encrypted your data. For symmetric cryptography it is the same: crytographically sign your messages to detect tampering.</p>
+        <aside class="note">If you don't know what the mode is, it simply describes how to apply the cipher when you have more than a block (generally 16 bytes) of data. It is generally written next to the cipher name. For example AES-256-GCM is using the AES cipher with a 256 bits key and the GCM mode.</aside>
+    </section>
+    <section id="the-simulation">
+        <h2>The simulation</h2>
+        <p>In order to demonstrate how an attacker could modify an encrypted message I wrote a little bank simulation in python. You can find the full code <a href="../file/demo_nomac_tamper.py">here</a>.</p>
+        <p><em>If you know python you may find some design choices weird. My primary goal was to produce a code that even a beginner can understand and modify to experiment other scenariis.</em></p>
+        <p>Let's launch it to see how it goes. To halt it use Ctl+C.</p>
+        <pre data-language="bash"><span></span>$ python demo_nomac_tamper.py
+<span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$6230</span> from Alice to Bob
+5844c2b7c2a31ec2bf47641e23c295c28fc28f54c38dc29e
+<span class="o">[</span><span class="m">0</span><span class="o">]</span> Transfered <span class="nv">$6230</span> from Alice to Bob
+
+<span class="o">[</span><span class="m">1</span><span class="o">]</span> Requesting a transfer of <span class="nv">$4731</span> from Denis to Alice
+5b47c2bcc2bc3ac2af6a621536c390c381c28853c282c29fc3bf0f
+<span class="o">[</span><span class="m">1</span><span class="o">]</span> Transfered <span class="nv">$4731</span> from Denis to Alice
+
+^C
+-----------
+Alice   <span class="nv">$8501</span>
+Bob     <span class="nv">$16230</span>
+Charles <span class="nv">$10000</span>
+Denis   <span class="nv">$5269</span>
+Eve     <span class="nv">$0</span></pre>
+        <p>We can see some money transfer requests between different persons. The hexadecimal string inbetween the request and confirmation is the encrypted message as seen by someone eavesdropping on the network. That person is Eve, the malicious user that would very much like stealing that money as she has nothing left on her account.</p>
+        <p>For now she is only looking at the packets, but let's turn the BE_EVIL flag at the top of the file and relaunch the demo:</p>
+        <pre data-language="bash"><span></span>$ python demo_nomac_tamper.py
+<span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$3115</span> from Alice to Bob
+5844c2b7c2a31ec2bf47641e23c290c28cc28d51c38dc29e
+<span class="o">[</span><span class="m">0</span><span class="o">]</span> Transfered <span class="nv">$3115</span> from Alice to Eve
+HACKED!
+
+<span class="o">[</span><span class="m">1</span><span class="o">]</span> Requesting a transfer of <span class="nv">$1734</span> from Bob to Charles
+5943c2b4c2ad33c2b65d7b3930c381c381c28d53c282c29ac3bf0f
+<span class="o">[</span><span class="m">1</span><span class="o">]</span> User not found Dqfrles
+
+^C
+-----------
+Alice   <span class="nv">$6885</span>
+Bob     <span class="nv">$10000</span>
+Charles <span class="nv">$10000</span>
+Denis   <span class="nv">$10000</span>
+Eve     <span class="nv">$3115</span></pre>
+        <p>We halted the program at two messages but you can continue. We see that a transfer request from Alice to Bob was confirmed as being a request from Alice to Eve! And we also see that a transfer from Bob to Charles gave a strange error about an user Dqfrles... What is happening there?</p>
+        <p>We just modified the encrypted message, betting on the fact that it would be for Bob, so that "Bob" actually decrypts to "Eve". As all messages aren't for Bob the others don't decrypt well now, but as the bank will just ignore them that's no concern for us. So we aren't taking Bob's money but we hijack any transfer to his account (and block any other transfer in this simple case).</p>
+    </section>
+    <section id="why-was-it-possible">
+        <h2>Why was it possible?</h2>
+        <img width="20%" src="../image/kigurumi_wondering.png" />
+        <p>There are lots of useful comments in the code to explain what we did and how we did it. I'll focus here on the more mathematical part.</p>
+        <p>I used the RC4 cipher which is a stream cipher. This means that I don't encrypt data a block at a time: for each plaintext byte <em>P</em> I will compute a pseudo-random byte <em>R</em> and XOR the two giving me an ciphered byte <em>C</em>.</p>
+        <span class="math">\(C = P \oplus R\)</span>
+        <p>Of course the random byte isn't really random, it is part of a random-looking sequence generated by the key so that it can be deciphered. But we aren't interested in that part, what is interesting is the XOR and the fact that the first byte of the ciphertext will be the first byte of the plaintext.</p>
+        <p>XOR-ing two identical bytes gives 0, and this operation can be done in any order. That's how the cipher works, to decipher the message just generate the same random bytes and XOR them with the ciphertext:</p>
+        <span class="math">\(C \oplus R = P \oplus R \oplus R = P\)</span>
+        <p>This also means that if we XOR some other <em>M</em> byte with the ciphertext it will be reflected in the plaintext:</p>
+        <span class="math">\(C' = C \oplus M\)</span>
+        <span class="math">\(C' \oplus R = P \oplus R \oplus M \oplus R = P \oplus M\)</span>
+        <p>We can use this to our advantage. Let's suppose that the plaintext byte is a <em>b</em>, then we can do the following.</p>
+        <span class="math">\(C' = C \oplus b\)</span>
+        <p>If <em>P</em> is indeed a <em>b</em> this will simplify into:</p>
+        <span class="math">\(C' \oplus R = (C \oplus b) \oplus R)\)</span>
+        <span class="math">\(C' \oplus R = ((P \oplus R) \oplus b) \oplus R)\)</span>
+        <span class="math">\(C' \oplus R = (b \oplus b \oplus R \oplus R)\)</span>
+        <span class="math">\(C' \oplus R = 0\)</span>
+        <p>We will have changed our <em>b</em> into 0! But that only works if we know what byte to change and what value we expect it to be. All that's left to do is to also XOR the letter we want instead, so an <em>e</em> in our case:</p>
+        <span class="math">\(C' = C \oplus b \oplus e\)</span>
+        <span class="math">\(C' \oplus R = e\)</span>
+        <p>And that's how we were able to change three bytes. Of course when the original bytes aren't what we expected them to be it won't decrypt to anything useful. But as most communications use very structured formats, emails for example, it is often possible to find something to modify to our advantage without ever decrypting the message.</p>
+    </section>
+    <footer>Generated on: 2017-04-02 09:44 UTC. </footer>
+
+    </div>
+  </body>
+</html>
