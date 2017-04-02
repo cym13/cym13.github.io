@@ -32,7 +32,10 @@
         <h2>Genesis</h2>
         <p>I was asked the question "Can someone modify an encrypted document without ever decrypting it?". The answer is yes, although it is quite counter intuitive.</p>
         <p>For that reason I recommand using the GCM mode which includes the messages authentication directly. If you are using another mode, for example CBC (which is what many libraries default to) you <strong>need</strong> to include a HMAC (Hash-based Message Authentication Code) after having encrypted your data. For symmetric cryptography it is the same: crytographically sign your messages to detect tampering.</p>
-        <aside class="note">If you don't know what the mode is, it simply describes how to apply the cipher when you have more than a block (generally 16 bytes) of data. It is generally written next to the cipher name. For example AES-256-GCM is using the AES cipher with a 256 bits key and the GCM mode.</aside>
+        <pre>If you don't know what the mode is, it simply describes how to apply the
+cipher when you have more than a block (generally 16 bytes) of data. It
+is generally written next to the cipher name. For example AES-256-GCM is
+using the AES cipher with a 256 bits key and the GCM mode.</pre>
     </section>
     <section id="the-simulation">
         <h2>The simulation</h2>
@@ -101,7 +104,7 @@ Eve     <span class="nv">$3115</span></pre>
         <span class="math">\(C' \oplus R = e\)</span>
         <p>And that's how we were able to change three bytes. Of course when the original bytes aren't what we expected them to be it won't decrypt to anything useful. But as most communications use very structured formats, emails for example, it is often possible to find something to modify to our advantage without ever decrypting the message.</p>
     </section>
-    <footer>Generated on: 2017-04-02 09:44 UTC. </footer>
+    <footer>Generated on: 2017-04-02 09:58 UTC. </footer>
 
     </div>
   </body>

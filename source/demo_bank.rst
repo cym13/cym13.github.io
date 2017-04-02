@@ -16,7 +16,7 @@ authentication directly. If you are using another mode, for example CBC
 For symmetric cryptography it is the same: crytographically sign your
 messages to detect tampering.
 
-.. note::
+::
 
     If you don't know what the mode is, it simply describes how to apply the
     cipher when you have more than a block (generally 16 bytes) of data. It
