@@ -1,5 +1,5 @@
 
-sources  = $(addprefix source/,$(shell ls source))
+sources  = $(shell ls source/*.rst)
 articles = $(subst .rst,.html,$(subst source/,article/,$(sources)))
 
 all: index.html about.html $(articles) rss.xml
@@ -19,4 +19,5 @@ rss.xml: gen_rss.sh index.html $(articles)
 
 clean:
 	find . -iname "*.html" -type f -delete
+	find /source -iname "*.bak" -type f -delete
 	rm -f rss.xml
