@@ -31,7 +31,7 @@
     <section id="genesis">
         <h2>Genesis</h2>
         <p>I was asked the question "Can someone modify an encrypted document without ever decrypting it?". The answer is yes, although it is quite counter intuitive.</p>
-        <p>For that reason I recommand using the GCM mode which includes the messages authentication directly. If you are using another mode, for example CBC (which is what many libraries default to) you <strong>need</strong> to include a HMAC (Hash-based Message Authentication Code) after having encrypted your data. For symmetric cryptography it is the same: crytographically sign your messages to detect tampering.</p>
+        <p>For that reason I recommend using the GCM mode which includes the messages authentication directly. If you are using another mode, for example CBC (which is what many libraries default to) you <strong>need</strong> to include a HMAC (Hash-based Message Authentication Code) after having encrypted your data. For asymmetric cryptography it is the same: cryptographically sign your messages to detect tampering.</p>
         <pre>If you don't know what the mode is, it simply describes how to apply the
 cipher when you have more than a block (generally 16 bytes) of data. It
 is generally written next to the cipher name. For example AES-256-GCM is
@@ -40,7 +40,7 @@ using the AES cipher with a 256 bits key and the GCM mode.</pre>
     <section id="the-simulation">
         <h2>The simulation</h2>
         <p>In order to demonstrate how an attacker could modify an encrypted message I wrote a little bank simulation in python. You can find the full code <a href="../file/demo_nomac_tamper.py">here</a>.</p>
-        <p><em>If you know python you may find some design choices weird. My primary goal was to produce a code that even a beginner can understand and modify to experiment other scenariis.</em></p>
+        <p><em>If you know python you may find some design choices weird. My primary goal was to produce a code that even a beginner can understand and modify to experiment other scenarios.</em></p>
         <p>Let's launch it to see how it goes. To halt it use Ctl+C.</p>
         <pre data-language="bash"><span></span>$ python demo_nomac_tamper.py
 <span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$6230</span> from Alice to Bob
@@ -58,7 +58,7 @@ Bob     <span class="nv">$16230</span>
 Charles <span class="nv">$10000</span>
 Denis   <span class="nv">$5269</span>
 Eve     <span class="nv">$0</span></pre>
-        <p>We can see some money transfer requests between different persons. The hexadecimal string inbetween the request and confirmation is the encrypted message as seen by someone eavesdropping on the network. That person is Eve, the malicious user that would very much like stealing that money as she has nothing left on her account.</p>
+        <p>We can see some money transfer requests between different persons. The hexadecimal string in-between the request and confirmation is the encrypted message as seen by someone eavesdropping on the network. That person is Eve, the malicious user that would very much like stealing that money as she has nothing left on her account.</p>
         <p>For now she is only looking at the packets, but let's turn the BE_EVIL flag at the top of the file and relaunch the demo:</p>
         <pre data-language="bash"><span></span>$ python demo_nomac_tamper.py
 <span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$3115</span> from Alice to Bob
@@ -110,7 +110,7 @@ Eve     <span class="nv">$3115</span></pre>
             </ul>
         </section>
     </section>
-    <footer>Generated on: 2017-04-02 10:04 UTC. </footer>
+    <footer>Generated on: 2017-04-02 10:09 UTC. </footer>
 
     </div>
   </body>

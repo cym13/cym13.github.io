@@ -9,11 +9,11 @@ I was asked the question "Can someone modify an encrypted document without
 ever decrypting it?". The answer is yes, although it is quite counter
 intuitive.
 
-For that reason I recommand using the GCM mode which includes the messages
+For that reason I recommend using the GCM mode which includes the messages
 authentication directly. If you are using another mode, for example CBC
 (which is what many libraries default to) you **need** to include a HMAC
 (Hash-based Message Authentication Code) after having encrypted your data.
-For symmetric cryptography it is the same: crytographically sign your
+For asymmetric cryptography it is the same: cryptographically sign your
 messages to detect tampering.
 
 ::
@@ -33,7 +33,7 @@ wrote a little bank simulation in python. You can find the full code here_.
 
 *If you know python you may find some design choices weird. My primary goal
 was to produce a code that even a beginner can understand and modify to
-experiment other scenariis.*
+experiment other scenarios.*
 
 Let's launch it to see how it goes. To halt it use Ctl+C.
 
@@ -57,7 +57,7 @@ Let's launch it to see how it goes. To halt it use Ctl+C.
     Eve     $0
 
 We can see some money transfer requests between different persons. The
-hexadecimal string inbetween the request and confirmation is the encrypted
+hexadecimal string in-between the request and confirmation is the encrypted
 message as seen by someone eavesdropping on the network. That person is Eve,
 the malicious user that would very much like stealing that money as she has
 nothing left on her account.
