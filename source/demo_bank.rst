@@ -179,3 +179,8 @@ original bytes aren't what we expected them to be it won't decrypt to
 anything useful. But as most communications use very structured formats,
 emails for example, it is often possible to find something to modify to our
 advantage without ever decrypting the message.
+
+Image source
+------------
+
+- https://catbox.moe/
