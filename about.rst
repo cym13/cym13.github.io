@@ -1,8 +1,8 @@
 =======
-QTSBMFA
+QTSBAMF
 =======
 
-(Questions That Should Be More Frequently Asked)
+(Questions That Should Be Asked More Frequently)
 
 Who am I?
 =========
@@ -13,11 +13,14 @@ Luxembourg.
 I spend most of my free time auditing free software, reversing malwares,
 developping new GNU/Linux tools and watching animes or My Little Pony.
 
-Why does this website look odd?
-===============================
+Where's the girl at the top coming from?
+========================================
 
-Well, I'm no web developper and I like the feeling of raw HTML/CSS. And
-orange. I like orange a lot.
+That's Tomoko_ from Watamote_.
+
+.. _Tomoko: http://watamote.wikia.com/wiki/Tomoko_Kuroki
+
+.. _Watamote: https://en.wikipedia.org/wiki/No_Matter_How_I_Look_at_It,_It%27s_You_Guys%27_Fault_I%27m_Not_Popular!
 
 Why is it on github.io? Isn't centralization bad?
 =================================================
