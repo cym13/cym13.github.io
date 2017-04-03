@@ -9,8 +9,11 @@
   <body>
     <header class="site-header">
       <div class="site-title">
-        <h1>Breakpoint</h1>
-        <h2>Stepping through security</h2>
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="image/tomoko1.png"/>
       </div>
       <div class="wrap">
         <ul>
