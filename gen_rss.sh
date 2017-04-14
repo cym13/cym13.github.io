@@ -3,7 +3,7 @@
 blogUrl="https://cym13.github.io/"
 lastBuildDate="$(date -R)"
 
-header_fmt="$(cat <<EOF
+cat >rss.xml <<EOF
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
@@ -14,9 +14,6 @@ header_fmt="$(cat <<EOF
   <pubDate>${lastBuildDate}</pubDate>
   <ttl>7200</ttl>
 EOF
-)"
-
-cat > rss.xml <<< "$header_fmt"
 
 grep -e dt -e dd index.html |\
 while read title_line ; do
