@@ -148,7 +148,7 @@
         <ul>
             <li>Missing encryption is worse than bad encryption. Is there any connection that should use HTTPS and isn't? Does the service allow us to bypass the encryption in any way? Is the original data really annihilated?</li>
             <li>Encryption without authentication can never be useful. For example an HTTPS connection that doesn't check the validity of the certificate just enforces that the communication between the application and the recipient is kept secret. It doesn't help much if the recipient is actually the attacker. Note that a shared secret counts as authentication: I prove that I am who I say I am by providing this password only you and me know.</li>
-            <li>You are likely to find the name of the encryption scheme used such as "AES265-CBC-PKCS1" or hash algorithms like "MD5". Just look it up on the internet, you're likely to find many people asking about it. If you find no answer then you might be against something exotic which is dubious at least.</li>
+            <li>You are likely to find the name of the encryption scheme used such as "AES256-CBC-PKCS1" or hash algorithms like "MD5". Just look it up on the internet, you're likely to find many people asking about it. If you find no answer then you might be against something exotic which is dubious at least.</li>
             <li>Cryptography needs real randomness. Use of the default random number function provided by the language or, worse, of time or constants <strong>will</strong> result in vulnerabilities.</li>
         </ul>
         <pre>Keywords: crypt cipher rand hash time secret obfuscate</pre>
@@ -266,7 +266,7 @@
             </ul>
         </section>
     </section>
-    <footer>Generated on: 2017-04-03 18:10 UTC. </footer>
+    <footer>Generated on: 2017-05-16 12:47 UTC. </footer>
 
     </div>
   </body>

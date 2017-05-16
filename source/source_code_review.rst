@@ -262,7 +262,7 @@ whole article to the subject but here are some starters:
   say I am by providing this password only you and me know.
 
 - You are likely to find the name of the encryption scheme used such as
-  "AES265-CBC-PKCS1" or hash algorithms like "MD5". Just look it up on the
+  "AES256-CBC-PKCS1" or hash algorithms like "MD5". Just look it up on the
   internet, you're likely to find many people asking about it. If you find no
   answer then you might be against something exotic which is dubious at least.
 
