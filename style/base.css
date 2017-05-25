@@ -55,22 +55,25 @@ li {
 }
 
 .site-title {
+    display: inline-block;
     padding-top: 10px;
     padding-bottom: 20px;
-    padding-left: 40px;
+    padding-left: 0px;
     padding-right: 40px;
+    width: 100%;
 }
 
 .site-title img {
     display: inline-block;
-    margin-left: 25%;
-    margin-right: 10%;
+    float: right;
+    margin-left: 10%;
+    margin-right: 5%;
     height: 180px;
 }
 
 .title-text {
     display: inline-block;
-    margin-left: 10%;
+    margin-left: 5%;
 }
 
 .title-text h1 {
