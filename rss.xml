@@ -4,20 +4,26 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link></link>
-  <lastBuildDate>Sun, 02 Apr 2017 11:47:37 +0200</lastBuildDate>
-  <pubDate>Sun, 02 Apr 2017 11:47:37 +0200</pubDate>
+  <lastBuildDate>Mon, 29 May 2017 20:08:17 +0200</lastBuildDate>
+  <pubDate>Mon, 29 May 2017 20:08:17 +0200</pubDate>
   <ttl>7200</ttl>
+ <item>
+   <title>Fixing video noise with sox</title>
+   <description>How to use sox for something simple and practical: fixing the noise in a youtube video.</description>
+   <link>https://cym13.github.io/article/fix_video_noise_sox.html</link>
+   <pubDate>Mon, 29 May 2017 20:06:22 +0200</pubDate>
+ </item>
  <item>
    <title>Why we need authenticated cryptography</title>
    <description>Simple demonstration of how an attacker could tamper with an encrypted message to his benefit without ever decrypting it in the absence of message authentication.</description>
    <link>https://cym13.github.io/article/demo_bank.html</link>
-   <pubDate>Sun, 02 Apr 2017 11:44:27 +0200</pubDate>
+   <pubDate>Sun, 02 Apr 2017 12:08:34 +0200</pubDate>
  </item>
  <item>
    <title>Weaponizing Excel Webservice</title>
    <description>Excel formula injections are common in programs generating XLS files, but otfen considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>
    <link>https://cym13.github.io/article/excel_webservice.html</link>
-   <pubDate>Sat, 01 Apr 2017 00:26:19 +0200</pubDate>
+   <pubDate>Tue, 11 Apr 2017 14:53:08 +0200</pubDate>
  </item>
  <item>
    <title>Privilege Escalations</title>
@@ -29,7 +35,7 @@
    <title>Fast Security Source Code Review</title>
    <description>Introduction to the main concepts behind a fast security review. Intended for developers as well as pentesters.</description>
    <link>https://cym13.github.io/article/source_code_review.html</link>
-   <pubDate>Sat, 01 Apr 2017 00:46:36 +0200</pubDate>
+   <pubDate>Tue, 16 May 2017 14:47:43 +0200</pubDate>
  </item>
  <item>
    <title>How secure is unpredictableSeed?</title>

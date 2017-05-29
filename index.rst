@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+May 2017
+--------
+
+`Fixing video noise with sox <article/fix_video_noise_sox.html>`_
+    How to use sox for something simple and practical: fixing the noise in a
+    youtube video.
+
 April 2017
 ----------
 
