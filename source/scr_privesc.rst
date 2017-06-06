@@ -90,9 +90,9 @@ Another case is the bogus exception:
     subprocess.Popen(["sh", "/tmp/mytmp/tmp.sh"])
 
 This makes the problem way easier for an attacker: just create a file
-*/tmp/mytmp/tmp.sh* that has no execution rights. The call to **open** will
+*/tmp/mytmp/tmp.sh* that has no write rights. The call to **open** will
 raise an exception, the **write** will never be executed and the program will
-gracefully continue its execution.
+gracefully continue its execution running your code.
 
 Any time an error is ignored it is important to understand what is really
 ignored and what it could mean to an attacker.
