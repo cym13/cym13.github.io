@@ -1,9 +1,8 @@
 <!DOCTYPE HTML>
-<html >
-  <head> 
-    <title>Fixing video noise with sox</title>
-    <meta charset="utf-8" />
-
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
 
@@ -28,48 +27,66 @@
     </header>
 
     <div class="content">
-      
-    <h1>Fixing video noise with sox</h1>
-    <section id="the-issue">
-        <h2>The issue</h2>
-        <p>This is not a security related post for once (although sox has many security related uses). I just wanted to have a look at some defcon <a href="https://www.youtube.com/watch?v=KrOReHwjCKI">video</a> but there was this annoying noise. I figured others may be interested in how to fix it quick and dirty style and without reaching to the mouse.</p>
-        <p>We'll use youtube-dl, sox and mpv there, nothing fancy.</p>
-    </section>
-    <section id="get-the-audio">
-        <h2>Get the audio</h2>
-        <p>First of all we need to get the audio from the video. This is straitforward:</p>
-        <pre data-language="shell"><span></span>youtube-dl --extract-audio    <span class="se">\</span>
-           --audio-format wav <span class="se">\</span>
-           <span class="s2">&quot;https://www.youtube.com/watch?v=KrOReHwjCKI&quot;</span></pre>
-        <p>In the following the audio file will be named <em>audio.wav</em>.</p>
-    </section>
-    <section id="fix-the-audio">
-        <h2>Fix the audio</h2>
-        <p>We can clearly hear the noise when listening to that audio, but at which frequency is it exactly? Let's start with a spectrogram to see the sound:</p>
-        <pre data-language="shell"><span></span>sox audio.wav -n spectrogram</pre>
-        <img src="../image/spectrogram_noisy.png" />
-        <p>The big purple area is our noise. We want to remove as much as we can of it but without removing the voice. The red band at about 4kHz stands out, it is likely to be part of the "real" sound so we'll try cutting at 5kHz.</p>
-        <p>We want to low frequencies to pass so we need a lowpass filter. This lowpass filter won't remove it blindly, but the higher the frequency the quieter the sound will be. As for any sound manipulation sox is the solution:</p>
-        <pre data-language="shell"><span></span>sox audio.wav fixed_audio.wav lowpass 5k</pre>
-        <p>If you give the audio a try it sounds pretty well. Unfortunately sound isn't really a good blog media so let's compare them visually by drawing another spectrogram:</p>
-        <pre data-language="shell"><span></span>sox fixed_audio.wav -n spectrogram</pre>
-        <img src="../image/spectrogram_fixed.png" />
-        <p>We can see the noise was well reduced. If that's not enough there are sox options to apply stronger filters but this will do in our case.</p>
-    </section>
-    <section id="playing-the-audio-alongside-the-video">
-        <h2>Playing the audio alongside the video</h2>
-        <p>Okay, great, but how do we play our video with the new sound? Turns out mpv has an option for that:</p>
-        <pre data-language="shell"><span></span>mpv --audio-file<span class="o">=</span>fixed_audio.wav <span class="se">\</span>
-    <span class="s2">&quot;https://www.youtube.com/watch?v=KrOReHwjCKI&quot;</span></pre>
-    </section>
-    <section id="conclusion">
-        <h2>Conclusion</h2>
-        <p>Sox is a great tool that doesn't get nearly as much credit as it should. Whenever you want to do sound manipulations, analysis, visualization, it is the tool I reach for.</p>
-        <p>This helps in some CTF challenges because hiding <a href="http://amazingstuff.co.uk/technology/hidden-images-in-sound-recordings/">images</a> in sound is fun, it also helps for signal analysis. On that last subject I strongly recommend the wonderful blog <a href="http://www.windytan.com/">http://www.windytan.com/</a> which doesn't write enough. Really, everything in there is of great value.</p>
-        <p>Although I hope this post will avoid me all this RTFMing next time I have this problem. Turns out the words "audio" and "file" are pretty common in mpv's manual.</p>
-    </section>
-    <footer>Generated on: 2017-05-29 18:08 UTC. </footer>
-
+      <div class="section" id="fixing-video-noise-with-sox">
+<h1>Fixing video noise with sox</h1>
+<div class="section" id="the-issue">
+<h2>The issue</h2>
+<p>This is not a security related post for once (although sox has many security
+related uses). I just wanted to have a look at some defcon <a class="reference external" href="https://www.youtube.com/watch?v=KrOReHwjCKI">video</a>
+but there was this annoying noise. I figured others may be interested in how
+to fix it quick and dirty style and without reaching to the mouse.</p>
+<p>We'll use youtube-dl, sox and mpv there, nothing fancy.</p>
+</div>
+<div class="section" id="get-the-audio">
+<h2>Get the audio</h2>
+<p>First of all we need to get the audio from the video. This is straitforward:</p>
+<pre class="code shell literal-block"><code>youtube-dl --extract-audio    <span class="se">\
+</span>           --audio-format wav <span class="se">\
+</span>           <span class="s2">&quot;https://www.youtube.com/watch?v=KrOReHwjCKI&quot;</span></code></pre>
+<p>In the following the audio file will be named <em>audio.wav</em>.</p>
+</div>
+<div class="section" id="fix-the-audio">
+<h2>Fix the audio</h2>
+<p>We can clearly hear the noise when listening to that audio, but at which
+frequency is it exactly? Let's start with a spectrogram to see the sound:</p>
+<pre class="code shell literal-block"><code>sox audio.wav -n spectrogram</code></pre>
+<img alt="../image/spectrogram_noisy.png" src="../image/spectrogram_noisy.png" />
+<p>The big purple area is our noise. We want to remove as much as we can of it
+but without removing the voice. The red band at about 4kHz stands out, it is
+likely to be part of the &quot;real&quot; sound so we'll try cutting at 5kHz.</p>
+<p>We want to low frequencies to pass so we need a lowpass filter. This lowpass
+filter won't remove it blindly, but the higher the frequency the quieter the
+sound will be. As for any sound manipulation sox is the solution:</p>
+<pre class="code shell literal-block"><code>sox audio.wav fixed_audio.wav lowpass 5k</code></pre>
+<p>If you give the audio a try it sounds pretty well. Unfortunately sound isn't
+really a good blog media so let's compare them visually by drawing another
+spectrogram:</p>
+<pre class="code shell literal-block"><code>sox fixed_audio.wav -n spectrogram</code></pre>
+<img alt="../image/spectrogram_fixed.png" src="../image/spectrogram_fixed.png" />
+<p>We can see the noise was well reduced. If that's not enough there are sox
+options to apply stronger filters but this will do in our case.</p>
+</div>
+<div class="section" id="playing-the-audio-alongside-the-video">
+<h2>Playing the audio alongside the video</h2>
+<p>Okay, great, but how do we play our video with the new sound? Turns out mpv
+has an option for that:</p>
+<pre class="code shell literal-block"><code>mpv --audio-file<span class="o">=</span>fixed_audio.wav <span class="se">\
+</span>    <span class="s2">&quot;https://www.youtube.com/watch?v=KrOReHwjCKI&quot;</span></code></pre>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Sox is a great tool that doesn't get nearly as much credit as it should.
+Whenever you want to do sound manipulations, analysis, visualization, it is
+the tool I reach for.</p>
+<p>This helps in some CTF challenges because hiding <a class="reference external" href="http://amazingstuff.co.uk/technology/hidden-images-in-sound-recordings/">images</a> in sound is fun, it
+also helps for signal analysis. On that last subject I strongly recommend the
+wonderful blog <a class="reference external" href="http://www.windytan.com/">http://www.windytan.com/</a> which doesn't write enough. Really,
+everything in there is of great value.</p>
+<p>Although I hope this post will avoid me all this RTFMing next time I have
+this problem. Turns out the words &quot;audio&quot; and &quot;file&quot; are pretty common in
+mpv's manual.</p>
+</div>
+</div>
     </div>
   </body>
 </html>

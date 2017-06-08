@@ -15,11 +15,11 @@ cat >rss.xml <<EOF
   <ttl>7200</ttl>
 EOF
 
-grep -e dt -e dd index.html |\
+grep -e "<dt>" -e "<dd>" index.html |\
 while read title_line ; do
   read description_line
 
-  link="$(cut -d '"' -f 2 <<< "$title_line")"
+  link="$(cut -d '"' -f 4 <<< "$title_line")"
   title="$(sed 's/^.*>\([^<]\+\)<\/a>.*$/\1/' <<< "$title_line")"
   description="$(sed 's/^.*>\([^<]\+\)<\/dd>.*$/\1/' <<< "$description_line")"
   src="$(sed 's/^article/source/;s/html$/rst/' <<< "$link")"

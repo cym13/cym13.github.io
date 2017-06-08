@@ -1,9 +1,8 @@
 <!DOCTYPE HTML>
-<html >
-  <head> 
-    <title>Fast security source code review</title>
-    <meta charset="utf-8" />
-
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
 
@@ -28,246 +27,396 @@
     </header>
 
     <div class="content">
-      
-    <h1>Fast security source code review</h1>
-    <img width="60%" src="../image/twilight_reading_hard.png" />
-    <section id="the-need-for-fsscr">
-        <h2>The need for FSSCR</h2>
-        <p>There are many situations in which one finds himself wanting to assess the security of a program or library:</p>
-        <ul>
-            <li>knowing if the program is secure before choosing to use it</li>
-            <li>performing a bug bounty to try and win a few bucks</li>
-            <li>making sure our code isn't jeopardizing our users and company</li>
-            <li>finding vulnerabilities to assist a penetration test</li>
-        </ul>
-        <p>I couldn't find any extensive documentation on how to make good and fast code reviews. Getting straight to the point, finding most things in a limited time is a very useful skill for anyone working in IT security. That's why I decided to write my own. It will span over a few blog posts of which I'll incorporate the links here.</p>
-        <p>Also I want to focus on <strong>finding</strong> bugs. To exploit them please refer to other documents.</p>
-    </section>
-    <section id="what-you-ll-find">
-        <h2>What you'll find</h2>
-        <p>There are three kinds of bugs: structural ones, generic ones, and specific ones.</p>
-        <p>To enlight better the kind of bugs we're talking about we'll take as example the <a href="https://www.owasp.org/index.php/Top_10_2013-Top_10">OWASP's Top Ten</a> which periodically draws the list of the ten most common and important web vulnerabilities:</p>
-        <ol type="1">
-            <li>Injections (SQL, OS, LDAP)</li>
-            <li>Broken authentication and session management</li>
-            <li>Cross-Site Scripting (XSS, a kind of injection really)</li>
-            <li>Insecure direct object reference</li>
-            <li>Security misconfiguration</li>
-            <li>Sensitive data exposure</li>
-            <li>Missing function level access control</li>
-            <li>Cross-site request forgery (CSRF)</li>
-            <li>Using components with known vulnerabilities</li>
-            <li>Unvalidated redirects and forwards</li>
-        </ol>
-        <section id="structural-bugs">
-            <h3>Structural bugs</h3>
-            <p>They are bugs of design, where the programmer just didn't think of putting any security in place.</p>
-            <p>The easiest bugs to find are part of this category because they are quite high-level, generally don't require to read much code if any. More importantly they don't require you to know the language used. You'll generally find them without any need for a specific analysis method, just putting yourself in the shoes of an attacker should do.</p>
-            <p>The following vulnerabilities are part of this category:</p>
-            <ul>
-                <li>Insecure direct object reference</li>
-                <li>Security misconfiguration</li>
-                <li>Sensitive data exposure</li>
-                <li>Missing function level access control</li>
-                <li>Using components with known vulnerabilities</li>
-                <li>Unvalidated redirects and forwards</li>
-            </ul>
-            <p>This is more than half of our list. This essentially means more than half of the most common vulnerabilities are design mistakes and not programming ones.</p>
-            <p>Not all of them can easily be found during a static analysis though. While it is by no means impossible if you have access to the live application it is far easier to just try them directly and see the result.</p>
-            <p>It is great to test them dynamically. Where there's a number increment it. Decrement it. Replace it by a quote, some text. Where there's validation go through anyway and see where it leads you. It often happens that the security primitives aren't checked even if they're present.</p>
-            <p>In this scenario source code analysis comes in second: find a bug dynamically first, then look in the source for similar patterns. Bugs often come in group.</p>
-            <p>Some exceptions are the use of vulnerable components, bad cryptography which can lead to a number of the aforementioned cases and security misconfiguration. Those are typically easier to see in the code.</p>
-        </section>
-        <section id="generic-bugs">
-            <h3>Generic bugs</h3>
-            <p>Those are mistakes that are common amongst most languages while still being programming ones. They are the bugs we are primarily looking for when performing a source code analysis.</p>
-            <p>Injections, most broken authentication and session management cases, XSS and CSRF are part of this category. Not only is this the rest of our list it contains the three top elements.</p>
-            <p>These bugs are programming ones. They are the ones for which FSSCR really shines because they are specific enough for many tools to miss them but generic enough that we can devise a method to find them.</p>
-        </section>
-        <section id="specific-bugs">
-            <h3>Specific bugs</h3>
-            <p>Those are the bugs that make the news.</p>
-            <p>Subtle off-by-one errors like the <a href="http://www.cryptofails.com/page/23">Cryptocat case</a>, slight indentation mistakes like <a href="https://www.imperialviolet.org/2014/02/22/applebug.html">Goto fail</a>, buffer overruns like <a href="https://xkcd.com/1354/">Heartbleed</a>. They are often typos where a single character makes the difference. They don't span out of badly designed or uninformed decisions but are true genuine errors (or stealthy <a href="https://freedom-to-tinker.com/2013/10/09/the-linux-backdoor-attempt-of-2003/">backdoors</a> of course). This makes them both extremely dangerous and extremely hard to find. They are also often tightly tied to the language they're written in.</p>
-            <p>There are however a number of ways one can approach the code to unveil those and I might talk about them someday but none of them fits a <em>fast</em> code review so we won't focus too much on them.</p>
-            <p>If you would like more information though I strongly recommend the book “A Bug Hunter's Diary” which is too awesome to be left out.</p>
-        </section>
-    </section>
-    <section id="the-tools">
-        <h2>The tools</h2>
-        <p>I use two kinds of tools mainly: discovery and exploration ones.</p>
-        <section id="discovery-tools">
-            <h3>Discovery tools</h3>
-            <p>They are all the security related automated source code scanner you can find. I don't know of any being really generic so you'll have to find one that's made for the language you study if any. For this reason I don't have much tools to recommend.</p>
-            <p>There is no reason not to use discovery tools: if they make your job easier use them. But be sure never to trust them. They will return false positives and they aren't likely to find most real security problems.</p>
-            <p>Special mention for <a href="https://github.com/openstack/bandit">bandit</a> in python which is the best tool I've found all languages considered. It is quite fasts, precise, security-oriented and very easy to use. It should be part of any project's automated testing stack.</p>
-        </section>
-        <section id="exploration-tools">
-            <h3>Exploration tools</h3>
-            <p>Those are the screwdrivers of our toolbox: rough but deadly efficient.</p>
-            <p>I spend 90% of my time using the following GNU/Linux tools:</p>
-            <ul>
-                <li>GNU Coreutils (bash, grep, sed... Useful to filter and format information)</li>
-                <li>vim (what could I do without a good text editor?)</li>
-                <li><a href="http://ranger.nongnu.org/">ranger</a> (an excellent file manager that I love for its preview mode)</li>
-                <li><a href="https://github.com/cym13/gg">gg</a> (a recursive grep on steroid in pure bash that I wrote)</li>
-            </ul>
-        </section>
-    </section>
-    <section id="know-thy-enemy">
-        <h2>Know thy enemy</h2>
-        <p>As always the exploration phase is the most import part. Getting familiar with the code base is what will make you efficient in the next steps of the analysis.</p>
-        <section id="see-it-live">
-            <h3>See it live</h3>
-            <p>If you have access to the live tool (eg: a website) visit it. Identify the points of interest (Is there authentication? What is the website trying to protect? What are the interaction points?).</p>
-        </section>
-        <section id="get-a-feel-of-the-vocabulary">
-            <h3>Get a feel of the vocabulary</h3>
-            <p>Many companies like defining their own world, calling customers "rabbiters" and items "carrots" for example. Get yourself in their world. For example, when studying a video game there is no point in searching "user_cart" if they call it a "player_booty". Are they talking about passwords, keys, tokens or secrets?</p>
-        </section>
-        <section id="identify-what-you-can-ignore">
-            <h3>Identify what you can ignore</h3>
-            <p>There is generally a lot you can ignore. I usually maintain two copies of the source code for big missions: one is the original, the other is the work version where I systematically delete any file that I don't think I need anymore. It can be resources, photos, near empty files as well as files that aren't likely to present any more vulnerability.</p>
-            <p>This is all about reducing the cognitive load: getting less grep hits, less garbage to filter out, less files to think about. The secret to being fast is avoiding any unnecessary work.</p>
-        </section>
-    </section>
-    <section id="start-with-the-lowest-fruits">
-        <h2>Start with the lowest fruits</h2>
-        <img width="50%" src="../image/after_a_hard_day_of_applebucking.png" />
-        <p>There is no need to build a boat where there is a bridge. The key here is to focus on what is directly available.</p>
-        <p>If you are doing a security audit checking the dynamic parts we discussed in the structural part would go there. I won't talk about it there though.</p>
-        <p>Outdated software is the first thing to look for. <a href="http://www.cvedetails.com/">CVEDetails</a> provides data on most known vulnerabilities, you can use it as reference.</p>
-        <p>If examining a client software look for misplaced logic. Any input validation or query building should be on the server-side. If not there is a good chance it's not properly validated on the other end. There is no need for SQL injection if the client is allowed to run any query it chooses.</p>
-        <p>After that look for passwords and other sensitive information hard-coded in the project's file. <em>gg</em> is your friend. This is not without link with the previous point: if there is direct access to a SQL server for example there needs to be credentials somewhere readily available.</p>
-        <pre>Keywords: password passw pwd key token secret</pre>
-        <p>If this doesn't give anything try it the other way around: identify places where they might make use of a hard-coded secret: use of an external service, development services which usually have weak passwords, etc. Try to adapt your vocabulary. Leverage your exploration phase fully.</p>
-    </section>
-    <section id="cryptography-the-great-forgotten">
-        <h2>Cryptography, the great forgotten</h2>
-        <p>The last low fruit is cryptography. Cryptography has a reputation of being impossible to grasp although identifying flaws is often quite easy in practice. It is easy to screw up, even security professionals generally shy away from it, finding common flaws is easy and if there's encryption there's definitely something worth finding.</p>
-        <p>This makes it the perfect think to look for in a FSSCR. I will dedicate a whole article to the subject but here are some starters:</p>
-        <ul>
-            <li>Missing encryption is worse than bad encryption. Is there any connection that should use HTTPS and isn't? Does the service allow us to bypass the encryption in any way? Is the original data really annihilated?</li>
-            <li>Encryption without authentication can never be useful. For example an HTTPS connection that doesn't check the validity of the certificate just enforces that the communication between the application and the recipient is kept secret. It doesn't help much if the recipient is actually the attacker. Note that a shared secret counts as authentication: I prove that I am who I say I am by providing this password only you and me know.</li>
-            <li>You are likely to find the name of the encryption scheme used such as "AES256-CBC-PKCS1" or hash algorithms like "MD5". Just look it up on the internet, you're likely to find many people asking about it. If you find no answer then you might be against something exotic which is dubious at least.</li>
-            <li>Cryptography needs real randomness. Use of the default random number function provided by the language or, worse, of time or constants <strong>will</strong> result in vulnerabilities.</li>
-        </ul>
-        <pre>Keywords: crypt cipher rand hash time secret obfuscate</pre>
-        <p>There are much more that could be said of course, but those four points will keep you running. Such flaws really are incredibly common.</p>
-    </section>
-    <section id="the-error-lies-in-the-interface">
-        <h2>The error lies in the interface</h2>
-        <p>Most bugs don't happen where the code is well managed with its internal logic, it happens at the interface, at the boundary of two worlds where the logic shifts from a rule set to another.</p>
-        <p>All injections are a problem at the interface of two languages:</p>
-        <ul>
-            <li>XSS: webserver language v/s HTML and JavaScript</li>
-            <li>SQL injection: application language v/s SQL</li>
-            <li>Shell injection: application language v/s shell</li>
-            <li>XML External Entity: XML v/s DTD</li>
-            <li>Eval misuse: application language v/s application language as text</li>
-            <li>Deserialization issues: application language v/s serialized language</li>
-            <li>...</li>
-        </ul>
-        <p>All those are very important issues that only happen in very specific code. This makes it easier to find them: just look for interface code.</p>
-        <p>Find code that manipulates text, preferably directly with string concatenation rather than through library functions that may perform escaping. Look for code dealing with well-known interfaces such as XML parsing, data serialization or SQL queries.</p>
-        <p>Learn about the edge functionalities of the format and library used. Most XML parsers accept DTD by default, yaml has directives to execute shell code and Perl's open will execute commands if the right filename is given.</p>
-        <p>All those vulnerabilities lie on the same principles: one should always make sure when interpreting something that what is data remains data and what is code remains code. Shell injections through file names, XSS through link URLs... If it's data it should be escaped without thinking twice about it.</p>
-        <pre>Keywords: exec system process query open load send read</pre>
-    </section>
-    <section id="privilege-escalations">
-        <h2>Privilege escalations</h2>
-        <p>There are other kinds of interfaces that can be exploited, like the boundary between user permissions. This is where privilege escalations dwell.</p>
-        <p>The idea of a privilege escalation is to gain more rights than you have by getting a privileged process to some execute code on your behalf. This can be done legitimately as with sudo on GNU/Linux systems.</p>
-        <p>However bugs like race conditions, bad error handling, untamed imports can lead the process to execute code that wasn't intended to be executed. The vulnerable application is then compelled to execute code on behalf on another process.</p>
-        <p>Check any file manipulation. Is the file that you opened really what you think it is? Could someone have had swapped it with a symbolic link while you weren't looking? Are the tests well performed and the exception handled? What files are you importing, is that DLL really the one you think it is? Are all paths unambiguous?</p>
-        <p>It doesn't matter how slim the possibility really is because privilege escalation is a domain where the attacker has an advantage: as he is already on the system he has access to a lot of information on the permissions and can try as many times as he wants to trigger an unstable bug. He only needs to get it right once.</p>
-        <pre>Keywords: open file read write rename chmod islink exists loadlibrary exec</pre>
-        <p>More in the <a href="scr_privesc.html">dedicated article</a>.</p>
-        <p>Of course not all kind of applications will be susceptible to privilege escalations. There are lots of bugs that are in some way application specific. CSRF attacks or session fixations for example do not target anything but web applications. What is important is to learn and recognize the kind of bugs that is specific to your application.</p>
-    </section>
-    <section id="the-language-barrier">
-        <h2>The language barrier</h2>
-        <p>Maybe you've noticed that we didn't talk about any specific programming language yet. It is because all the bugs we saw are largely language agnostic.</p>
-        <section id="language-specifics">
-            <h3>Language specifics</h3>
-            <p>Of course this doesn't mean that the programming language doesn't matter. Some languages like Perl or Ruby strive on proposing many ways to do the same thing which complicates the analysis, contrary to languages like Python that try to propose one default way to do the work. Multiple syntaxes mean more time to search the same kind of operations.</p>
-            <p>Also all languages have their specificities. Ruby is one of the only languages that uses multi-line regex by default for example. This means that there might be bugs if the programmer uses "^" and "$" instead of \A and \Z to match the beginning and end of line. Similarly in Lua array indexing starts at 1 so subtracting one to the length of the list won't give the index of the last element, that could cause an off-by-one bug.</p>
-            <p>To find language specific bugs the experience you have with the language matters a lot. But to find the generic bugs we listed before, not so much actually.</p>
-            <p>A shell injection will always be a shell injection, no matter what language it's written in. If you don't know the language just look up what functions and syntax can be used to perform shell execution and look for it. Most languages share the same names for common functions.</p>
-        </section>
-        <section id="manual-memory-management">
-            <h3>Manual memory management</h3>
-            <p>There is however one class of languages that hides a whole category of very specific and powerful bugs: those with manual memory management, and first and foremost the C programming language.</p>
-            <p>C (and C++ with it) has a whole class of bugs that hardly ever happen in any managed language such as Python, Java or C#:</p>
-            <ul>
-                <li>uninitialized memory</li>
-                <li>buffer overflow</li>
-                <li>double free</li>
-                <li>use-after-free</li>
-                <li>pointer arithmetic error</li>
-            </ul>
-            <p>To those I'd like to add "integer overflow" which many high-level languages such as Python or Perl avoid gracefully, but I can't count Java and C# amongst them.</p>
-            <p>The reason is simple, by giving the programmer more leverage to manage his memory there are more times where the memory isn't managed as it should.</p>
-            <p>If you study C programs, those bugs are important and generally hard to find. I strongly recommend using tools such as <a href="http://cppcheck.sourceforge.net/">cppcheck</a> or <a href="http://clang-analyzer.llvm.org/scan-build.html">scan-build</a> to help you in this task.</p>
-            <p>We won't talk about them here because they deserve much more than a few lines in a blog post. However, remember that all the bugs we talked about earlier are also present in C programs.</p>
-        </section>
-    </section>
-    <section id="going-further">
-        <h2>Going further</h2>
-        <img width="40%" src="../image/fluttershy_mane_in_wind.png" />
-        <p>There is of course much more to say about code reviews. I will write more detailed articles about some points I glanced over in this post and update this page in circumstance.</p>
-        <p>If you want to go further here are some resources that I found interesting:</p>
-        <ul>
-            <li>
-                <dl>
-                    <dt><a href="http://www.trapkit.de/books/bhd/en.html">A Bug Hunter's Diary</a></dt>
-                    <dd>Complete analysis by Tobias Klein of some bugs he found, how he found them and how they could be exploited. Very low-level, but very enlightening.</dd>
-                </dl>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <dl>
-                    <dt><a href="https://msdn.microsoft.com/en-us/library/ff649315.aspx">How to Perform a Security Code Review for Managed Code</a></dt>
-                    <dd>An article by Microsoft explaining their review method. Very thorough.</dd>
-                </dl>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <dl>
-                    <dt><a href="https://access.redhat.com/blogs/766093/posts/2592591">A bite of Python</a></dt>
-                    <dd>Python specific tips and tricks for security reviews.</dd>
-                </dl>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <dl>
-                    <dt><a href="http://phrack.org/issues/69/12.html">Attacking Ruby on Rails Applications</a></dt>
-                    <dd>Phrack article on common pitfalls of Rails applications.</dd>
-                </dl>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <dl>
-                    <dt><a href="https://pentest.blog/unexpected-journey-3-visiting-another-siem-and-uncovering-pre-auth-privileged-remote-code-execution/">Unexpected Journey #3</a></dt>
-                    <dd>A good example of what a <em>fast</em> code review can look like.</dd>
-                </dl>
-            </li>
-        </ul>
-        <p>Have fun!</p>
-        <section id="image-sources">
-            <h3>Image sources</h3>
-            <ul>
-                <li><a href="http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png">http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png</a></li>
-                <li><a href="http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258">http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258</a></li>
-                <li><a href="http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849">http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849</a></li>
-            </ul>
-        </section>
-    </section>
-    <footer>Generated on: 2017-05-16 12:47 UTC. </footer>
-
+      <div class="section" id="fast-security-source-code-review">
+<h1>Fast security source code review</h1>
+<img alt="../image/twilight_reading_hard.png" src="../image/twilight_reading_hard.png" style="width: 60%;" />
+<div class="section" id="the-need-for-fsscr">
+<h2>The need for FSSCR</h2>
+<p>There are many situations in which one finds himself wanting to assess the
+security of a program or library:</p>
+<ul class="simple">
+<li><p>knowing if the program is secure before choosing to use it</p></li>
+<li><p>performing a bug bounty to try and win a few bucks</p></li>
+<li><p>making sure our code isn't jeopardizing our users and company</p></li>
+<li><p>finding vulnerabilities to assist a penetration test</p></li>
+</ul>
+<p>I couldn't find any extensive documentation on how to make good and fast
+code reviews. Getting straight to the point, finding most things in a limited
+time is a very useful skill for anyone working in IT security. That's why I
+decided to write my own. It will span over a few blog posts of which I'll
+incorporate the links here.</p>
+<p>Also I want to focus on <strong>finding</strong> bugs. To exploit them please refer to
+other documents.</p>
+</div>
+<div class="section" id="what-you-ll-find">
+<h2>What you'll find</h2>
+<p>There are three kinds of bugs: structural ones, generic ones, and specific
+ones.</p>
+<p>To enlight better the kind of bugs we're talking about we'll take as example
+the <a class="reference external" href="https://www.owasp.org/index.php/Top_10_2013-Top_10">OWASP's Top Ten</a>
+which periodically draws the list of the ten most common and important web
+vulnerabilities:</p>
+<ol class="arabic simple">
+<li><p>Injections (SQL, OS, LDAP)</p></li>
+<li><p>Broken authentication and session management</p></li>
+<li><p>Cross-Site Scripting (XSS, a kind of injection really)</p></li>
+<li><p>Insecure direct object reference</p></li>
+<li><p>Security misconfiguration</p></li>
+<li><p>Sensitive data exposure</p></li>
+<li><p>Missing function level access control</p></li>
+<li><p>Cross-site request forgery (CSRF)</p></li>
+<li><p>Using components with known vulnerabilities</p></li>
+<li><p>Unvalidated redirects and forwards</p></li>
+</ol>
+<div class="section" id="structural-bugs">
+<h3>Structural bugs</h3>
+<p>They are bugs of design, where the programmer just didn't think of putting
+any security in place.</p>
+<p>The easiest bugs to find are part of this category because they are quite
+high-level, generally don't require to read much code if any. More
+importantly they don't require you to know the language used.  You'll
+generally find them without any need for a specific analysis method, just
+putting yourself in the shoes of an attacker should do.</p>
+<p>The following vulnerabilities are part of this category:</p>
+<ul class="simple">
+<li><p>Insecure direct object reference</p></li>
+<li><p>Security misconfiguration</p></li>
+<li><p>Sensitive data exposure</p></li>
+<li><p>Missing function level access control</p></li>
+<li><p>Using components with known vulnerabilities</p></li>
+<li><p>Unvalidated redirects and forwards</p></li>
+</ul>
+<p>This is more than half of our list. This essentially means more than half of
+the most common vulnerabilities are design mistakes and not programming ones.</p>
+<p>Not all of them can easily be found during a static analysis though. While it
+is by no means impossible if you have access to the live application it is
+far easier to just try them directly and see the result.</p>
+<p>It is great to test them dynamically. Where there's a number increment it.
+Decrement it. Replace it by a quote, some text. Where there's validation go
+through anyway and see where it leads you. It often happens that the security
+primitives aren't checked even if they're present.</p>
+<p>In this scenario source code analysis comes in second: find a bug dynamically
+first, then look in the source for similar patterns. Bugs often come in
+group.</p>
+<p>Some exceptions are the use of vulnerable components, bad cryptography which
+can lead to a number of the aforementioned cases and security
+misconfiguration. Those are typically easier to see in the code.</p>
+</div>
+<div class="section" id="generic-bugs">
+<h3>Generic bugs</h3>
+<p>Those are mistakes that are common amongst most languages while still being
+programming ones. They are the bugs we are primarily looking for when
+performing a source code analysis.</p>
+<p>Injections, most broken authentication and session management cases, XSS and
+CSRF are part of this category. Not only is this the rest of our list it
+contains the three top elements.</p>
+<p>These bugs are programming ones. They are the ones for which FSSCR really
+shines because they are specific enough for many tools to miss them but
+generic enough that we can devise a method to find them.</p>
+</div>
+<div class="section" id="specific-bugs">
+<h3>Specific bugs</h3>
+<p>Those are the bugs that make the news.</p>
+<p>Subtle off-by-one errors like the <a class="reference external" href="http://www.cryptofails.com/page/23">Cryptocat case</a>, slight indentation mistakes like
+<a class="reference external" href="https://www.imperialviolet.org/2014/02/22/applebug.html">Goto fail</a>,
+buffer overruns like <a class="reference external" href="https://xkcd.com/1354/">Heartbleed</a>. They are often
+typos where a single character makes the difference. They don't span out of
+badly designed or uninformed decisions but are true genuine errors (or
+stealthy <a class="reference external" href="https://freedom-to-tinker.com/2013/10/09/the-linux-backdoor-attempt-of-2003/">backdoors</a> of course). This makes them both extremely dangerous and
+extremely hard to find. They are also often tightly tied to the language
+they're written in.</p>
+<p>There are however a number of ways one can approach the code to unveil those
+and I might talk about them someday but none of them fits a <em>fast</em> code
+review so we won't focus too much on them.</p>
+<p>If you would like more information though I strongly recommend the book “A
+Bug Hunter's Diary” which is too awesome to be left out.</p>
+</div>
+</div>
+<div class="section" id="the-tools">
+<h2>The tools</h2>
+<p>I use two kinds of tools mainly: discovery and exploration ones.</p>
+<div class="section" id="discovery-tools">
+<h3>Discovery tools</h3>
+<p>They are all the security related automated source code scanner you can find.
+I don't know of any being really generic so you'll have to find one that's
+made for the language you study if any. For this reason I don't have much
+tools to recommend.</p>
+<p>There is no reason not to use discovery tools: if they make your job easier
+use them. But be sure never to trust them. They will return false positives
+and they aren't likely to find most real security problems.</p>
+<p>Special mention for <a class="reference external" href="https://github.com/openstack/bandit">bandit</a> in python which is the best tool I've found all
+languages considered. It is quite fasts, precise, security-oriented and very
+easy to use. It should be part of any project's automated testing stack.</p>
+</div>
+<div class="section" id="exploration-tools">
+<h3>Exploration tools</h3>
+<p>Those are the screwdrivers of our toolbox: rough but deadly efficient.</p>
+<p>I spend 90% of my time using the following GNU/Linux tools:</p>
+<ul class="simple">
+<li><p>GNU Coreutils (bash, grep, sed... Useful to filter and format information)</p></li>
+<li><p>vim (what could I do without a good text editor?)</p></li>
+<li><p><a class="reference external" href="http://ranger.nongnu.org/">ranger</a> (an excellent file manager that I love for its preview mode)</p></li>
+<li><p><a class="reference external" href="https://github.com/cym13/gg">gg</a> (a recursive grep on steroid in pure bash that I wrote)</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="know-thy-enemy">
+<h2>Know thy enemy</h2>
+<p>As always the exploration phase is the most import part. Getting familiar
+with the code base is what will make you efficient in the next steps of the
+analysis.</p>
+<div class="section" id="see-it-live">
+<h3>See it live</h3>
+<p>If you have access to the live tool (eg: a website) visit it. Identify the
+points of interest (Is there authentication? What is the website trying to
+protect? What are the interaction points?).</p>
+</div>
+<div class="section" id="get-a-feel-of-the-vocabulary">
+<h3>Get a feel of the vocabulary</h3>
+<p>Many companies like defining their own world, calling customers &quot;rabbiters&quot;
+and items &quot;carrots&quot; for example. Get yourself in their world. For example,
+when studying a video game there is no point in searching &quot;user_cart&quot; if they
+call it a &quot;player_booty&quot;. Are they talking about passwords, keys, tokens or
+secrets?</p>
+</div>
+<div class="section" id="identify-what-you-can-ignore">
+<h3>Identify what you can ignore</h3>
+<p>There is generally a lot you can ignore. I usually maintain two copies of the
+source code for big missions: one is the original, the other is the work
+version where I systematically delete any file that I don't think I need
+anymore. It can be resources, photos, near empty files as well as files that
+aren't likely to present any more vulnerability.</p>
+<p>This is all about reducing the cognitive load: getting less grep hits, less
+garbage to filter out, less files to think about. The secret to being fast is
+avoiding any unnecessary work.</p>
+</div>
+</div>
+<div class="section" id="start-with-the-lowest-fruits">
+<h2>Start with the lowest fruits</h2>
+<img alt="../image/after_a_hard_day_of_applebucking.png" src="../image/after_a_hard_day_of_applebucking.png" style="width: 50%;" />
+<p>There is no need to build a boat where there is a bridge. The key here is to
+focus on what is directly available.</p>
+<p>If you are doing a security audit checking the dynamic parts we discussed in
+the structural part would go there. I won't talk about it there though.</p>
+<p>Outdated software is the first thing to look for. <a class="reference external" href="http://www.cvedetails.com/">CVEDetails</a> provides data
+on most known vulnerabilities, you can use it as reference.</p>
+<p>If examining a client software look for misplaced logic. Any input validation
+or query building should be on the server-side. If not there is a good chance
+it's not properly validated on the other end. There is no need for SQL
+injection if the client is allowed to run any query it chooses.</p>
+<p>After that look for passwords and other sensitive information hard-coded in
+the project's file. <em>gg</em> is your friend. This is not without link with the
+previous point: if there is direct access to a SQL server for example there
+needs to be credentials somewhere readily available.</p>
+<pre class="literal-block">Keywords: password passw pwd key token secret</pre>
+<p>If this doesn't give anything try it the other way around: identify places
+where they might make use of a hard-coded secret: use of an external service,
+development services which usually have weak passwords, etc. Try to adapt
+your vocabulary. Leverage your exploration phase fully.</p>
+</div>
+<div class="section" id="cryptography-the-great-forgotten">
+<h2>Cryptography, the great forgotten</h2>
+<p>The last low fruit is cryptography. Cryptography has a reputation of being
+impossible to grasp although identifying flaws is often quite easy in
+practice. It is easy to screw up, even security professionals generally shy
+away from it, finding common flaws is easy and if there's encryption there's
+definitely something worth finding.</p>
+<p>This makes it the perfect think to look for in a FSSCR. I will dedicate a
+whole article to the subject but here are some starters:</p>
+<ul class="simple">
+<li><p>Missing encryption is worse than bad encryption. Is there any connection
+that should use HTTPS and isn't? Does the service allow us to bypass the
+encryption in any way? Is the original data really annihilated?</p></li>
+<li><p>Encryption without authentication can never be useful. For example an HTTPS
+connection that doesn't check the validity of the certificate just enforces
+that the communication between the application and the recipient is kept
+secret. It doesn't help much if the recipient is actually the attacker.
+Note that a shared secret counts as authentication: I prove that I am who I
+say I am by providing this password only you and me know.</p></li>
+<li><p>You are likely to find the name of the encryption scheme used such as
+&quot;AES256-CBC-PKCS1&quot; or hash algorithms like &quot;MD5&quot;. Just look it up on the
+internet, you're likely to find many people asking about it. If you find no
+answer then you might be against something exotic which is dubious at least.</p></li>
+<li><p>Cryptography needs real randomness. Use of the default random number
+function provided by the language or, worse, of time or constants <strong>will</strong>
+result in vulnerabilities.</p></li>
+</ul>
+<pre class="literal-block">Keywords: crypt cipher rand hash time secret obfuscate</pre>
+<p>There are much more that could be said of course, but those four points will
+keep you running. Such flaws really are incredibly common.</p>
+</div>
+<div class="section" id="the-error-lies-in-the-interface">
+<h2>The error lies in the interface</h2>
+<p>Most bugs don't happen where the code is well managed with its internal
+logic, it happens at the interface, at the boundary of two worlds where the
+logic shifts from a rule set to another.</p>
+<p>All injections are a problem at the interface of two languages:</p>
+<ul class="simple">
+<li><p>XSS: webserver language v/s HTML and JavaScript</p></li>
+<li><p>SQL injection: application language v/s SQL</p></li>
+<li><p>Shell injection: application language v/s shell</p></li>
+<li><p>XML External Entity: XML v/s DTD</p></li>
+<li><p>Eval misuse: application language v/s application language as text</p></li>
+<li><p>Deserialization issues: application language v/s serialized language</p></li>
+<li><p>...</p></li>
+</ul>
+<p>All those are very important issues that only happen in very specific code.
+This makes it easier to find them: just look for interface code.</p>
+<p>Find code that manipulates text, preferably directly with string
+concatenation rather than through library functions that may perform
+escaping. Look for code dealing with well-known interfaces such as XML
+parsing, data serialization or SQL queries.</p>
+<p>Learn about the edge functionalities of the format and library used. Most XML
+parsers accept DTD by default, yaml has directives to execute shell code and
+Perl's open will execute commands if the right filename is given.</p>
+<p>All those vulnerabilities lie on the same principles: one should always make
+sure when interpreting something that what is data remains data and what is
+code remains code. Shell injections through file names, XSS through link
+URLs... If it's data it should be escaped without thinking twice about it.</p>
+<pre class="literal-block">Keywords: exec system process query open load send read</pre>
+</div>
+<div class="section" id="privilege-escalations">
+<h2>Privilege escalations</h2>
+<p>There are other kinds of interfaces that can be exploited, like the boundary
+between user permissions. This is where privilege escalations dwell.</p>
+<p>The idea of a privilege escalation is to gain more rights than you have by
+getting a privileged process to some execute code on your behalf. This can be
+done legitimately as with sudo on GNU/Linux systems.</p>
+<p>However bugs like race conditions, bad error handling, untamed imports can
+lead the process to execute code that wasn't intended to be executed. The
+vulnerable application is then compelled to execute code on behalf on another
+process.</p>
+<p>Check any file manipulation. Is the file that you opened really what you
+think it is? Could someone have had swapped it with a symbolic link while you
+weren't looking? Are the tests well performed and the exception handled? What
+files are you importing, is that DLL really the one you think it is? Are all
+paths unambiguous?</p>
+<p>It doesn't matter how slim the possibility really is because privilege
+escalation is a domain where the attacker has an advantage: as he is already
+on the system he has access to a lot of information on the permissions and
+can try as many times as he wants to trigger an unstable bug. He only needs
+to get it right once.</p>
+<pre class="literal-block">Keywords: open file read write rename chmod islink exists loadlibrary exec</pre>
+<p>More in the <a class="reference external" href="scr_privesc.html">dedicated article</a>.</p>
+<p>Of course not all kind of applications will be susceptible to privilege
+escalations. There are lots of bugs that are in some way application
+specific. CSRF attacks or session fixations for example do not target
+anything but web applications. What is important is to learn and recognize
+the kind of bugs that is specific to your application.</p>
+</div>
+<div class="section" id="the-language-barrier">
+<h2>The language barrier</h2>
+<p>Maybe you've noticed that we didn't talk about any specific programming
+language yet. It is because all the bugs we saw are largely language
+agnostic.</p>
+<div class="section" id="language-specifics">
+<h3>Language specifics</h3>
+<p>Of course this doesn't mean that the programming language doesn't matter.
+Some languages like Perl or Ruby strive on proposing many ways to do the same
+thing which complicates the analysis, contrary to languages like Python that
+try to propose one default way to do the work. Multiple syntaxes mean more
+time to search the same kind of operations.</p>
+<p>Also all languages have their specificities. Ruby is one of the only
+languages that uses multi-line regex by default for example. This means that
+there might be bugs if the programmer uses &quot;^&quot; and &quot;$&quot; instead of \A and \Z
+to match the beginning and end of line. Similarly in Lua array indexing
+starts at 1 so subtracting one to the length of the list won't give the
+index of the last element, that could cause an off-by-one bug.</p>
+<p>To find language specific bugs the experience you have with the language
+matters a lot. But to find the generic bugs we listed before, not so much
+actually.</p>
+<p>A shell injection will always be a shell injection, no matter what language
+it's written in. If you don't know the language just look up what functions
+and syntax can be used to perform shell execution and look for it. Most
+languages share the same names for common functions.</p>
+</div>
+<div class="section" id="manual-memory-management">
+<h3>Manual memory management</h3>
+<p>There is however one class of languages that hides a whole category of very
+specific and powerful bugs: those with manual memory management, and first
+and foremost the C programming language.</p>
+<p>C (and C++ with it) has a whole class of bugs that hardly ever happen in any
+managed language such as Python, Java or C#:</p>
+<ul class="simple">
+<li><p>uninitialized memory</p></li>
+<li><p>buffer overflow</p></li>
+<li><p>double free</p></li>
+<li><p>use-after-free</p></li>
+<li><p>pointer arithmetic error</p></li>
+</ul>
+<p>To those I'd like to add &quot;integer overflow&quot; which many high-level languages
+such as Python or Perl avoid gracefully, but I can't count Java and C#
+amongst them.</p>
+<p>The reason is simple, by giving the programmer more leverage to manage his
+memory there are more times where the memory isn't managed as it should.</p>
+<p>If you study C programs, those bugs are important and generally hard to find.
+I strongly recommend using tools such as <a class="reference external" href="http://cppcheck.sourceforge.net/">cppcheck</a> or <a class="reference external" href="http://clang-analyzer.llvm.org/scan-build.html">scan-build</a> to help you
+in this task.</p>
+<p>We won't talk about them here because they deserve much more than a few lines
+in a blog post. However, remember that all the bugs we talked about earlier
+are also present in C programs.</p>
+</div>
+</div>
+<div class="section" id="going-further">
+<h2>Going further</h2>
+<img alt="../image/fluttershy_mane_in_wind.png" src="../image/fluttershy_mane_in_wind.png" style="width: 40%;" />
+<p>There is of course much more to say about code reviews. I will write more
+detailed articles about some points I glanced over in this post and update
+this page in circumstance.</p>
+<p>If you want to go further here are some resources that I found interesting:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="http://www.trapkit.de/books/bhd/en.html">A Bug Hunter's Diary</a></dt>
+<dd><p>Complete analysis by Tobias Klein of some bugs he found, how he found
+them and how they could be exploited. Very low-level, but very
+enlightening.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="https://msdn.microsoft.com/en-us/library/ff649315.aspx">How to Perform a Security Code Review for Managed Code</a></dt>
+<dd><p>An article by Microsoft explaining their review method. Very thorough.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="https://access.redhat.com/blogs/766093/posts/2592591">A bite of Python</a></dt>
+<dd><p>Python specific tips and tricks for security reviews.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="http://phrack.org/issues/69/12.html">Attacking Ruby on Rails Applications</a></dt>
+<dd><p>Phrack article on common pitfalls of Rails applications.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference external" href="https://pentest.blog/unexpected-journey-3-visiting-another-siem-and-uncovering-pre-auth-privileged-remote-code-execution/">Unexpected Journey #3</a></dt>
+<dd><p>A good example of what a <em>fast</em> code review can look like.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Have fun!</p>
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png">http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png</a></p></li>
+<li><p><a class="reference external" href="http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258">http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258</a></p></li>
+<li><p><a class="reference external" href="http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849">http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849</a></p></li>
+</ul>
+</div>
+</div>
+</div>
     </div>
   </body>
 </html>

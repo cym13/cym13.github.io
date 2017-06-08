@@ -1,9 +1,8 @@
 <!DOCTYPE HTML>
-<html >
-  <head> 
-    <title>Ed: l'éditeur standard</title>
-    <meta charset="utf-8" />
-
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
 
@@ -28,90 +27,125 @@
     </header>
 
     <div class="content">
-      
-    <h1>Ed: l'éditeur standard</h1>
-    <section id="introduction">
-        <h2>Introduction</h2>
-        <p>Ed est un éditeur de texte datant de 1969, aujourd'hui encore, fait partie du standard POSIX normalement respecté par tout système UNIX ou Linux. A l'époque il n'était pas possible à cause des ressources limitées d'afficher les modifications effectuées sur le texte en temps réel comme n'importe quel éditeur récent le fait. On interragit avec le texte par commandes interposées.</p>
-        <p>Ed est à l'origine de nombreux outils comme sed, ex, vi, ou vim qui reprennent tout ou partie de ses commandes appréciées pour leur expressivité et leur concision. Étant donné que ces outils sont maintenant communs cette introduction suppose une certaine familiarité du lecteur avec au moins vi ou sed bien qu'il soit possible de la suivre sans avoir utilisé ces outils auparavant.</p>
-    </section>
-    <section id="a-la-rencontre-du-monstre">
-        <h2>À la rencontre du monstre</h2>
-        <p>Lançons la bête puis essayons de la quitter :</p>
-        <pre data-language="text"><span></span>$ ed
+      <div class="section" id="ed-l-editeur-standard">
+<h1>Ed: l'éditeur standard</h1>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>Ed est un éditeur de texte datant de 1969, aujourd'hui encore, fait partie du
+standard POSIX normalement respecté par tout système UNIX ou Linux. A
+l'époque il n'était pas possible à cause des ressources limitées d'afficher
+les modifications effectuées sur le texte en temps réel comme n'importe quel
+éditeur récent le fait. On interragit avec le texte par commandes
+interposées.</p>
+<p>Ed est à l'origine de nombreux outils comme sed, ex, vi, ou vim qui reprennent
+tout ou partie de ses commandes appréciées pour leur expressivité et leur
+concision. Étant donné que ces outils sont maintenant communs cette
+introduction suppose une certaine familiarité du lecteur avec au moins vi ou
+sed bien qu'il soit possible de la suivre sans avoir utilisé ces outils
+auparavant.</p>
+</div>
+<div class="section" id="a-la-rencontre-du-monstre">
+<h2>À la rencontre du monstre</h2>
+<p>Lançons la bête puis essayons de la quitter :</p>
+<pre class="code text literal-block"><code>$ ed
 ^C
 ?
 quit
 ?
-q</pre>
-        <p>Par défaut Ed ne possède aucun prompt permettant de distinguer l'attente d'une commande d'une attente de texte "brut". De même l'affichage des erreurs est succint : un point d'interrogation marque l'incompréhension. La commande 'h' permet d'afficher des informations sur la dernière erreur rencontrée:</p>
-        <pre data-language="text"><span></span>$ ed
+q</code></pre>
+<p>Par défaut Ed ne possède aucun prompt permettant de distinguer l'attente
+d'une commande d'une attente de texte &quot;brut&quot;. De même l'affichage des erreurs
+est succint : un point d'interrogation marque l'incompréhension. La commande
+'h' permet d'afficher des informations sur la dernière erreur rencontrée:</p>
+<pre class="code text literal-block"><code>$ ed
 quit
 ?
 h
 Invalid command suffix
-q</pre>
-        <p>Comme on peut le voir Ed n'a pas compris la commande "quit", mais semble reconnaître le début. C'est tout à fait normal car 'q' est la commande permettant de quitter l'éditeur. Toutes les commandes vous l'aurez deviné ne sont constituées que d'une seule lettre.</p>
-        <p>Afin de faciliter l'édition nous allons définir un alias pour mettre en place un prompt et automatiquement afficher les messages d'erreur :</p>
-        <pre data-language="sh"><span></span><span class="nb">alias</span> <span class="nv">ed</span><span class="o">=</span><span class="s1">&#39;ed --prompt=&quot;&gt;&gt;&gt; &quot; --verbose &#39;</span></pre>
-        <p>Tout les exemples du reste de cette introduction employeront cet alias.</p>
-    </section>
-    <section id="edition-basique">
-        <h2>Édition basique</h2>
-        <section id="creer-un-nouveau-fichier">
-            <h3>Créer un nouveau fichier</h3>
-            <p>Nous allons maintenant créer un nouveau fichier pour explorer les possibilités :</p>
-            <pre data-language="text"><span></span>$ ed myfile
+q</code></pre>
+<p>Comme on peut le voir Ed n'a pas compris la commande &quot;quit&quot;, mais semble
+reconnaître le début. C'est tout à fait normal car 'q' est la commande
+permettant de quitter l'éditeur. Toutes les commandes vous l'aurez deviné ne
+sont constituées que d'une seule lettre.</p>
+<p>Afin de faciliter l'édition nous allons définir un alias pour mettre en place
+un prompt et automatiquement afficher les messages d'erreur :</p>
+<pre class="code sh literal-block"><code><span class="nb">alias</span> <span class="nv">ed</span><span class="o">=</span><span class="s1">'ed --prompt=&quot;&gt;&gt;&gt; &quot; --verbose '</span></code></pre>
+<p>Tout les exemples du reste de cette introduction employeront cet alias.</p>
+</div>
+<div class="section" id="edition-basique">
+<h2>Édition basique</h2>
+<div class="section" id="creer-un-nouveau-fichier">
+<h3>Créer un nouveau fichier</h3>
+<p>Nous allons maintenant créer un nouveau fichier pour explorer les
+possibilités :</p>
+<pre class="code text literal-block"><code>$ ed myfile
 myfile: No such file or directory
-&gt;&gt;&gt; # La commande # permet de faire des commentaires dans ed</pre>
-            <p>Entrons du texte avec 'a' pour 'append'.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; a
+&gt;&gt;&gt; # La commande # permet de faire des commentaires dans ed</code></pre>
+<p>Entrons du texte avec 'a' pour 'append'.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; a
 Note the consistent user interface and error reportage.
 Ed is generous enough to flag errors,
 yet prudent enough not to overwhelm the novice with verbosity.
-.</pre>
-            <p>Toute entrée de texte se termine par un point solitaire. Après cette edition nous sommes placés à la fin du texte entré comme on peut facilement le constater avec la commande 'p' pour 'print' ou encore 'n' pour 'number' qui affichent respectivement la ligne courante et la ligne avec son numéro.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; p
+.</code></pre>
+<p>Toute entrée de texte se termine par un point solitaire. Après cette edition
+nous sommes placés à la fin du texte entré comme on peut facilement le
+constater avec la commande 'p' pour 'print' ou encore 'n' pour 'number' qui
+affichent respectivement la ligne courante et la ligne avec son numéro.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; p
 yet prudent enough not to overwhelm the novice with verbosity.
 &gt;&gt;&gt; n
-3       yet prudent enough not to overwhelm the novice with verbosity.</pre>
-            <p>On peut afficher une ligne en particulier en plaçant son numéro devant la commande, et même employer une plage de nombre pour un affichage multiple :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 2p
+3       yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
+<p>On peut afficher une ligne en particulier en plaçant son numéro devant la
+commande, et même employer une plage de nombre pour un affichage multiple :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 2p
 Ed is generous enough to flag errors,
 &gt;&gt;&gt; 1,3n
 1       Note the consistent user interface and error reportage.
 2       Ed is generous enough to flag errors,
-3       yet prudent enough not to overwhelm the novice with verbosity.</pre>
-            <p>Il est possible d'utiliser ces addresses avec n'importe quelle commande Ed, par exemple 'i' pour 'insert' qui a un effet similaire à 'a' si ce n'est que le texte est entré avant la ligne courante au lieu de après.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1i
+3       yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
+<p>Il est possible d'utiliser ces addresses avec n'importe quelle commande Ed,
+par exemple 'i' pour 'insert' qui a un effet similaire à 'a' si ce n'est que
+le texte est entré avant la ligne courante au lieu de après.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1i
 # Source https://www.gnu.org/fun/jokes/ed.msg
-.</pre>
-            <p>Entrer une addresse sans commande nous place à cette position.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 2
-Note the consistent user interface and error reportage.</pre>
-            <p>Nous pouvons maintenant écrire le fichier sur le disque (write donc 'w') et quitter ('q') l'éditeur. L'opération est suffisamment commune pour qu'on puisse utiliser les deux commandes en une :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; wq
-203</pre>
-            <p>Le nombre inscrit en sortie correspond au nombre d'octets écrits dans le fichier. Write peut également prendre en argument un nom de fichier pour enregistrer tout ou partie (avec une plage d'addresse) du fichier courant dans un autre.</p>
-        </section>
-        <section id="editer-un-fichier-existant">
-            <h3>Éditer un fichier existant</h3>
-            <p>Nous allons maintenant le reprendre, Ed nous placera naturellement à la dernière ligne.</p>
-            <pre data-language="text"><span></span>$ ed myfile
+.</code></pre>
+<p>Entrer une addresse sans commande nous place à cette position.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 2
+Note the consistent user interface and error reportage.</code></pre>
+<p>Nous pouvons maintenant écrire le fichier sur le disque (write donc 'w') et
+quitter ('q') l'éditeur. L'opération est suffisamment commune pour qu'on
+puisse utiliser les deux commandes en une :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; wq
+203</code></pre>
+<p>Le nombre inscrit en sortie correspond au nombre d'octets écrits dans le
+fichier. Write peut également prendre en argument un nom de fichier pour
+enregistrer tout ou partie (avec une plage d'addresse) du fichier courant
+dans un autre.</p>
+</div>
+<div class="section" id="editer-un-fichier-existant">
+<h3>Éditer un fichier existant</h3>
+<p>Nous allons maintenant le reprendre, Ed nous placera naturellement à la
+dernière ligne.</p>
+<pre class="code text literal-block"><code>$ ed myfile
 203
 &gt;&gt;&gt; p
-yet prudent enough not to overwhelm the novice with verbosity.</pre>
-            <p>On retrouve l'affichage de la taille du fichier. Afficher tout le fichier est possible à l'aide d'une range, '$' signifiant dans ce contexte « dernière ligne ».</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1,$p
+yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
+<p>On retrouve l'affichage de la taille du fichier. Afficher tout le fichier est
+possible à l'aide d'une range, '$' signifiant dans ce contexte « dernière
+ligne ».</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1,$p
 # Source https://www.gnu.org/fun/jokes/ed.msg
 Note the consistent user interface and error reportage.
 Ed is generous enough to flag errors,
-yet prudent enough not to overwhelm the novice with verbosity.</pre>
-            <p>Cependant cela peut poser problème si le fichier que nous sommes en train de manipuler est particulièrement gros. Ouvrons à fin d'exemple le fichier /etc/services à l'aide de la commande 'e' pour 'edit' :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; e /etc/services
-293694</pre>
-            <p>Nous allons afficher le texte bloc par bloc depuis le début en utilisant '.' pour référencer la ligne courante.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1
+yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
+<p>Cependant cela peut poser problème si le fichier que nous sommes en train de
+manipuler est particulièrement gros. Ouvrons à fin d'exemple le fichier
+/etc/services à l'aide de la commande 'e' pour 'edit' :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; e /etc/services
+293694</code></pre>
+<p>Nous allons afficher le texte bloc par bloc depuis le début en utilisant '.'
+pour référencer la ligne courante.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1
 # Full data: /usr/share/iana-etc/port-numbers.iana
 &gt;&gt;&gt; .,.+5p
 # Full data: /usr/share/iana-etc/port-numbers.iana
@@ -125,14 +159,16 @@ compressnet         2/tcp
 compressnet         3/udp
 rje                 5/tcp
 rje                 5/udp
-echo                7/tcp</pre>
-            <p>On voit vite plusieurs problèmes avec cette méthode :</p>
-            <ul>
-                <li>Comme la ligne courante est comprise il faudrait en fait faire .+1,.+5p</li>
-                <li>Le fait que Ed n'ai pas d'historique des commandes rend l'opération vite lassante.</li>
-            </ul>
-            <p>C'est en partie pour ces raisons qu'Ed permet d'afficher le texte bloc par bloc où chaque bloc fait la taille de l'écran courant avec 'z'.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1z
+echo                7/tcp</code></pre>
+<p>On voit vite plusieurs problèmes avec cette méthode :</p>
+<ul class="simple">
+<li><p>Comme la ligne courante est comprise il faudrait en fait faire .+1,.+5p</p></li>
+<li><p>Le fait que Ed n'ai pas d'historique des commandes rend l'opération vite
+lassante.</p></li>
+</ul>
+<p>C'est en partie pour ces raisons qu'Ed permet d'afficher le texte bloc par
+bloc où chaque bloc fait la taille de l'écran courant avec 'z'.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1z
 # Full data: /usr/share/iana-etc/port-numbers.iana
 
 tcpmux              1/tcp
@@ -151,9 +187,11 @@ discard             9/sctp
 discard             9/dccp
 systat             11/tcp
 systat             11/udp
-daytime            13/tcp</pre>
-            <p>Celui-ci peut même être combiné avec 'n' pour obtenir les numéros de lignes, et sans addresse explicite il part de la ligne courante ce qui rend la navigation plus aisée et sans répétition de ligne.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; zn
+daytime            13/tcp</code></pre>
+<p>Celui-ci peut même être combiné avec 'n' pour obtenir les numéros de lignes,
+et sans addresse explicite il part de la ligne courante ce qui rend la
+navigation plus aisée et sans répétition de ligne.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; zn
 20      daytime            13/udp
 21      qotd               17/tcp
 22      qotd               17/udp
@@ -172,18 +210,21 @@ daytime            13/tcp</pre>
 35      telnet             23/udp
 36      smtp               25/tcp
 37      smtp               25/udp
-38      nsw-fe             27/tcp</pre>
-        </section>
-        <section id="chercher-et-modifier">
-            <h3>Chercher et modifier</h3>
-            <p>Chercher du texte est sans suprise pour un utilisateur de vim :</p>
-            <ul>
-                <li>'/regex/' ammène à la première occurence rencontrée dans le sens de lecture naturel.</li>
-                <li>'?regex?' ammène à la première occurence rencontrée dans le sens de lecture inverse.</li>
-                <li>'/' ou '?' répètent la dernière recherche dans un sens ou dans l'autre.</li>
-                <li>Il n'est pas nécessaire de "fermer" la recherche en répétant la commande si on ne combine pas celle-ci avec autre chose.</li>
-            </ul>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; /https/
+38      nsw-fe             27/tcp</code></pre>
+</div>
+<div class="section" id="chercher-et-modifier">
+<h3>Chercher et modifier</h3>
+<p>Chercher du texte est sans suprise pour un utilisateur de vim :</p>
+<ul class="simple">
+<li><p>'/regex/' ammène à la première occurence rencontrée dans le sens de lecture
+naturel.</p></li>
+<li><p>'?regex?' ammène à la première occurence rencontrée dans le sens de lecture
+inverse.</p></li>
+<li><p>'/' ou '?' répètent la dernière recherche dans un sens ou dans l'autre.</p></li>
+<li><p>Il n'est pas nécessaire de &quot;fermer&quot; la recherche en répétant la commande si
+on ne combine pas celle-ci avec autre chose.</p></li>
+</ul>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; /https/
 https             443/tcp
 &gt;&gt;&gt; ?ssh?
 ssh                22/sctp
@@ -192,9 +233,11 @@ https             443/tcp
 &gt;&gt;&gt; /
 https             443/udp
 &gt;&gt;&gt; ?
-https             443/tcp</pre>
-            <p>Comme suggérer on peut en effet l'employer en conjonction avec d'autres commandes car une recherche par regex est en fait considéré comme une addresse. On peut donc également les utiliser dans des ranges :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1
+https             443/tcp</code></pre>
+<p>Comme suggérer on peut en effet l'employer en conjonction avec d'autres
+commandes car une recherche par regex est en fait considéré comme une
+addresse. On peut donc également les utiliser dans des ranges :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1
 # Full data: /usr/share/iana-etc/port-numbers.iana
 &gt;&gt;&gt; /ssh/n
 31      ssh                22/tcp
@@ -204,9 +247,11 @@ ssh                22/udp
 ssh                22/sctp
 telnet             23/tcp
 telnet             23/udp
-smtp               25/tcp</pre>
-            <p>Pour réaliser une opération sur toutes les lignes correspondant à la recherche on peut utiliser le préfix 'g' pour 'global'. C'est d'ailleurs de là que vient le nom de grep : « g/re/p »</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; g/ssh/p
+smtp               25/tcp</code></pre>
+<p>Pour réaliser une opération sur toutes les lignes correspondant à la
+recherche on peut utiliser le préfix 'g' pour 'global'. C'est d'ailleurs de
+là que vient le nom de grep : « g/re/p »</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; g/ssh/p
 ssh                22/tcp
 ssh                22/udp
 ssh                22/sctp
@@ -222,11 +267,21 @@ snmpssh-trap     5162/tcp
 tl1-ssh          6252/tcp
 tl1-ssh          6252/udp
 ssh-mgmt        17235/tcp
-ssh-mgmt        17235/udp</pre>
-            <p>Pour réaliser une commande sur les lignes ne correspondant pas à une regex on utilise le préfixe 'v' à la place de 'g' qui a notamment donné son nom à l'option de grep '-v'.</p>
-            <p>Modifier le texte se fait principalement par l'intermédiare de deux commandes : 's' pour 'substitute' et 'c' pour 'change'. La première modifie une ou plusieurs lignes en remplaçant une expression par une autre alors que la seconde supprime la ou les lignes addressées et entre en mode insertion afin d'entrer la nouvelle version.</p>
-            <p>Substitute ne change cependant que la première occurence par défaut. On peut lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en suffixe un nombre pour signifier l'occurence précise à remplacer. De plus, ommettre le symbole de fin de commande indique la volonté d'afficher le nouveau texte :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1
+ssh-mgmt        17235/udp</code></pre>
+<p>Pour réaliser une commande sur les lignes ne correspondant pas à une regex on
+utilise le préfixe 'v' à la place de 'g' qui a notamment donné son nom à
+l'option de grep '-v'.</p>
+<p>Modifier le texte se fait principalement par l'intermédiare de deux
+commandes : 's' pour 'substitute' et 'c' pour 'change'. La première modifie
+une ou plusieurs lignes en remplaçant une expression par une autre alors que
+la seconde supprime la ou les lignes addressées et entre en mode insertion
+afin d'entrer la nouvelle version.</p>
+<p>Substitute ne change cependant que la première occurence par défaut. On peut
+lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en
+suffixe un nombre pour signifier l'occurence précise à remplacer. De plus,
+ommettre le symbole de fin de commande indique la volonté d'afficher le
+nouveau texte :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1
 # Full data: /usr/share/iana-etc/port-numbers.iana
 &gt;&gt;&gt; s/a/A/
 &gt;&gt;&gt; p
@@ -242,22 +297,25 @@ ssh-mgmt        17235/udp</pre>
 &gt;&gt;&gt; p
 # Full dAtA: /usr/shAre/iAnA-etc/port-numbers.iAnA
 &gt;&gt;&gt; s/A/a/gp
-# Full data: /usr/share/iana-etc/port-numbers.iana</pre>
-            <p>Pour substituer sur l'ensemble du texte on peut soit utiliser la range '1,$' soit le préfixe '%' qui a le même effet. On est placé à la dernière occurence modifiée.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1,$s/a/A/gp
+# Full data: /usr/share/iana-etc/port-numbers.iana</code></pre>
+<p>Pour substituer sur l'ensemble du texte on peut soit utiliser la range '1,$'
+soit le préfixe '%' qui a le même effet. On est placé à la dernière occurence
+modifiée.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1,$s/a/A/gp
 mAtAhAri        49000/tcp
 &gt;&gt;&gt; %s/A/a/gp
-matahari        49000/tcp</pre>
-            <p>On peut annuler la denrière modification avec 'u' pour 'undo'. Refaire 'u' annule l'annulation ce qui revient à appliquer de nouveau la modification.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; u
+matahari        49000/tcp</code></pre>
+<p>On peut annuler la denrière modification avec 'u' pour 'undo'. Refaire 'u'
+annule l'annulation ce qui revient à appliquer de nouveau la modification.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; u
 &gt;&gt;&gt; p
 &gt;&gt;&gt; p
 mAtAhAri        49000/tcp
 &gt;&gt;&gt; u
 &gt;&gt;&gt; p
-matahari        49000/tcp</pre>
-            <p>Supprimer une ligne se fait avec 'd' pour 'delete'.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 1,5n
+matahari        49000/tcp</code></pre>
+<p>Supprimer une ligne se fait avec 'd' pour 'delete'.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 1,5n
 1       # Full data: /usr/share/iana-etc/port-numbers.iana
 2
 3       tcpmux              1/tcp
@@ -276,9 +334,9 @@ matahari        49000/tcp</pre>
 2
 3       tcpmux              1/tcp
 4       tcpmux              1/udp
-5       compressnet         2/tcp</pre>
-            <p>Pour supprimer et insérer on peut utiliser 'c' :</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 3,4c
+5       compressnet         2/tcp</code></pre>
+<p>Pour supprimer et insérer on peut utiliser 'c' :</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 3,4c
 haha
 huhu
 .
@@ -287,25 +345,32 @@ huhu
 2
 3       haha
 4       huhu
-5       compressnet         2/tcp</pre>
-            <p>Puisque nous n'avons pas les droits d'écriture dans le fichier il nous faut quitter sans enregistrer, c'est fait avec 'Q'.</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; w
+5       compressnet         2/tcp</code></pre>
+<p>Puisque nous n'avons pas les droits d'écriture dans le fichier il nous faut
+quitter sans enregistrer, c'est fait avec 'Q'.</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; w
 /etc/services: Permission denied
 ?
 Cannot open output file
 &gt;&gt;&gt; q
 ?
 Warning: buffer modified
-&gt;&gt;&gt; Q</pre>
-            <p>Ce qui a été vu jusqu'ici suffit à une utilisation des plus basiques mais il y a plus à Ed que cela et le confort dépend beaucoup des petites choses qui facilitent la vie sans forcément la changer.</p>
-        </section>
-    </section>
-    <section id="utilisation-avancee">
-        <h2>Utilisation avancée</h2>
-        <section id="interagir-avec-le-shell">
-            <h3>Interagir avec le shell</h3>
-            <p>Les interactions avec le shell sont sans doute le point le plus important du confort dans l'utilisation de Ed. Elle se fait avec la commande '!' et permet soit d'exécuter une commande shell, soit d'en récupérer le contenu dans le document courant, soit de passer tout ou partie du document courant comme entrée standard d'une commande.</p>
-            <pre data-language="text"><span></span>$ ed
+&gt;&gt;&gt; Q</code></pre>
+<p>Ce qui a été vu jusqu'ici suffit à une utilisation des plus basiques mais il
+y a plus à Ed que cela et le confort dépend beaucoup des petites choses qui
+facilitent la vie sans forcément la changer.</p>
+</div>
+</div>
+<div class="section" id="utilisation-avancee">
+<h2>Utilisation avancée</h2>
+<div class="section" id="interagir-avec-le-shell">
+<h3>Interagir avec le shell</h3>
+<p>Les interactions avec le shell sont sans doute le point le plus important du
+confort dans l'utilisation de Ed. Elle se fait avec la commande '!' et permet
+soit d'exécuter une commande shell, soit d'en récupérer le contenu dans le
+document courant, soit de passer tout ou partie du document courant comme
+entrée standard d'une commande.</p>
+<pre class="code text literal-block"><code>$ ed
 &gt;&gt;&gt; !ls
 articles  bin  Documents  downloads  images  myfile  usr  videos
 !
@@ -324,7 +389,7 @@ articles  bin  Documents  downloads  images  myfile  usr  videos
 Documents
 downloads
 31
-&gt;&gt;&gt; w !tr &#39;A-Z&#39; &#39;a-z&#39;
+&gt;&gt;&gt; w !tr 'A-Z' 'a-z'
 articles
 bin
 documents
@@ -334,13 +399,16 @@ myfile
 usr
 videos
 58
-&gt;&gt;&gt; q</pre>
-            <p>On a ici utilisé la commande 'r' pour 'read' que l'on avait pas eu l'occasion de croiser auparavant. Elle permet d'insérer à la position courante le contenu d'un autre fichier ou, comme ici avec '!', d'une commande shell.</p>
-        </section>
-        <section id="inserer-du-texte-au-debut-d-un-bloc">
-            <h3>Insérer du texte au début d'un bloc</h3>
-            <p>Moins une fonctionnalité avancées qu'un « truc » utile pour, par exemple commenter ou identer du texte:</p>
-            <pre data-language="text"><span></span>$ ed
+&gt;&gt;&gt; q</code></pre>
+<p>On a ici utilisé la commande 'r' pour 'read' que l'on avait pas eu l'occasion
+de croiser auparavant. Elle permet d'insérer à la position courante le
+contenu d'un autre fichier ou, comme ici avec '!', d'une commande shell.</p>
+</div>
+<div class="section" id="inserer-du-texte-au-debut-d-un-bloc">
+<h3>Insérer du texte au début d'un bloc</h3>
+<p>Moins une fonctionnalité avancées qu'un « truc » utile pour, par exemple
+commenter ou identer du texte:</p>
+<pre class="code text literal-block"><code>$ ed
 &gt;&gt;&gt; a
 My best pony is Pinkie Pie
 Although I like Twilight very much
@@ -350,12 +418,14 @@ And Rainbow Dash is just the coolest
 &gt;&gt;&gt; 1,3p
 # My best pony is Pinkie Pie
 # Although I like Twilight very much
-# And Rainbow Dash is just the coolest</pre>
-        </section>
-        <section id="deplacer-et-copier">
-            <h3>Déplacer et copier</h3>
-            <p>Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour 'transfer'. Le bloc est plaçé après la ligne à l'addresse indiquée, celle-ci pouvant être 0.</p>
-            <pre data-language="text"><span></span>$ ed myfile
+# And Rainbow Dash is just the coolest</code></pre>
+</div>
+<div class="section" id="deplacer-et-copier">
+<h3>Déplacer et copier</h3>
+<p>Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
+'transfer'. Le bloc est plaçé après la ligne à l'addresse indiquée, celle-ci
+pouvant être 0.</p>
+<pre class="code text literal-block"><code>$ ed myfile
 203
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
@@ -375,9 +445,14 @@ And Rainbow Dash is just the coolest
 3       Ed is generous enough to flag errors,
 4       # Source https://www.gnu.org/fun/jokes/ed.msg
 5       Note the consistent user interface and error reportage.
-6       yet prudent enough not to overwhelm the novice with verbosity.</pre>
-            <p>Copier peut également se faire avec 'y' pour 'yank' et 'x'. Yank place la cible dans le buffer de copie et 'x' place le contenu du buffer de copie à l'addresse indiquée. Yank n'est pas la seule commande à modifier ce buffer : lorsque l'on supprime avec 'd' ou change avec 'c' une ou plusieurs lignes elles sont également placées dans ce buffer ce qui permet de faire du « couper/coller ».</p>
-            <pre data-language="text"><span></span>&gt;&gt;&gt; 3y
+6       yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
+<p>Copier peut également se faire avec 'y' pour 'yank' et 'x'. Yank place la
+cible dans le buffer de copie et 'x' place le contenu du buffer de copie à
+l'addresse indiquée. Yank n'est pas la seule commande à modifier ce buffer :
+lorsque l'on supprime avec 'd' ou change avec 'c' une ou plusieurs lignes
+elles sont également placées dans ce buffer ce qui permet de faire du
+« couper/coller ».</p>
+<pre class="code text literal-block"><code>&gt;&gt;&gt; 3y
 &gt;&gt;&gt; 5x
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
@@ -396,20 +471,21 @@ And Rainbow Dash is just the coolest
 4       yet prudent enough not to overwhelm the novice with verbosity.
 5       # Source https://www.gnu.org/fun/jokes/ed.msg
 6       Note the consistent user interface and error reportage.
-7       Ed is generous enough to flag errors,</pre>
-        </section>
-    </section>
-    <section id="ressources-externes">
-        <h2>Ressources externes</h2>
-        <dl>
-            <dt>Cheat Sheet</dt>
-            <dd><a href="http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf">http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf</a></dd>
-            <dt>Tutorial par le vénérale Brian Kernighan (co-créateur d'unix et du C)</dt>
-            <dd><a href="http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf">http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf</a></dd>
-        </dl>
-    </section>
-    <footer>Generated on: 2017-04-03 18:10 UTC. </footer>
-
+7       Ed is generous enough to flag errors,</code></pre>
+</div>
+</div>
+<div class="section" id="ressources-externes">
+<h2>Ressources externes</h2>
+<dl class="simple">
+<dt>Cheat Sheet</dt>
+<dd><p><a class="reference external" href="http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf">http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf</a></p>
+</dd>
+<dt>Tutorial par le vénérale Brian Kernighan (co-créateur d'unix et du C)</dt>
+<dd><p><a class="reference external" href="http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf">http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf</a></p>
+</dd>
+</dl>
+</div>
+</div>
     </div>
   </body>
 </html>

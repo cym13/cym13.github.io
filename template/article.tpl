@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
-<html {html_attr}>
-  <head> {head}
+<html>
+  <head> %(head)s
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
 
@@ -25,7 +25,7 @@
     </header>
 
     <div class="content">
-      {body}
+      %(body)s
     </div>
   </body>
 </html>

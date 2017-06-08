@@ -1,9 +1,8 @@
 <!DOCTYPE HTML>
-<html >
-  <head> 
-    <title>Comment who fonctionne-t-il ?</title>
-    <meta charset="utf-8" />
-
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.13.1: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
 
@@ -28,18 +27,21 @@
     </header>
 
     <div class="content">
-      
-    <h1>Comment who fonctionne-t-il ?</h1>
-    <section id="explication-preliminaire">
-        <h2>Explication préliminaire</h2>
-        <p>Une question posée sur irc est à l'origine de cette question, l'utilisateur en question assurant que <strong>who</strong> ne retournait rien pour lui, pas même les informations du shell courant.</p>
-        <p>Le cas a paru intéressant pour montrer comment utiliser strace en pratique.</p>
-    </section>
-    <section id="bon-ok-mais-c-est-quoi-who">
-        <h2>Bon, ok, mais c'est quoi who ?</h2>
-        <p><strong>who</strong> est une commande permettant de voir quels sont les utilisateurs loggés sur le système, sur quel terminal et depuis combien de temps.</p>
-        <p>Exemple:</p>
-        <pre data-language="bash"><span></span>$ who
+      <div class="section" id="comment-who-fonctionne-t-il">
+<h1>Comment who fonctionne-t-il ?</h1>
+<div class="section" id="explication-preliminaire">
+<h2>Explication préliminaire</h2>
+<p>Une question posée sur irc est à l'origine de cette question, l'utilisateur
+en question assurant que <strong>who</strong> ne retournait rien pour lui, pas même les
+informations du shell courant.</p>
+<p>Le cas a paru intéressant pour montrer comment utiliser strace en pratique.</p>
+</div>
+<div class="section" id="bon-ok-mais-c-est-quoi-who">
+<h2>Bon, ok, mais c'est quoi who ?</h2>
+<p><strong>who</strong> est une commande permettant de voir quels sont les utilisateurs
+loggés sur le système, sur quel terminal et depuis combien de temps.</p>
+<p>Exemple:</p>
+<pre class="code bash literal-block"><code>$ who
 cym13    tty1         <span class="m">2016</span>-02-15 <span class="m">18</span>:17
 cym13    pts/1        <span class="m">2016</span>-02-15 <span class="m">19</span>:08 <span class="o">(</span>:pts/2:S.0<span class="o">)</span>
 cym13    pts/3        <span class="m">2016</span>-02-15 <span class="m">18</span>:17 <span class="o">(</span>:pts/4:S.0<span class="o">)</span>
@@ -47,51 +49,80 @@ cym13    pts/5        <span class="m">2016</span>-02-15 <span class="m">18</span
 cym13    pts/7        <span class="m">2016</span>-02-15 <span class="m">18</span>:17 <span class="o">(</span>:pts/8:S.0<span class="o">)</span>
 cym13    pts/9        <span class="m">2016</span>-02-15 <span class="m">20</span>:23 <span class="o">(</span>:pts/10:S.0<span class="o">)</span>
 cym13    pts/12       <span class="m">2016</span>-02-15 <span class="m">19</span>:21 <span class="o">(</span>:pts/13:S.0<span class="o">)</span>
-cym13    pts/15       <span class="m">2016</span>-02-15 <span class="m">19</span>:50 <span class="o">(</span>:pts/2:S.1<span class="o">)</span></pre>
-        <p>Je suis loggé une fois sur le système depuis un tty d'où la première ligne, et j'ai 7 terminaux d'ouverts. À chacun correspond un pts. Comme on peut le constater il est difficile d'imaginer lancer <strong>who</strong> sans avoir de sortie, on devrait avoir au moins une ligne correspondant au shell depuis lequel <strong>who</strong> est lancé.</p>
-        <p>Du coup on va chercher à savoir comment fonctionne <strong>who</strong>. Et pour ça on va lire son code source ! Bon peut-être pas en fait. <strong>who</strong> est un logiciel libre faisant partie du projet GNU coreutils donc son code source est tout à fait accessible. Cependant ça nous donnera des informations sur comment il est sensé fonctionner en théorie alors que des informations dynamiques (quelles sont effectivement les opérations effectuées) seraient intéressantes. Ceci étant dit j'invite vraiment à prendre l'habitude de lire le code de ce genre de programmes, c'est très instructif.</p>
-    </section>
-    <section id="bon-mais-du-coup-on-fait-quoi">
-        <h2>Bon, mais du coup on fait quoi ?</h2>
-        <p>Et bien du coup nous allons utiliser <strong>strace</strong>. <strong>strace</strong> est un utilitaire permettant de tracer les appels systèmes fait au noyau linux.</p>
-        <section id="un-appel-quoi">
-            <h3>Un appel quoi ?</h3>
-            <p>Le travail du noyau linux c'est de faire le lien entre le matériel (clavier, écran, souris, disque dur...) et le logiciel utilisant ce matériel. Un logiciel n'accède donc normalement jamais au matériel directement, à la place il dépose sa demande auprès du noyau qui lui interragit avec le matériel puis renvois la réponse. Cette demande c'est un appel système.</p>
-            <p>On fait donc des appels systèmes tout le temps puisque chaque interraction avec quelque chose qui n'est pas logiciel en génère ! Au moment où j'écris ces lignes par exemple j'ai des appels systèmes read() qui sont effectués pour lire les touches tapées au clavier, des appels write() pour sauvegarder périodiquement mon fichier sur mon disque dur, des appels recv() sans doute aussi en arrière plan avec mon lecteur de RSS qui reçoit des informations depuis des servers distants... Toute action non triviale passe par un appel système ou presque.</p>
-            <p>Pour savoir quels sont les appels systèmes pour linux 64 bits on peut aller voir dans /usr/include/asm/unistd_64.h</p>
-            <pre data-language="bash"><span></span>$ cat /usr/include/asm/unistd_64.h
-<span class="c1">#ifndef _ASM_X86_UNISTD_64_H</span>
-<span class="c1">#define _ASM_X86_UNISTD_64_H 1</span>
-
-<span class="c1">#define __NR_read 0</span>
-<span class="c1">#define __NR_write 1</span>
-<span class="c1">#define __NR_open 2</span>
-<span class="c1">#define __NR_close 3</span>
-<span class="c1">#define __NR_stat 4</span>
-<span class="c1">#define __NR_fstat 5</span>
-<span class="c1">#define __NR_lstat 6</span>
-...</pre>
-            <p>Comme on peut le voir les appels systèmes sont numérotés, on apperçoit read() et write() que nous avons déjà évoqué.</p>
-            <p>Pour avoir plus d'information sur un appel système on peut utiliser le manuel, les pages correspondants aux appels systèmes sont dans la section 2 :</p>
-            <pre data-language="bash"><span></span>$ man <span class="m">2</span> <span class="nb">read</span>
-READ<span class="o">(</span><span class="m">2</span><span class="o">)</span>       Linux Programmer<span class="err">&#39;</span>s Manual       READ<span class="o">(</span><span class="m">2</span><span class="o">)</span>
+cym13    pts/15       <span class="m">2016</span>-02-15 <span class="m">19</span>:50 <span class="o">(</span>:pts/2:S.1<span class="o">)</span></code></pre>
+<p>Je suis loggé une fois sur le système depuis un tty d'où la première ligne,
+et j'ai 7 terminaux d'ouverts. À chacun correspond un pts. Comme on peut le
+constater il est difficile d'imaginer lancer <strong>who</strong> sans avoir de sortie, on
+devrait avoir au moins une ligne correspondant au shell depuis lequel <strong>who</strong>
+est lancé.</p>
+<p>Du coup on va chercher à savoir comment fonctionne <strong>who</strong>. Et pour ça on va
+lire son code source ! Bon peut-être pas en fait. <strong>who</strong> est un logiciel
+libre faisant partie du projet GNU coreutils donc son code source est tout à
+fait accessible. Cependant ça nous donnera des informations sur comment il
+est sensé fonctionner en théorie alors que des informations dynamiques
+(quelles sont effectivement les opérations effectuées) seraient
+intéressantes. Ceci étant dit j'invite vraiment à prendre l'habitude de lire
+le code de ce genre de programmes, c'est très instructif.</p>
+</div>
+<div class="section" id="bon-mais-du-coup-on-fait-quoi">
+<h2>Bon, mais du coup on fait quoi ?</h2>
+<p>Et bien du coup nous allons utiliser <strong>strace</strong>. <strong>strace</strong> est un utilitaire
+permettant de tracer les appels systèmes fait au noyau linux.</p>
+<div class="section" id="un-appel-quoi">
+<h3>Un appel quoi ?</h3>
+<p>Le travail du noyau linux c'est de faire le lien entre le matériel (clavier,
+écran, souris, disque dur...) et le logiciel utilisant ce matériel. Un
+logiciel n'accède donc normalement jamais au matériel directement, à la place
+il dépose sa demande auprès du noyau qui lui interragit avec le matériel puis
+renvois la réponse. Cette demande c'est un appel système.</p>
+<p>On fait donc des appels systèmes tout le temps puisque chaque interraction
+avec quelque chose qui n'est pas logiciel en génère ! Au moment où j'écris
+ces lignes par exemple j'ai des appels systèmes read() qui sont effectués
+pour lire les touches tapées au clavier, des appels write() pour sauvegarder
+périodiquement mon fichier sur mon disque dur, des appels recv() sans doute
+aussi en arrière plan avec mon lecteur de RSS qui reçoit des informations
+depuis des servers distants... Toute action non triviale passe par un appel
+système ou presque.</p>
+<p>Pour savoir quels sont les appels systèmes pour linux 64 bits on peut aller
+voir dans /usr/include/asm/unistd_64.h</p>
+<pre class="code bash literal-block"><code>$ cat /usr/include/asm/unistd_64.h
+<span class="c1">#ifndef _ASM_X86_UNISTD_64_H
+#define _ASM_X86_UNISTD_64_H 1
+</span>
+<span class="c1">#define __NR_read 0
+#define __NR_write 1
+#define __NR_open 2
+#define __NR_close 3
+#define __NR_stat 4
+#define __NR_fstat 5
+#define __NR_lstat 6
+</span>...</code></pre>
+<p>Comme on peut le voir les appels systèmes sont numérotés, on apperçoit read()
+et write() que nous avons déjà évoqué.</p>
+<p>Pour avoir plus d'information sur un appel système on peut utiliser le
+manuel, les pages correspondants aux appels systèmes sont dans la section 2 :</p>
+<pre class="code bash literal-block"><code>$ man <span class="m">2</span> <span class="nb">read</span>
+READ<span class="o">(</span><span class="m">2</span><span class="o">)</span>       Linux Programmer<span class="err">'</span>s Manual       READ<span class="o">(</span><span class="m">2</span><span class="o">)</span>
 
 NAME
        <span class="nb">read</span> - <span class="nb">read</span> from a file descriptor
 
 SYNOPSIS
-       <span class="c1">#include &lt;unistd.h&gt;</span>
-
-       ssize_t read<span class="o">(</span>int fd, void *buf, size_t count<span class="o">)</span><span class="p">;</span></pre>
-            <!-- *** -->
-            <p>On peut constater que du point de vu d'un programmeur un appel système est une fonction C comme une autre, il est tout à fait possible de les utiliser dans un programme directement.</p>
-        </section>
-    </section>
-    <section id="bon-mais-strace-du-coup">
-        <h2>Bon, mais strace du coup ?</h2>
-        <p><strong>strace</strong> nous permet de tracer ces appels pour un processus donné et donc de voir ce qui est demandé exactement au kernel et ce qu'il répond en retour.</p>
-        <p>Voici un exemple sur une commande simple..</p>
-        <pre data-language="bash"><span></span>$ strace <span class="nb">echo</span> <span class="s1">&#39;Hello World!&#39;</span>
+       <span class="c1">#include &lt;unistd.h&gt;
+</span>
+       ssize_t read<span class="o">(</span>int fd, void *buf, size_t count<span class="o">)</span><span class="p">;</span></code></pre>
+<!-- *** -->
+<p>On peut constater que du point de vu d'un programmeur un appel système est
+une fonction C comme une autre, il est tout à fait possible de les utiliser
+dans un programme directement.</p>
+</div>
+</div>
+<div class="section" id="bon-mais-strace-du-coup">
+<h2>Bon, mais strace du coup ?</h2>
+<p><strong>strace</strong> nous permet de tracer ces appels pour un processus donné et donc
+de voir ce qui est demandé exactement au kernel et ce qu'il répond en retour.</p>
+<p>Voici un exemple sur une commande simple..</p>
+<pre class="code bash literal-block"><code>$ strace <span class="nb">echo</span> <span class="s1">'Hello World!'</span>
 execve<span class="o">(</span><span class="s2">&quot;/usr/bin/echo&quot;</span>, <span class="o">[</span><span class="s2">&quot;echo&quot;</span>, <span class="s2">&quot;Hello World!&quot;</span><span class="o">]</span>, <span class="o">[</span>/* <span class="m">47</span> vars */<span class="o">])</span> <span class="o">=</span> <span class="m">0</span>
 brk<span class="o">(</span><span class="m">0</span><span class="o">)</span>                                  <span class="o">=</span> 0x23ac000
 access<span class="o">(</span><span class="s2">&quot;/etc/ld.so.preload&quot;</span>, R_OK<span class="o">)</span>
@@ -139,40 +170,73 @@ close<span class="o">(</span><span class="m">1</span><span class="o">)</span>   
 munmap<span class="o">(</span>0x7fe7c7164000, <span class="m">4096</span><span class="o">)</span>            <span class="o">=</span> <span class="m">0</span>
 close<span class="o">(</span><span class="m">2</span><span class="o">)</span>                                <span class="o">=</span> <span class="m">0</span>
 exit_group<span class="o">(</span><span class="m">0</span><span class="o">)</span>                           <span class="o">=</span> ?
-+++ exited with <span class="m">0</span> +++</pre>
-        <!-- *** -->
-        <p>Bon. Vu comme ça ça ne parait pas particulièrement utile, et pourtant il y a beaucoup d'informations très intéressantes. On va voir ça par partie pour comprendre un peu mieux ce qui se passe. <strong>L'essentiel est de ne pas chercher à tout comprendre</strong>. Il y a beaucoup de choses qui se passe et seule une fraction correspond à notre problème. Il ne faut pas se focaliser sur l'incompris.</p>
-        <p>La première ligne est un appel à exceve(). Cet appel dit au système d'exploitation « Hé, je voudrais lancer le programme /usr/bin/echo avec les arguments "echo" et "Hello World!". » Le fait d'avoir "echo" comme argument ne devrait pas étonner les programmeurs, si vous avez déjà récupéré les arguments passés par la ligne de commande dans un programme vous savez que le premier argument est le nom avec lequel le programme a été appelé.</p>
-        <p>Ensuite le système charge d'éventuelles librairies passées via LD_PRELOAD, on voit que l'accès a échoué car nous n'en avons pas spécifié. Si vous ne savez pas ce qu'est LD_PRELOAD je vous invite à vous renseigner dessus ; bien que ce soit hors du propos de cet article c'est un système très sympa à connaître.</p>
-        <p>On charge ensuite la librairies standard C en ouvrant deux librairies et lisant le contenu des fichiers avant de les refermer (d'open() à close()). Open renvois un <em>file descriptor</em>, un identifiant du fichier ouvert. C'est ce <em>file descriptor</em> qu'on passe en premier argument de read, on peut donc savoir depuis quel fichier on lit les données. Il existe 3 descripteurs de fichiers spéciaux:</p>
-        <blockquote>
-            <ul>
-                <li>0 pour l'entrée standard, accessible seulement en lecture</li>
-                <li>1 pour la sortie standard, accessible seulement en écriture</li>
-                <li>2 pour la sortie d'erreur, accessible seulement en écriture</li>
-            </ul>
-        </blockquote>
-        <p>C'est aussi pour cette raison que lorsque l'on ouvre des fichiers les descripteurs que l'on obtient commencent normalement à 3.</p>
-        <p>On peut aussi remarquer différents appels à mmap(). mmap() est une fonction très utile permettant d'affecter un block de la mémoire matérielle à un certaine addresse pour pouvoir interragir facilement avec sans reccourir au système d'exploitation à chaque lecture ou écriture.</p>
-        <p>On remarque aussi quelques appels à fstat(). fstat() permet d'aquérir des informations sur un fichier (droits d'accès, taille...). Lui aussi prend un descripteur de fichier en argument.</p>
-        <p>La partie véritablement intéressante arrive à peine quelques lignes avant la fin:</p>
-        <pre data-language="C"><span></span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="n">Hello</span> <span class="n">World</span><span class="o">!</span>
-<span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span></pre>
-        <p>Voilà. On a écrit "Hello World!\n" sur la sortie standard. Tout ça pour ça. Les lignes suivantes ne servent qu'à remballer. La raison pour laquelle cette ligne semble cassée c'est qu'en fait les deux sorties (standard et erreur) sont mélangées, mais on a bien deux lignes différentes en fait:</p>
-        <pre data-language="C"><span></span><span class="cp"># stderr</span>
-<span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span>
++++ exited with <span class="m">0</span> +++</code></pre>
+<!-- *** -->
+<p>Bon. Vu comme ça ça ne parait pas particulièrement utile, et pourtant il y a
+beaucoup d'informations très intéressantes. On va voir ça par partie pour
+comprendre un peu mieux ce qui se passe. <strong>L'essentiel est de ne pas chercher
+à tout comprendre</strong>. Il y a beaucoup de choses qui se passe et seule une
+fraction correspond à notre problème. Il ne faut pas se focaliser sur
+l'incompris.</p>
+<p>La première ligne est un appel à exceve(). Cet appel dit au système
+d'exploitation « Hé, je voudrais lancer le programme /usr/bin/echo avec les
+arguments &quot;echo&quot; et &quot;Hello World!&quot;. » Le fait d'avoir &quot;echo&quot; comme argument
+ne devrait pas étonner les programmeurs, si vous avez déjà récupéré les
+arguments passés par la ligne de commande dans un programme vous savez que le
+premier argument est le nom avec lequel le programme a été appelé.</p>
+<p>Ensuite le système charge d'éventuelles librairies passées via LD_PRELOAD, on
+voit que l'accès a échoué car nous n'en avons pas spécifié. Si vous ne savez
+pas ce qu'est LD_PRELOAD je vous invite à vous renseigner dessus ; bien que
+ce soit hors du propos de cet article c'est un système très sympa à
+connaître.</p>
+<p>On charge ensuite la librairies standard C en ouvrant deux librairies et lisant
+le contenu des fichiers avant de les refermer (d'open() à close()). Open
+renvois un <em>file descriptor</em>, un identifiant du fichier ouvert. C'est ce <em>file
+descriptor</em> qu'on passe en premier argument de read, on peut donc savoir
+depuis quel fichier on lit les données. Il existe 3 descripteurs de fichiers
+spéciaux:</p>
+<blockquote>
+<ul class="simple">
+<li><p>0 pour l'entrée standard, accessible seulement en lecture</p></li>
+<li><p>1 pour la sortie standard, accessible seulement en écriture</p></li>
+<li><p>2 pour la sortie d'erreur, accessible seulement en écriture</p></li>
+</ul>
+</blockquote>
+<p>C'est aussi pour cette raison que lorsque l'on ouvre des fichiers les
+descripteurs que l'on obtient commencent normalement à 3.</p>
+<p>On peut aussi remarquer différents appels à mmap(). mmap() est une fonction
+très utile permettant d'affecter un block de la mémoire matérielle à un
+certaine addresse pour pouvoir interragir facilement avec sans reccourir au
+système d'exploitation à chaque lecture ou écriture.</p>
+<p>On remarque aussi quelques appels à fstat(). fstat() permet d'aquérir des
+informations sur un fichier (droits d'accès, taille...). Lui aussi prend un
+descripteur de fichier en argument.</p>
+<p>La partie véritablement intéressante arrive à peine quelques lignes avant la
+fin:</p>
+<pre class="code C literal-block"><code><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="n">Hello</span> <span class="n">World</span><span class="o">!</span>
+<span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span></code></pre>
+<p>Voilà. On a écrit &quot;Hello World!\n&quot; sur la sortie standard. Tout ça pour ça.
+Les lignes suivantes ne servent qu'à remballer. La raison pour laquelle cette
+ligne semble cassée c'est qu'en fait les deux sorties (standard et erreur)
+sont mélangées, mais on a bien deux lignes différentes en fait:</p>
+<pre class="code C literal-block"><code><span class="cp"># stderr
+</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>          <span class="o">=</span> <span class="mi">13</span>
 
-<span class="cp"># stdout</span>
-<span class="n">Hello</span> <span class="n">World</span><span class="o">!</span></pre>
-        <p>Bon. Voilà. On a vu un echo et on a eu un apperçu de ce que strace faisait. Mais du coup, pour who?</p>
-    </section>
-    <section id="le-cas-de-who">
-        <h2>Le cas de who</h2>
-        <p>Je ne vais pas détailler autant que pour echo car beaucoup d'étapes sont redondantes. Comme on l'a vu l'essentiel est à la fin, donc je vais commencer par là.</p>
-        <pre data-language="C"><span></span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;cym13    tty1         2016-02-15&quot;</span><span class="p">...,</span> <span class="mi">405</span><span class="p">)</span> <span class="o">=</span> <span class="mi">405</span>
-<span class="n">close</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                                <span class="o">=</span> <span class="mi">0</span></pre>
-        <p>Ok, donc on écrit le texte sur la sortie standard. Super, mais ça on était déjà au courant. Remontons de quelques lignes:</p>
-        <pre data-language="C"><span></span><span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/pts/1&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0620</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">136</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="cp"># stdout
+</span><span class="n">Hello</span> <span class="n">World</span><span class="o">!</span></code></pre>
+<p>Bon. Voilà. On a vu un echo et on a eu un apperçu de ce que strace faisait.
+Mais du coup, pour who?</p>
+</div>
+<div class="section" id="le-cas-de-who">
+<h2>Le cas de who</h2>
+<p>Je ne vais pas détailler autant que pour echo car beaucoup d'étapes sont
+redondantes. Comme on l'a vu l'essentiel est à la fin, donc je vais commencer
+par là.</p>
+<pre class="code C literal-block"><code><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;cym13    tty1         2016-02-15&quot;</span><span class="p">...,</span> <span class="mi">405</span><span class="p">)</span> <span class="o">=</span> <span class="mi">405</span>
+<span class="n">close</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                                <span class="o">=</span> <span class="mi">0</span></code></pre>
+<p>Ok, donc on écrit le texte sur la sortie standard. Super, mais ça on était
+déjà au courant. Remontons de quelques lignes:</p>
+<pre class="code C literal-block"><code><span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/pts/1&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0620</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">136</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mo">0644</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">2971</span><span class="p">,</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/pts/3&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0620</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">136</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mo">0644</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">2971</span><span class="p">,</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
@@ -185,78 +249,105 @@ exit_group<span class="o">(</span><span class="m">0</span><span class="o">)</spa
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/pts/11&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0620</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">136</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mo">0644</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">2971</span><span class="p">,</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/pts/12&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0620</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">136</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">stat</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mo">0644</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">2971</span><span class="p">,</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span></pre>
-        <p>Ok, donc on récupère des informations sur différents fichiers dans /dev/pts et /etc/localtime. Un petit <strong>man 5 localtime</strong> nous en dis plus sur ce fichier et nous apprend qu'il pointe vers un fichier spécial correspondant à la timezone de notre ordinateur. On cherche donc à récupérer des informations temporelles, ça fait sens avec ce qu'on voit.</p>
-        <p>Les fichiers en /dev/pts font sens également: il est courant dans le monde unix de représenter les ressources systèmes par des fichiers et les numéros correspondent à mes pts ouverts. On peut donc supposer qu'il vérifie s'ils existent pour savoir si les pts correspondants existent vraiment et depuis combien de temps.</p>
-        <p>Mais d'où tire-t-il la liste précise en premier lieu ? Je veux dire, il n'a pas testé /dev/pts/2 par exemple, c'est donc qu'il savait déjà quoi chercher. Comment ? Remontons encore...</p>
-        <p>On croise au passage le petit manquant de la liste: /dev/tty1:</p>
-        <pre data-language="C"><span></span><span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/tty1&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0600</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">open</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="o">|</span><span class="n">O_CLOEXEC</span><span class="p">)</span> <span class="o">=</span> <span class="mi">3</span></pre>
-        <p>Mais il faut remonter plus loin pour trouver ce que l'on cherche. On trouve une série d'appels à read (entre autres choses) ressemblant à ça:</p>
-        <pre data-language="C"><span></span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\7\0\0\0\350</span><span class="s">l</span><span class="se">\0\0</span><span class="s">pts/12</span><span class="se">\0\0\0\0\0\0\0\0\0\0\0\0\0</span><span class="s">&quot;</span><span class="p">...,</span> <span class="mi">384</span><span class="p">)</span> <span class="o">=</span> <span class="mi">384</span></pre>
-        <p>On remarque au milieu de cette chaine de caractère (tronquée par strace pour limiter le bruit) pts/12. Ce n'est sans doute pas une coïncidence. Toutes les autres lignes ont également au milieu un pts/quelquechose. On dirait donc que l'on lit des blocs de 384 octets dans un fichier binaire et que ce bloc contient les informations sur notre pts. Un bloc binaire de taille fixe contenant différentes informations ? En C ça serait une structure, il y a sans doute plus d'informations dans ce bloc qu'il n'y semble. Mais dans quel fichier sommes-nous en train de lire tout ça ?</p>
-        <p>Le <em>file descriptor</em> est 3, remontons jusqu'à un appel open() renvoyant 3:</p>
-        <pre data-language="C"><span></span><span class="n">open</span><span class="p">(</span><span class="s">&quot;/var/run/utmp&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="o">|</span><span class="n">O_CLOEXEC</span><span class="p">)</span> <span class="o">=</span> <span class="mi">3</span></pre>
-        <p>Nous sommes donc en train de lire dans /var/run/utmp. Que nous dit le manuel?</p>
-        <pre data-language="bash"><span></span>$ man <span class="m">5</span> utmp
-UTMP<span class="o">(</span><span class="m">5</span><span class="o">)</span>                Linux Programmer<span class="err">&#39;</span>s Manual               UTMP<span class="o">(</span><span class="m">5</span><span class="o">)</span>
+<span class="n">stat</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFREG</span><span class="o">|</span><span class="mo">0644</span><span class="p">,</span> <span class="n">st_size</span><span class="o">=</span><span class="mi">2971</span><span class="p">,</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
+<p>Ok, donc on récupère des informations sur différents fichiers dans /dev/pts
+et /etc/localtime. Un petit <strong>man 5 localtime</strong> nous en dis plus sur ce
+fichier et nous apprend qu'il pointe vers un fichier spécial correspondant à
+la timezone de notre ordinateur. On cherche donc à récupérer des informations
+temporelles, ça fait sens avec ce qu'on voit.</p>
+<p>Les fichiers en /dev/pts font sens également: il est courant dans le monde
+unix  de représenter les ressources systèmes par des fichiers et les numéros
+correspondent à mes pts ouverts. On peut donc supposer qu'il vérifie s'ils
+existent pour savoir si les pts correspondants existent vraiment et depuis
+combien de temps.</p>
+<p>Mais d'où tire-t-il la liste précise en premier lieu ? Je veux dire, il n'a
+pas testé /dev/pts/2 par exemple, c'est donc qu'il savait déjà quoi chercher.
+Comment ? Remontons encore...</p>
+<p>On croise au passage le petit manquant de la liste: /dev/tty1:</p>
+<pre class="code C literal-block"><code><span class="n">stat</span><span class="p">(</span><span class="s">&quot;/dev/tty1&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">st_mode</span><span class="o">=</span><span class="n">S_IFCHR</span><span class="o">|</span><span class="mo">0600</span><span class="p">,</span> <span class="n">st_rdev</span><span class="o">=</span><span class="n">makedev</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">...})</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">open</span><span class="p">(</span><span class="s">&quot;/etc/localtime&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="o">|</span><span class="n">O_CLOEXEC</span><span class="p">)</span> <span class="o">=</span> <span class="mi">3</span></code></pre>
+<p>Mais il faut remonter plus loin pour trouver ce que l'on cherche. On trouve
+une série d'appels à read (entre autres choses) ressemblant à ça:</p>
+<pre class="code C literal-block"><code><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\7\0\0\0\350</span><span class="s">l</span><span class="se">\0\0</span><span class="s">pts/12</span><span class="se">\0\0\0\0\0\0\0\0\0\0\0\0\0</span><span class="s">&quot;</span><span class="p">...,</span> <span class="mi">384</span><span class="p">)</span> <span class="o">=</span> <span class="mi">384</span></code></pre>
+<p>On remarque au milieu de cette chaine de caractère (tronquée par strace pour
+limiter le bruit) pts/12. Ce n'est sans doute pas une coïncidence. Toutes les
+autres lignes ont également au milieu un pts/quelquechose. On dirait donc que
+l'on lit des blocs de 384 octets dans un fichier binaire et que ce bloc
+contient les informations sur notre pts. Un bloc binaire de taille fixe
+contenant différentes informations ? En C ça serait une structure, il y a
+sans doute plus d'informations dans ce bloc qu'il n'y semble. Mais dans quel
+fichier sommes-nous en train de lire tout ça ?</p>
+<p>Le <em>file descriptor</em> est 3, remontons jusqu'à un appel open() renvoyant 3:</p>
+<pre class="code C literal-block"><code><span class="n">open</span><span class="p">(</span><span class="s">&quot;/var/run/utmp&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="o">|</span><span class="n">O_CLOEXEC</span><span class="p">)</span> <span class="o">=</span> <span class="mi">3</span></code></pre>
+<p>Nous sommes donc en train de lire dans /var/run/utmp. Que nous dit le manuel?</p>
+<pre class="code bash literal-block"><code>$ man <span class="m">5</span> utmp
+UTMP<span class="o">(</span><span class="m">5</span><span class="o">)</span>                Linux Programmer<span class="err">'</span>s Manual               UTMP<span class="o">(</span><span class="m">5</span><span class="o">)</span>
 
 NAME
        utmp, wtmp - login records
 
 SYNOPSIS
-       <span class="c1">#include &lt;utmp.h&gt;</span>
-
+       <span class="c1">#include &lt;utmp.h&gt;
+</span>
 DESCRIPTION
    The utmp file allows one to discover information about who is currently
    using the system.  There may be more users currently using the  system,
-   because not all programs use utmp logging.</pre>
-        <p>Bien ! Donc ce fichier est un journal de qui est loggé et comment. On a également un élément de réponse à notre mystère : si l'utilisateur n'est pas loggé avec un système utilisant utmp alors il est possible que who ne le trouve pas.</p>
-        <p>La question se pose donc de savoir si <strong>who</strong> lis d'autres fichiers ou non, et lesquels. Facile, juste au-dessus du open() pour /var/run/utmp on trouve :</p>
-        <pre data-language="C"><span></span><span class="n">access</span><span class="p">(</span><span class="s">&quot;/var/run/utmpx&quot;</span><span class="p">,</span> <span class="n">F_OK</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="n">ENOENT</span> <span class="p">(</span><span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span><span class="p">)</span></pre>
-        <p>C'est le seul appel de la sorte et donc le seul fichier non trouvé. Il reste possible que who s'arrète simplement au premier fichier qu'il trouve sans aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
-        <section id="et-notre-structure-alors">
-            <h3>Et notre structure alors ?</h3>
-            <p>Tout est là, dans le man de utmp :</p>
-            <pre data-language="C"><span></span><span class="k">struct</span> <span class="n">utmp</span> <span class="p">{</span>
+   because not all programs use utmp logging.</code></pre>
+<p>Bien ! Donc ce fichier est un journal de qui est loggé et comment. On a
+également un élément de réponse à notre mystère : si l'utilisateur n'est pas
+loggé avec un système utilisant utmp alors il est possible que who ne le
+trouve pas.</p>
+<p>La question se pose donc de savoir si <strong>who</strong> lis d'autres fichiers ou non,
+et lesquels. Facile, juste au-dessus du open() pour /var/run/utmp on trouve :</p>
+<pre class="code C literal-block"><code><span class="n">access</span><span class="p">(</span><span class="s">&quot;/var/run/utmpx&quot;</span><span class="p">,</span> <span class="n">F_OK</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="n">ENOENT</span> <span class="p">(</span><span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span><span class="p">)</span></code></pre>
+<p>C'est le seul appel de la sorte et donc le seul fichier non trouvé. Il reste
+possible que who s'arrète simplement au premier fichier qu'il trouve sans
+aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
+<div class="section" id="et-notre-structure-alors">
+<h3>Et notre structure alors ?</h3>
+<p>Tout est là, dans le man de utmp :</p>
+<pre class="code C literal-block"><code><span class="k">struct</span> <span class="n">utmp</span> <span class="p">{</span>
     <span class="kt">short</span>   <span class="n">ut_type</span><span class="p">;</span>              <span class="cm">/* Type of record */</span>
     <span class="kt">pid_t</span>   <span class="n">ut_pid</span><span class="p">;</span>               <span class="cm">/* PID of login process */</span>
     <span class="kt">char</span>    <span class="n">ut_line</span><span class="p">[</span><span class="n">UT_LINESIZE</span><span class="p">];</span> <span class="cm">/* Device name of tty - &quot;/dev/&quot; */</span>
-    <span class="kt">char</span>    <span class="n">ut_id</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>             <span class="cm">/* Terminal name suffix,</span>
-<span class="cm">                                     or inittab(5) ID */</span>
+    <span class="kt">char</span>    <span class="n">ut_id</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>             <span class="cm">/* Terminal name suffix,
+                                     or inittab(5) ID */</span>
     <span class="kt">char</span>    <span class="n">ut_user</span><span class="p">[</span><span class="n">UT_NAMESIZE</span><span class="p">];</span> <span class="cm">/* Username */</span>
-    <span class="kt">char</span>    <span class="n">ut_host</span><span class="p">[</span><span class="n">UT_HOSTSIZE</span><span class="p">];</span> <span class="cm">/* Hostname for remote login, or</span>
-<span class="cm">                                     kernel version for run-level</span>
-<span class="cm">                                     messages */</span>
-    <span class="k">struct</span>  <span class="n">exit_status</span> <span class="n">ut_exit</span><span class="p">;</span>  <span class="cm">/* Exit status of a process</span>
-<span class="cm">                                     marked as DEAD_PROCESS; not</span>
-<span class="cm">                                     used by Linux init (1 */</span>
-    <span class="cm">/* The ut_session and ut_tv fields must be the same size when</span>
-<span class="cm">       compiled 32- and 64-bit.  This allows data files and shared</span>
-<span class="cm">       memory to be shared between 32- and 64-bit applications. */</span>
-<span class="cp">#if __WORDSIZE == 64 &amp;&amp; defined __WORDSIZE_COMPAT32</span>
-    <span class="kt">int32_t</span> <span class="n">ut_session</span><span class="p">;</span>           <span class="cm">/* Session ID (getsid(2)),</span>
-<span class="cm">                                     used for windowing */</span>
+    <span class="kt">char</span>    <span class="n">ut_host</span><span class="p">[</span><span class="n">UT_HOSTSIZE</span><span class="p">];</span> <span class="cm">/* Hostname for remote login, or
+                                     kernel version for run-level
+                                     messages */</span>
+    <span class="k">struct</span>  <span class="n">exit_status</span> <span class="n">ut_exit</span><span class="p">;</span>  <span class="cm">/* Exit status of a process
+                                     marked as DEAD_PROCESS; not
+                                     used by Linux init (1 */</span>
+    <span class="cm">/* The ut_session and ut_tv fields must be the same size when
+       compiled 32- and 64-bit.  This allows data files and shared
+       memory to be shared between 32- and 64-bit applications. */</span>
+<span class="cp">#if __WORDSIZE == 64 &amp;&amp; defined __WORDSIZE_COMPAT32
+</span>    <span class="kt">int32_t</span> <span class="n">ut_session</span><span class="p">;</span>           <span class="cm">/* Session ID (getsid(2)),
+                                     used for windowing */</span>
     <span class="k">struct</span> <span class="p">{</span>
         <span class="kt">int32_t</span> <span class="n">tv_sec</span><span class="p">;</span>           <span class="cm">/* Seconds */</span>
         <span class="kt">int32_t</span> <span class="n">tv_usec</span><span class="p">;</span>          <span class="cm">/* Microseconds */</span>
     <span class="p">}</span> <span class="n">ut_tv</span><span class="p">;</span>                      <span class="cm">/* Time entry was made */</span>
-<span class="cp">#else</span>
-     <span class="kt">long</span>   <span class="n">ut_session</span><span class="p">;</span>           <span class="cm">/* Session ID */</span>
+<span class="cp">#else
+</span>     <span class="kt">long</span>   <span class="n">ut_session</span><span class="p">;</span>           <span class="cm">/* Session ID */</span>
      <span class="k">struct</span> <span class="n">timeval</span> <span class="n">ut_tv</span><span class="p">;</span>        <span class="cm">/* Time entry was made */</span>
-<span class="cp">#endif</span>
-
-    <span class="kt">int32_t</span> <span class="n">ut_addr_v6</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>        <span class="cm">/* Internet address of remote</span>
-<span class="cm">                                     host; IPv4 address uses</span>
-<span class="cm">                                     just ut_addr_v6[0] */</span>
+<span class="cp">#endif
+</span>
+    <span class="kt">int32_t</span> <span class="n">ut_addr_v6</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>        <span class="cm">/* Internet address of remote
+                                     host; IPv4 address uses
+                                     just ut_addr_v6[0] */</span>
     <span class="kt">char</span> <span class="n">__unused</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>            <span class="cm">/* Reserved for future use */</span>
-<span class="p">};</span></pre>
-            <!-- *** -->
-            <p>Voilà, je pense que ça ira pour cette fois. On a pu voir que <strong>strace</strong> même utilisé naïvement sans options aucunes peut être utilisé pour comprendre comment les choses marchent et on en a profité pour apprendre les principes fondamentaux derrière <strong>who</strong>. Strace est un outil très puissant qui a beaucoup de possibilités, n'hésitez pas à en manger !</p>
-        </section>
-    </section>
-    <footer>Generated on: 2017-04-03 18:10 UTC. </footer>
-
+<span class="p">};</span></code></pre>
+<!-- *** -->
+<p>Voilà, je pense que ça ira pour cette fois. On a pu voir que <strong>strace</strong> même
+utilisé naïvement sans options aucunes peut être utilisé pour comprendre
+comment les choses marchent et on en a profité pour apprendre les principes
+fondamentaux derrière <strong>who</strong>. Strace est un outil très puissant qui a
+beaucoup de possibilités, n'hésitez pas à en manger !</p>
+</div>
+</div>
+</div>
     </div>
   </body>
 </html>
