@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+June 2017
+---------
+
+`Hacking the simplest database <article/hacking_simplest_database.html>`_
+    Julia Evans proposed the simplest database, let's take it down! A case
+    study of simple file manipulations in bash.
+
 May 2017
 --------
 
