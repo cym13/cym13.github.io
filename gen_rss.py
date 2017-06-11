@@ -7,8 +7,7 @@ BLOG_URL        = "https://cym13.github.io/"
 DATE_FORMAT     = "%a, %d %b %Y %H:%M:%S %z"
 LAST_BUILD_DATE = time.strftime(DATE_FORMAT)
 
-header_template = """
-<?xml version="1.0" encoding="UTF-8" ?>
+header_template = """<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
   <title>Breakpoint</title>
