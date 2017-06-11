@@ -17,8 +17,8 @@ article/%.html: source/%.rst template/article.tpl
 	rst2html5 $(RST2HTMLOPT) --template template/base.tpl $< > $@
 	chmod -w $@
 
-rss.xml: gen_rss.sh index.html $(articles)
-	./gen_rss.sh
+rss.xml: gen_rss.py index.html $(articles)
+	./gen_rss.py > rss.xml
 
 clean:
 	find . -iname "*.html" -type f -delete
