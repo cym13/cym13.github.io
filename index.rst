@@ -11,6 +11,10 @@ Recent articles
 June 2017
 ---------
 
+`SSL/TLS Configuration Recommendations <article/ssl_tls_recommendations.html>`_
+    How to configure SSL/TLS on your server in order to make it secure? Here
+    is the way to do it quick and cleanly.
+
 `Hacking the simplest database <article/hacking_simplest_database.html>`_
     Julia Evans proposed the simplest database, let's take it down! A case
     study of simple file manipulations in bash.

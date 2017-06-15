@@ -35,6 +35,9 @@ The default configuration of most web servers (when they provide one) is not
 secure. It is meant to provide something that works without fuss so that you can
 proceed with your development. It is not meant to stop an attacker.
 
+.. image:: ../image/kagami-hiiragi-nope-nope.png
+    :width: 50%
+
 You should use a configuration generator
 ----------------------------------------
 
@@ -77,15 +80,19 @@ The tools
 You wrote your configuration and want to check that it is indeed what your
 expect it to be. How can you do?
 
-Mozilla recommends the tool https://github.com/mozilla/cipherscan which lists
-the available cipher suites proposed by the server. It is a good tool to verify
-that the configuration is indeed what you set up.
+Mozilla recommends the tool `cipherscan`_ which lists the available cipher
+suites proposed by the server. It is a good tool to verify that the
+configuration is indeed what you set up.
 
-However I prefer https://testssl.sh/. This tool will not only provide you with
+.. _cipherscan: https://github.com/mozilla/cipherscan
+
+However I prefer `testssl.sh`_. This tool will not only provide you with
 the list of exposed ciphers and protocols, it will also warn you of known
 vulnerabilities and mis-configurations. Furthermore it will simulate many
 connections to determine what cipher suite would be used if you were using what
 web client.
+
+.. _testssl.sh: https://testssl.sh/
 
 None of these tools require installation. However keep in mind that while they
 may provide good indications they will not supplant a security expert.
@@ -116,6 +123,9 @@ If you have a commercial interest in keeping your server secure you should have
 its configuration validated by a security expert. You may consider my opinion to
 be slightly biased in the matter as that is my job, but at least the bias is
 publicly known.
+
+.. image:: ../image/mayoi-hachikuji-yeees.png
+    :width: 50%
 
 The tools again
 ---------------
@@ -149,4 +159,16 @@ applications:
 
 - Regularly recheck the configuration using up-to-date verification tools.
 
-If you follow those advices you won't have much to fear about SSL/TLS attacks.
+What? So no practical advice on what cipher is better etc?
+----------------------------------------------------------
+
+No. Those things change, and they should not be left to the choice of
+developpers anyway. Let's face it, most developpers are not competent to make
+cryptographic choices: it just isn't their job. Let professionals do those
+choices for you and spend your time doing what you really like: building
+stuff that matters.
+
+Image sources
+-------------
+
+- https://www.4chan.org/

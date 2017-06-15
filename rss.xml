@@ -4,16 +4,16 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io/</link>
-  <lastBuildDate>Sun, 11 Jun 2017 23:47:29 +0200</lastBuildDate>
-  <pubDate>Sun, 11 Jun 2017 23:47:29 +0200</pubDate>
+  <lastBuildDate>Thu, 15 Jun 2017 20:06:29 +0200</lastBuildDate>
+  <pubDate>Thu, 15 Jun 2017 20:06:29 +0200</pubDate>
   <ttl>7200</ttl>
 
 
  <item>
-   <title>Hacking the simplest database</title>
-   <description>Julia Evans proposed the simplest database, let's take it down! A casestudy of simple file manipulations in bash.</description>
-   <link>https://cym13.github.io//article/hacking_simplest_database.html</link>
-   <pubDate>Sun, 11 Jun 2017 22:41:17 +0200</pubDate>
+   <title>SSL/TLS Configuration Recommendations</title>
+   <description>How to configure SSL/TLS on your server in order to make it secure? Hereis the way to do it quick and cleanly.</description>
+   <link>https://cym13.github.io//article/ssl_tls_recommendations.html</link>
+   <pubDate>Thu, 15 Jun 2017 20:06:29 +0200</pubDate>
  </item>
 
 
