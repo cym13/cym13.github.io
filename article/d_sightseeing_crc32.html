@@ -111,12 +111,13 @@ first argument of a function can be moved before it using a dot.</p>
 <p>To that we must add that empty parentheses are always optional, so we can
 also write:</p>
 <pre class="code d literal-block"><code><span class="s">&quot;TEST&quot;</span><span class="p">.</span><span class="n">toLower</span><span class="p">.</span><span class="n">writeln</span><span class="p">(</span><span class="s">&quot;.txt&quot;</span><span class="p">);</span></code></pre>
-<p>This serves two purposes. First it looks nice: it gives a feeling of pipeline
-programming that fits well processes such as our <em>crc32</em> function where the
-code flows from one function into another.</p>
+<p>This serves two purposes.</p>
+<p>First of all it looks nice: it gives a feeling of pipeline programming that
+fits well processes such as our <em>crc32</em> function where the code flows from
+one function into another.</p>
 <p>Secondly it allows making weak overloads of methods. Let's say you have a lot
 of classes and would like to add a method to manage a given type but don't
-want to write an overload for each struct. One way is to write a function
+want to write an overload for each class. One way is to write a function
 that manages that type and can take any of the classes we want and use UFCS
 to make it look like a method call.</p>
 <p>There are of course limits to that approach so it's not what I'd recommend in

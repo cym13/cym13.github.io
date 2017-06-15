@@ -125,13 +125,15 @@ also write:
 
     "TEST".toLower.writeln(".txt");
 
-This serves two purposes. First it looks nice: it gives a feeling of pipeline
-programming that fits well processes such as our *crc32* function where the
-code flows from one function into another.
+This serves two purposes.
+
+First of all it looks nice: it gives a feeling of pipeline programming that
+fits well processes such as our *crc32* function where the code flows from
+one function into another.
 
 Secondly it allows making weak overloads of methods. Let's say you have a lot
 of classes and would like to add a method to manage a given type but don't
-want to write an overload for each struct. One way is to write a function
+want to write an overload for each class. One way is to write a function
 that manages that type and can take any of the classes we want and use UFCS
 to make it look like a method call.
 
