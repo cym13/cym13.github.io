@@ -11,6 +11,10 @@ Recent articles
 June 2017
 ---------
 
+`D sightseeing: crc32 <article/d_sightseeing_crc32.html>`_
+    Let's have a glance at a real although very short D program to discuss
+    some of its features.
+
 `SSL/TLS Configuration Recommendations <article/ssl_tls_recommendations.html>`_
     How to configure SSL/TLS on your server in order to make it secure? Here
     is the way to do it quick and cleanly.

@@ -4,16 +4,16 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io/</link>
-  <lastBuildDate>Thu, 15 Jun 2017 20:06:29 +0200</lastBuildDate>
-  <pubDate>Thu, 15 Jun 2017 20:06:29 +0200</pubDate>
+  <lastBuildDate>Thu, 15 Jun 2017 23:37:00 +0200</lastBuildDate>
+  <pubDate>Thu, 15 Jun 2017 23:37:00 +0200</pubDate>
   <ttl>7200</ttl>
 
 
  <item>
-   <title>SSL/TLS Configuration Recommendations</title>
-   <description>How to configure SSL/TLS on your server in order to make it secure? Hereis the way to do it quick and cleanly.</description>
-   <link>https://cym13.github.io//article/ssl_tls_recommendations.html</link>
-   <pubDate>Thu, 15 Jun 2017 20:06:29 +0200</pubDate>
+   <title>D sightseeing: crc32</title>
+   <description>Let's have a glance at a real although very short D program to discusssome of its features.</description>
+   <link>https://cym13.github.io//article/d_sightseeing_crc32.html</link>
+   <pubDate>Thu, 15 Jun 2017 23:37:00 +0200</pubDate>
  </item>
 
 
