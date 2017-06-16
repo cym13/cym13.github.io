@@ -90,9 +90,9 @@ import (and compile) what you don't use that way.
         import std.uni;
         import std.digest.crc;
 
-Use of UFCS and optional parentheses as explained in the mail. Read the file
-by chunks, compute the crc32 which returns a byte array, and build a string
-from that. I think it's pretty self-explanatory.
+Use of UFCS and optional parentheses as explained below. Read the file by
+chunks, compute the crc32 which returns a byte array, and build a string from
+that. I think it's pretty self-explanatory.
 
 .. code:: d
 
@@ -224,7 +224,7 @@ Here the call could have been written:
 The first set of parens is prefixed with ! so it's a compile-time argument.
 The second set is the runtime argument. In C++ it would have been
 `filter<isFile>(args[1..$])`.  Remember UFCS? We can rewrite it (dropping the
-empty parens:
+empty parens):
 
 .. code:: d
 

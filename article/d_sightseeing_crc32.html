@@ -90,9 +90,9 @@ import (and compile) what you don't use that way.</p>
 <span class="nb">string</span> <span class="n">crc32</span><span class="p">(</span><span class="n">File</span> <span class="n">chunks</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">uni</span><span class="p">;</span>
     <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">digest</span><span class="p">.</span><span class="n">crc</span><span class="p">;</span></code></pre>
-<p>Use of UFCS and optional parentheses as explained in the mail. Read the file
-by chunks, compute the crc32 which returns a byte array, and build a string
-from that. I think it's pretty self-explanatory.</p>
+<p>Use of UFCS and optional parentheses as explained below. Read the file by
+chunks, compute the crc32 which returns a byte array, and build a string from
+that. I think it's pretty self-explanatory.</p>
 <pre class="code d literal-block"><code>    <span class="k">return</span> <span class="n">chunks</span><span class="p">.</span><span class="n">byChunk</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
                  <span class="p">.</span><span class="n">crc32Of</span>
                  <span class="p">.</span><span class="n">reverse</span>
@@ -181,7 +181,7 @@ generators in Python).</p>
 <p>The first set of parens is prefixed with ! so it's a compile-time argument.
 The second set is the runtime argument. In C++ it would have been
 <cite>filter&lt;isFile&gt;(args[1..$])</cite>.  Remember UFCS? We can rewrite it (dropping the
-empty parens:</p>
+empty parens):</p>
 <pre class="code d literal-block"><code><span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">filter</span><span class="p">!(</span><span class="n">isFile</span><span class="p">)</span></code></pre>
 <p>And as the call is unambiguous we can drop the last parens as well.</p>
 <p>Filter returns a range, it is lazy as many things in the standard library,
