@@ -3,7 +3,7 @@
 import time
 import xml.dom.minidom
 
-BLOG_URL        = "https://cym13.github.io/"
+BLOG_URL        = "https://cym13.github.io"
 DATE_FORMAT     = "%a, %d %b %Y %H:%M:%S %z"
 LAST_BUILD_DATE = time.strftime(DATE_FORMAT)
 
@@ -19,12 +19,12 @@ header_template = """<?xml version="1.0" encoding="UTF-8" ?>
 """
 
 item_template = """
- <item>
-   <title>{title}</title>
-   <description>{description}</description>
-   <link>{link}</link>
-   <pubDate>{pub_date}</pubDate>
- </item>
+  <item>
+    <title>{title}</title>
+    <description>{description}</description>
+    <link>{link}</link>
+    <pubDate>{pub_date}</pubDate>
+  </item>
 """
 
 footer_template = """
@@ -32,30 +32,36 @@ footer_template = """
 </rss>
 """
 
-def title(article):
-    return article.getElementsByTagName("a")[0].childNodes[0].data
+def get_titles(nodes):
+    for article in nodes:
+        yield article.getElementsByTagName("a")[0].childNodes[0].data
 
-def description(article):
-    desc =  article.getElementsByTagName("p")[0].childNodes[0].data
-    return ''.join(desc.splitlines())
+def get_descriptions(nodes):
+    for article in nodes:
+        desc = article.getElementsByTagName("p")[0].childNodes[0].data
+        yield ''.join(desc.splitlines())
 
-def link(article):
-    return article.getElementsByTagName("a")[0].attributes["href"].value
+def get_links(nodes):
+    for article in nodes:
+        yield article.getElementsByTagName("a")[0].attributes["href"].value
 
-def pub_date(article):
+def pub_date(link):
     import os
     return time.strftime(DATE_FORMAT,
-                         time.localtime(os.stat(link(article)).st_ctime))
+                         time.localtime(os.stat(link).st_ctime))
 
 def parse_items(content):
-    dom = xml.dom.minidom.parseString(content)
-    articles = dom.getElementsByTagName("dl")
+    dom          = xml.dom.minidom.parseString(content)
 
-    for article in articles:
-        yield {"title":        title(article),
-                "description": description(article),
-                "link":        BLOG_URL + "/" + link(article),
-                "pub_date":    pub_date(article)}
+    titles       = get_titles(dom.getElementsByTagName("dt"))
+    descriptions = get_descriptions(dom.getElementsByTagName("dd"))
+    links        = get_links(dom.getElementsByTagName("dt"))
+
+    for title, description, link in zip(titles, descriptions, links):
+        yield {"title":        title,
+                "description": description,
+                "link":        BLOG_URL + "/" + link,
+                "pub_date":    pub_date(link)}
 
 def main():
     print(header_template.format(blog_url=BLOG_URL,
