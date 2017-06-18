@@ -46,9 +46,10 @@ def get_links(nodes):
         yield article.getElementsByTagName("a")[0].attributes["href"].value
 
 def pub_date(link):
-    import os
-    return time.strftime(DATE_FORMAT,
-                         time.localtime(os.stat(link).st_ctime))
+    import subprocess
+
+    link = link.replace("'", "''")
+    return subprocess.getoutput("git log --format=%aD $'"+ link +"' | tail -1")
 
 def parse_items(content):
     dom          = xml.dom.minidom.parseString(content)
