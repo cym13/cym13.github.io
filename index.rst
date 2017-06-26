@@ -40,7 +40,7 @@ April 2017
 
 `Weaponizing Excel Webservice <article/excel_webservice.html>`_
     Excel formula injections are common in programs generating XLS files, but
-    otfen considered harmless. This discusses a new technique that greatly
+    often considered harmless. This discusses a new technique that greatly
     improve the Red Team situation.
 
 March 2017
