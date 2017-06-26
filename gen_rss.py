@@ -39,7 +39,7 @@ def get_titles(nodes):
 def get_descriptions(nodes):
     for article in nodes:
         desc = article.getElementsByTagName("p")[0].childNodes[0].data
-        yield ''.join(desc.splitlines())
+        yield ' '.join(desc.splitlines())
 
 def get_links(nodes):
     for article in nodes:

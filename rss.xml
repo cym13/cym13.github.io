@@ -4,14 +4,14 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Sun, 18 Jun 2017 14:33:37 +0200</lastBuildDate>
-  <pubDate>Sun, 18 Jun 2017 14:33:37 +0200</pubDate>
+  <lastBuildDate>Mon, 26 Jun 2017 12:29:42 +0200</lastBuildDate>
+  <pubDate>Mon, 26 Jun 2017 12:29:42 +0200</pubDate>
   <ttl>7200</ttl>
 
 
   <item>
     <title>D sightseeing: crc32</title>
-    <description>Let's have a glance at a real although very short D program to discusssome of its features.</description>
+    <description>Let's have a glance at a real although very short D program to discuss some of its features.</description>
     <link>https://cym13.github.io/article/d_sightseeing_crc32.html</link>
     <pubDate>Thu, 15 Jun 2017 23:38:09 +0200</pubDate>
   </item>
@@ -19,7 +19,7 @@
 
   <item>
     <title>SSL/TLS Configuration Recommendations</title>
-    <description>How to configure SSL/TLS on your server in order to make it secure? Hereis the way to do it quick and cleanly.</description>
+    <description>How to configure SSL/TLS on your server in order to make it secure? Here is the way to do it quick and cleanly.</description>
     <link>https://cym13.github.io/article/ssl_tls_recommendations.html</link>
     <pubDate>Thu, 15 Jun 2017 20:07:34 +0200</pubDate>
   </item>
@@ -27,7 +27,7 @@
 
   <item>
     <title>Hacking the simplest database</title>
-    <description>Julia Evans proposed the simplest database, let's take it down! A casestudy of simple file manipulations in bash.</description>
+    <description>Julia Evans proposed the simplest database, let's take it down! A case study of simple file manipulations in bash.</description>
     <link>https://cym13.github.io/article/hacking_simplest_database.html</link>
     <pubDate>Sun, 11 Jun 2017 22:46:18 +0200</pubDate>
   </item>
@@ -35,7 +35,7 @@
 
   <item>
     <title>Fixing video noise with sox</title>
-    <description>How to use sox for something simple and practical: fixing the noise in ayoutube video.</description>
+    <description>How to use sox for something simple and practical: fixing the noise in a youtube video.</description>
     <link>https://cym13.github.io/article/fix_video_noise_sox.html</link>
     <pubDate>Mon, 29 May 2017 20:09:18 +0200</pubDate>
   </item>
@@ -43,7 +43,7 @@
 
   <item>
     <title>Why we need authenticated cryptography</title>
-    <description>Simple demonstration of how an attacker could tamper with an encryptedmessage to his benefit without ever decrypting it in the absence ofmessage authentication.</description>
+    <description>Simple demonstration of how an attacker could tamper with an encrypted message to his benefit without ever decrypting it in the absence of message authentication.</description>
     <link>https://cym13.github.io/article/demo_bank.html</link>
     <pubDate>Sun, 2 Apr 2017 11:49:11 +0200</pubDate>
   </item>
@@ -51,7 +51,7 @@
 
   <item>
     <title>Weaponizing Excel Webservice</title>
-    <description>Excel formula injections are common in programs generating XLS files, butotfen considered harmless. This discusses a new technique that greatlyimprove the Red Team situation.</description>
+    <description>Excel formula injections are common in programs generating XLS files, but otfen considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>
     <link>https://cym13.github.io/article/excel_webservice.html</link>
     <pubDate>Sat, 1 Apr 2017 00:30:08 +0200</pubDate>
   </item>
@@ -59,7 +59,7 @@
 
   <item>
     <title>Privilege Escalations</title>
-    <description>How to identify flawed resource management leading to privilegeescalation. Part of the Fast Security Source Code Review series.</description>
+    <description>How to identify flawed resource management leading to privilege escalation. Part of the Fast Security Source Code Review series.</description>
     <link>https://cym13.github.io/article/scr_privesc.html</link>
     <pubDate>Wed, 22 Mar 2017 01:05:29 +0100</pubDate>
   </item>
@@ -67,7 +67,7 @@
 
   <item>
     <title>Fast Security Source Code Review</title>
-    <description>Introduction to the main concepts behind a fast security review.Intended for developers as well as pentesters.</description>
+    <description>Introduction to the main concepts behind a fast security review. Intended for developers as well as pentesters.</description>
     <link>https://cym13.github.io/article/source_code_review.html</link>
     <pubDate>Wed, 22 Mar 2017 00:59:39 +0100</pubDate>
   </item>
@@ -75,7 +75,7 @@
 
   <item>
     <title>How secure is unpredictableSeed?</title>
-    <description>D's unpredictableSeed is sometimes used to compensate for the lack of aCSPRNG in the standard library. But how secure is that really?</description>
+    <description>D's unpredictableSeed is sometimes used to compensate for the lack of a CSPRNG in the standard library. But how secure is that really?</description>
     <link>https://cym13.github.io/article/unpredictableSeed.html</link>
     <pubDate>Sun, 26 Feb 2017 18:52:38 +0100</pubDate>
   </item>
@@ -83,7 +83,7 @@
 
   <item>
     <title>Crypter writeup</title>
-    <description>"A file was encrypted. You have the encryption software and an encryptedfile. Decrypt that file." Detailed writeup using radare2.</description>
+    <description>"A file was encrypted. You have the encryption software and an encrypted file. Decrypt that file." Detailed writeup using radare2.</description>
     <link>https://cym13.github.io/article/crypter_writeup.html</link>
     <pubDate>Sat, 25 Feb 2017 03:16:43 +0100</pubDate>
   </item>
@@ -91,7 +91,7 @@
 
   <item>
     <title>Exploiting Gource</title>
-    <description>Improvised code review of the Gource git repository viewer. It is meantas a way to show how one can perform quick and targeted code reviews.</description>
+    <description>Improvised code review of the Gource git repository viewer. It is meant as a way to show how one can perform quick and targeted code reviews.</description>
     <link>https://cym13.github.io/article/exploiting_gource.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
@@ -99,7 +99,7 @@
 
   <item>
     <title>Let's build an Object System!</title>
-    <description>What makes an object system tick? What does it mean to be objectoriented? What are classes really?</description>
+    <description>What makes an object system tick? What does it mean to be object oriented? What are classes really?</description>
     <link>https://cym13.github.io/article/object_system.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
@@ -107,7 +107,7 @@
 
   <item>
     <title>Mail.local et TOCTTOU</title>
-    <description>Une explication détaillée d'exploitation de programme SUID root via uneTOCTTOU pour obtenir une élévation de privilège.</description>
+    <description>Une explication détaillée d'exploitation de programme SUID root via une TOCTTOU pour obtenir une élévation de privilège.</description>
     <link>https://cym13.github.io/article/mail_local_tocttou.html</link>
     <pubDate>Sat, 25 Feb 2017 00:52:02 +0100</pubDate>
   </item>
@@ -115,7 +115,7 @@
 
   <item>
     <title>Comment who fonctionne-t-il ?</title>
-    <description>Strace est un outil puissant mais qui peut être difficile à manipuler.Nous voyons donc un cas concret en étudiant le fonctionnement de lacommande "who".</description>
+    <description>Strace est un outil puissant mais qui peut être difficile à manipuler. Nous voyons donc un cas concret en étudiant le fonctionnement de la commande "who".</description>
     <link>https://cym13.github.io/article/strace_who.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
@@ -123,7 +123,7 @@
 
   <item>
     <title>Puppy writeup</title>
-    <description>Quelqu'un sur irc a proposé hier un petit challenge de steganographie. Lavictime du jour ? Un chiot qui renferme, nous dit-on, des secrets.</description>
+    <description>Quelqu'un sur irc a proposé hier un petit challenge de steganographie. La victime du jour ? Un chiot qui renferme, nous dit-on, des secrets.</description>
     <link>https://cym13.github.io/article/puppy_writeup.html</link>
     <pubDate>Sat, 25 Feb 2017 01:52:33 +0100</pubDate>
   </item>
@@ -131,7 +131,7 @@
 
   <item>
     <title>Introduction à l'éditeur de texte ed</title>
-    <description>Ed est un éditeur puissant mais terriblement déconcertant au premierabord. Cet article présente les commandes essentielles et un peu pluspour bien débuter avec l'Éditeur.</description>
+    <description>Ed est un éditeur puissant mais terriblement déconcertant au premier abord. Cet article présente les commandes essentielles et un peu plus pour bien débuter avec l'Éditeur.</description>
     <link>https://cym13.github.io/article/introduction_ed.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
@@ -139,7 +139,7 @@
 
   <item>
     <title>Shell streams and redirections</title>
-    <description>Shell streams are the most powerful feature of bash. Knowing aboutredirections is a capital step toward an efficient use of command-line.</description>
+    <description>Shell streams are the most powerful feature of bash. Knowing about redirections is a capital step toward an efficient use of command-line.</description>
     <link>https://cym13.github.io/article/shell_streams_and_redirections.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
