@@ -29,7 +29,7 @@ Prelude to the program
 D accepts shebangs, rdmd is a program that's used to launch programs
 "script-style" by compiling on the fly (and avoiding recompiling if
 possible). It can also be used to run little command lines as D doesn't have
-a repl. Very handy.
+a REPL (Read-Eval-Print Loop). Very handy.
 
 ::
 
@@ -90,9 +90,10 @@ import (and compile) what you don't use that way.
         import std.uni;
         import std.digest.crc;
 
-Use of UFCS and optional parentheses as explained below. Read the file by
-chunks, compute the crc32 which returns a byte array, and build a string from
-that. I think it's pretty self-explanatory.
+Use of UFCS (Uniform Function Call Syntax) and optional parentheses as
+explained below. Read the file by chunks, compute the crc32 which returns a
+byte array, and build a string from that. I think it's pretty
+self-explanatory.
 
 .. code:: d
 

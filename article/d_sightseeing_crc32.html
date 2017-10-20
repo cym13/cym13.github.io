@@ -49,7 +49,7 @@ beginning of a line. You may safely ignore them.</p>
 <p>D accepts shebangs, rdmd is a program that's used to launch programs
 &quot;script-style&quot; by compiling on the fly (and avoiding recompiling if
 possible). It can also be used to run little command lines as D doesn't have
-a repl. Very handy.</p>
+a REPL (Read-Eval-Print Loop). Very handy.</p>
 <pre class="literal-block">rdmd --eval='[1, 2, 3].map!(x =&gt; x*2-1).writeln'</pre>
 <p>Below are some imports from the standard library.</p>
 <pre class="code d literal-block"><code><span class="err">#</span><span class="p">!/</span><span class="n">usr</span><span class="p">/</span><span class="n">bin</span><span class="p">/</span><span class="n">env</span> <span class="n">rdmd</span>
@@ -90,9 +90,10 @@ import (and compile) what you don't use that way.</p>
 <span class="nb">string</span> <span class="n">crc32</span><span class="p">(</span><span class="n">File</span> <span class="n">chunks</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">uni</span><span class="p">;</span>
     <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">digest</span><span class="p">.</span><span class="n">crc</span><span class="p">;</span></code></pre>
-<p>Use of UFCS and optional parentheses as explained below. Read the file by
-chunks, compute the crc32 which returns a byte array, and build a string from
-that. I think it's pretty self-explanatory.</p>
+<p>Use of UFCS (Uniform Function Call Syntax) and optional parentheses as
+explained below. Read the file by chunks, compute the crc32 which returns a
+byte array, and build a string from that. I think it's pretty
+self-explanatory.</p>
 <pre class="code d literal-block"><code>    <span class="k">return</span> <span class="n">chunks</span><span class="p">.</span><span class="n">byChunk</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
                  <span class="p">.</span><span class="n">crc32Of</span>
                  <span class="p">.</span><span class="n">reverse</span>
