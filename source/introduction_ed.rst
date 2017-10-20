@@ -85,7 +85,7 @@ Entrons du texte avec 'a' pour 'append'.
 .. code:: text
 
     >>> a
-    Note the consistent user interface and error reportage.
+    Note the consistent user interface and error reporting.
     Ed is generous enough to flag errors,
     yet prudent enough not to overwhelm the novice with verbosity.
     .
@@ -110,11 +110,11 @@ commande, et même employer une plage de nombre pour un affichage multiple :
     >>> 2p
     Ed is generous enough to flag errors,
     >>> 1,3n
-    1       Note the consistent user interface and error reportage.
+    1       Note the consistent user interface and error reporting.
     2       Ed is generous enough to flag errors,
     3       yet prudent enough not to overwhelm the novice with verbosity.
 
-Il est possible d'utiliser ces addresses avec n'importe quelle commande Ed,
+Il est possible d'utiliser ces adresses avec n'importe quelle commande Ed,
 par exemple 'i' pour 'insert' qui a un effet similaire à 'a' si ce n'est que
 le texte est entré avant la ligne courante au lieu de après.
 
@@ -124,12 +124,12 @@ le texte est entré avant la ligne courante au lieu de après.
     # Source https://www.gnu.org/fun/jokes/ed.msg
     .
 
-Entrer une addresse sans commande nous place à cette position.
+Entrer une adresse sans commande nous place à cette position.
 
 .. code:: text
 
     >>> 2
-    Note the consistent user interface and error reportage.
+    Note the consistent user interface and error reporting.
 
 .. raw:: pdf
 
@@ -146,7 +146,7 @@ puisse utiliser les deux commandes en une :
 
 Le nombre inscrit en sortie correspond au nombre d'octets écrits dans le
 fichier. Write peut également prendre en argument un nom de fichier pour
-enregistrer tout ou partie (avec une plage d'addresse) du fichier courant
+enregistrer tout ou partie (avec une plage d'adresse) du fichier courant
 dans un autre.
 
 Éditer un fichier existant
@@ -163,14 +163,14 @@ dernière ligne.
     yet prudent enough not to overwhelm the novice with verbosity.
 
 On retrouve l'affichage de la taille du fichier. Afficher tout le fichier est
-possible à l'aide d'une range, '$' signifiant dans ce contexte « dernière
+possible à l'aide d'une plage, '$' signifiant dans ce contexte « dernière
 ligne ».
 
 .. code:: text
 
     >>> 1,$p
     # Source https://www.gnu.org/fun/jokes/ed.msg
-    Note the consistent user interface and error reportage.
+    Note the consistent user interface and error reporting.
     Ed is generous enough to flag errors,
     yet prudent enough not to overwhelm the novice with verbosity.
 
@@ -238,7 +238,7 @@ bloc où chaque bloc fait la taille de l'écran courant avec 'z'.
     daytime            13/tcp
 
 Celui-ci peut même être combiné avec 'n' pour obtenir les numéros de lignes,
-et sans addresse explicite il part de la ligne courante ce qui rend la
+et sans adresse explicite il part de la ligne courante ce qui rend la
 navigation plus aisée et sans répétition de ligne.
 
 .. code:: text
@@ -297,9 +297,9 @@ Chercher du texte est sans suprise pour un utilisateur de vim :
     >>> ?
     https             443/tcp
 
-Comme suggérer on peut en effet l'employer en conjonction avec d'autres
-commandes car une recherche par regex est en fait considéré comme une
-addresse. On peut donc également les utiliser dans des ranges :
+Comme suggéré on peut en effet l'employer en conjonction avec d'autres
+commandes car une recherche par regex est en fait considérée comme une
+adresse. On peut donc également les utiliser dans des plages :
 
 .. code:: text
 
@@ -349,7 +349,7 @@ une ou plusieurs lignes en remplaçant une expression par une autre alors que
 la seconde supprime la ou les lignes addressées et entre en mode insertion
 afin d'entrer la nouvelle version.
 
-Substitute ne change cependant que la première occurence par défaut. On peut
+*Substitute* ne change cependant que la première occurence par défaut. On peut
 lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en
 suffixe un nombre pour signifier l'occurence précise à remplacer. De plus,
 ommettre le symbole de fin de commande indique la volonté d'afficher le
@@ -375,7 +375,7 @@ nouveau texte :
     >>> s/A/a/gp
     # Full data: /usr/share/iana-etc/port-numbers.iana
 
-Pour substituer sur l'ensemble du texte on peut soit utiliser la range '1,$'
+Pour substituer sur l'ensemble du texte on peut soit utiliser la plage '1,$'
 soit le préfixe '%' qui a le même effet. On est placé à la dernière occurence
 modifiée.
 
@@ -543,7 +543,7 @@ Déplacer et copier
 ------------------
 
 Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
-'transfer'. Le bloc est plaçé après la ligne à l'addresse indiquée, celle-ci
+'transfer'. Le bloc est plaçé après la ligne à l'adresse indiquée, celle-ci
 pouvant être 0.
 
 .. code:: text
@@ -552,27 +552,27 @@ pouvant être 0.
     203
     >>> 1zn
     1       # Source https://www.gnu.org/fun/jokes/ed.msg
-    2       Note the consistent user interface and error reportage.
+    2       Note the consistent user interface and error reporting.
     3       Ed is generous enough to flag errors,
     4       yet prudent enough not to overwhelm the novice with verbosity.
     >>> 1,2m3
     >>> 1zn
     1       Ed is generous enough to flag errors,
     2       # Source https://www.gnu.org/fun/jokes/ed.msg
-    3       Note the consistent user interface and error reportage.
+    3       Note the consistent user interface and error reporting.
     4       yet prudent enough not to overwhelm the novice with verbosity.
     >>> 2,3t0
     >>> 1zn
     1       # Source https://www.gnu.org/fun/jokes/ed.msg
-    2       Note the consistent user interface and error reportage.
+    2       Note the consistent user interface and error reporting.
     3       Ed is generous enough to flag errors,
     4       # Source https://www.gnu.org/fun/jokes/ed.msg
-    5       Note the consistent user interface and error reportage.
+    5       Note the consistent user interface and error reporting.
     6       yet prudent enough not to overwhelm the novice with verbosity.
 
 Copier peut également se faire avec 'y' pour 'yank' et 'x'. Yank place la
 cible dans le buffer de copie et 'x' place le contenu du buffer de copie à
-l'addresse indiquée. Yank n'est pas la seule commande à modifier ce buffer :
+l'adresse indiquée. Yank n'est pas la seule commande à modifier ce buffer :
 lorsque l'on supprime avec 'd' ou change avec 'c' une ou plusieurs lignes
 elles sont également placées dans ce buffer ce qui permet de faire du
 « couper/coller ».
@@ -583,21 +583,21 @@ elles sont également placées dans ce buffer ce qui permet de faire du
     >>> 5x
     >>> 1zn
     1       # Source https://www.gnu.org/fun/jokes/ed.msg
-    2       Note the consistent user interface and error reportage.
+    2       Note the consistent user interface and error reporting.
     3       Ed is generous enough to flag errors,
     4       # Source https://www.gnu.org/fun/jokes/ed.msg
-    5       Note the consistent user interface and error reportage.
+    5       Note the consistent user interface and error reporting.
     6       Ed is generous enough to flag errors,
     7       yet prudent enough not to overwhelm the novice with verbosity.
     >>> 7d
     >>> 3x
     >>> 1zn
     1       # Source https://www.gnu.org/fun/jokes/ed.msg
-    2       Note the consistent user interface and error reportage.
+    2       Note the consistent user interface and error reporting.
     3       Ed is generous enough to flag errors,
     4       yet prudent enough not to overwhelm the novice with verbosity.
     5       # Source https://www.gnu.org/fun/jokes/ed.msg
-    6       Note the consistent user interface and error reportage.
+    6       Note the consistent user interface and error reporting.
     7       Ed is generous enough to flag errors,
 
 

@@ -83,7 +83,7 @@ myfile: No such file or directory
 &gt;&gt;&gt; # La commande # permet de faire des commentaires dans ed</code></pre>
 <p>Entrons du texte avec 'a' pour 'append'.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; a
-Note the consistent user interface and error reportage.
+Note the consistent user interface and error reporting.
 Ed is generous enough to flag errors,
 yet prudent enough not to overwhelm the novice with verbosity.
 .</code></pre>
@@ -100,18 +100,18 @@ commande, et même employer une plage de nombre pour un affichage multiple :</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 2p
 Ed is generous enough to flag errors,
 &gt;&gt;&gt; 1,3n
-1       Note the consistent user interface and error reportage.
+1       Note the consistent user interface and error reporting.
 2       Ed is generous enough to flag errors,
 3       yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
-<p>Il est possible d'utiliser ces addresses avec n'importe quelle commande Ed,
+<p>Il est possible d'utiliser ces adresses avec n'importe quelle commande Ed,
 par exemple 'i' pour 'insert' qui a un effet similaire à 'a' si ce n'est que
 le texte est entré avant la ligne courante au lieu de après.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 1i
 # Source https://www.gnu.org/fun/jokes/ed.msg
 .</code></pre>
-<p>Entrer une addresse sans commande nous place à cette position.</p>
+<p>Entrer une adresse sans commande nous place à cette position.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 2
-Note the consistent user interface and error reportage.</code></pre>
+Note the consistent user interface and error reporting.</code></pre>
 <p>Nous pouvons maintenant écrire le fichier sur le disque (write donc 'w') et
 quitter ('q') l'éditeur. L'opération est suffisamment commune pour qu'on
 puisse utiliser les deux commandes en une :</p>
@@ -119,7 +119,7 @@ puisse utiliser les deux commandes en une :</p>
 203</code></pre>
 <p>Le nombre inscrit en sortie correspond au nombre d'octets écrits dans le
 fichier. Write peut également prendre en argument un nom de fichier pour
-enregistrer tout ou partie (avec une plage d'addresse) du fichier courant
+enregistrer tout ou partie (avec une plage d'adresse) du fichier courant
 dans un autre.</p>
 </div>
 <div class="section" id="editer-un-fichier-existant">
@@ -131,11 +131,11 @@ dernière ligne.</p>
 &gt;&gt;&gt; p
 yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
 <p>On retrouve l'affichage de la taille du fichier. Afficher tout le fichier est
-possible à l'aide d'une range, '$' signifiant dans ce contexte « dernière
+possible à l'aide d'une plage, '$' signifiant dans ce contexte « dernière
 ligne ».</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 1,$p
 # Source https://www.gnu.org/fun/jokes/ed.msg
-Note the consistent user interface and error reportage.
+Note the consistent user interface and error reporting.
 Ed is generous enough to flag errors,
 yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
 <p>Cependant cela peut poser problème si le fichier que nous sommes en train de
@@ -189,7 +189,7 @@ systat             11/tcp
 systat             11/udp
 daytime            13/tcp</code></pre>
 <p>Celui-ci peut même être combiné avec 'n' pour obtenir les numéros de lignes,
-et sans addresse explicite il part de la ligne courante ce qui rend la
+et sans adresse explicite il part de la ligne courante ce qui rend la
 navigation plus aisée et sans répétition de ligne.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; zn
 20      daytime            13/udp
@@ -234,9 +234,9 @@ https             443/tcp
 https             443/udp
 &gt;&gt;&gt; ?
 https             443/tcp</code></pre>
-<p>Comme suggérer on peut en effet l'employer en conjonction avec d'autres
-commandes car une recherche par regex est en fait considéré comme une
-addresse. On peut donc également les utiliser dans des ranges :</p>
+<p>Comme suggéré on peut en effet l'employer en conjonction avec d'autres
+commandes car une recherche par regex est en fait considérée comme une
+adresse. On peut donc également les utiliser dans des plages :</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 1
 # Full data: /usr/share/iana-etc/port-numbers.iana
 &gt;&gt;&gt; /ssh/n
@@ -276,7 +276,7 @@ commandes : 's' pour 'substitute' et 'c' pour 'change'. La première modifie
 une ou plusieurs lignes en remplaçant une expression par une autre alors que
 la seconde supprime la ou les lignes addressées et entre en mode insertion
 afin d'entrer la nouvelle version.</p>
-<p>Substitute ne change cependant que la première occurence par défaut. On peut
+<p><em>Substitute</em> ne change cependant que la première occurence par défaut. On peut
 lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en
 suffixe un nombre pour signifier l'occurence précise à remplacer. De plus,
 ommettre le symbole de fin de commande indique la volonté d'afficher le
@@ -298,7 +298,7 @@ nouveau texte :</p>
 # Full dAtA: /usr/shAre/iAnA-etc/port-numbers.iAnA
 &gt;&gt;&gt; s/A/a/gp
 # Full data: /usr/share/iana-etc/port-numbers.iana</code></pre>
-<p>Pour substituer sur l'ensemble du texte on peut soit utiliser la range '1,$'
+<p>Pour substituer sur l'ensemble du texte on peut soit utiliser la plage '1,$'
 soit le préfixe '%' qui a le même effet. On est placé à la dernière occurence
 modifiée.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 1,$s/a/A/gp
@@ -423,32 +423,32 @@ And Rainbow Dash is just the coolest
 <div class="section" id="deplacer-et-copier">
 <h3>Déplacer et copier</h3>
 <p>Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
-'transfer'. Le bloc est plaçé après la ligne à l'addresse indiquée, celle-ci
+'transfer'. Le bloc est plaçé après la ligne à l'adresse indiquée, celle-ci
 pouvant être 0.</p>
 <pre class="code text literal-block"><code>$ ed myfile
 203
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
-2       Note the consistent user interface and error reportage.
+2       Note the consistent user interface and error reporting.
 3       Ed is generous enough to flag errors,
 4       yet prudent enough not to overwhelm the novice with verbosity.
 &gt;&gt;&gt; 1,2m3
 &gt;&gt;&gt; 1zn
 1       Ed is generous enough to flag errors,
 2       # Source https://www.gnu.org/fun/jokes/ed.msg
-3       Note the consistent user interface and error reportage.
+3       Note the consistent user interface and error reporting.
 4       yet prudent enough not to overwhelm the novice with verbosity.
 &gt;&gt;&gt; 2,3t0
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
-2       Note the consistent user interface and error reportage.
+2       Note the consistent user interface and error reporting.
 3       Ed is generous enough to flag errors,
 4       # Source https://www.gnu.org/fun/jokes/ed.msg
-5       Note the consistent user interface and error reportage.
+5       Note the consistent user interface and error reporting.
 6       yet prudent enough not to overwhelm the novice with verbosity.</code></pre>
 <p>Copier peut également se faire avec 'y' pour 'yank' et 'x'. Yank place la
 cible dans le buffer de copie et 'x' place le contenu du buffer de copie à
-l'addresse indiquée. Yank n'est pas la seule commande à modifier ce buffer :
+l'adresse indiquée. Yank n'est pas la seule commande à modifier ce buffer :
 lorsque l'on supprime avec 'd' ou change avec 'c' une ou plusieurs lignes
 elles sont également placées dans ce buffer ce qui permet de faire du
 « couper/coller ».</p>
@@ -456,21 +456,21 @@ elles sont également placées dans ce buffer ce qui permet de faire du
 &gt;&gt;&gt; 5x
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
-2       Note the consistent user interface and error reportage.
+2       Note the consistent user interface and error reporting.
 3       Ed is generous enough to flag errors,
 4       # Source https://www.gnu.org/fun/jokes/ed.msg
-5       Note the consistent user interface and error reportage.
+5       Note the consistent user interface and error reporting.
 6       Ed is generous enough to flag errors,
 7       yet prudent enough not to overwhelm the novice with verbosity.
 &gt;&gt;&gt; 7d
 &gt;&gt;&gt; 3x
 &gt;&gt;&gt; 1zn
 1       # Source https://www.gnu.org/fun/jokes/ed.msg
-2       Note the consistent user interface and error reportage.
+2       Note the consistent user interface and error reporting.
 3       Ed is generous enough to flag errors,
 4       yet prudent enough not to overwhelm the novice with verbosity.
 5       # Source https://www.gnu.org/fun/jokes/ed.msg
-6       Note the consistent user interface and error reportage.
+6       Note the consistent user interface and error reporting.
 7       Ed is generous enough to flag errors,</code></pre>
 </div>
 </div>
