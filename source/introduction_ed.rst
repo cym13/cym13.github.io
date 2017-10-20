@@ -393,7 +393,6 @@ annule l'annulation ce qui revient à appliquer de nouveau la modification.
 
     >>> u
     >>> p
-    >>> p
     mAtAhAri        49000/tcp
     >>> u
     >>> p
@@ -521,8 +520,8 @@ contenu d'un autre fichier ou, comme ici avec '!', d'une commande shell.
 Insérer du texte au début d'un bloc
 -----------------------------------
 
-Moins une fonctionnalité avancées qu'un « truc » utile pour, par exemple
-commenter ou identer du texte:
+Moins une fonctionnalité avancée qu'un « truc » utile pour, par exemple
+commenter ou indenter du texte:
 
 .. code:: text
 
@@ -543,7 +542,7 @@ Déplacer et copier
 ------------------
 
 Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
-'transfer'. Le bloc est plaçé après la ligne à l'adresse indiquée, celle-ci
+'transfer'. Le bloc est placé après la ligne à l'adresse indiquée, celle-ci
 pouvant être 0.
 
 .. code:: text
