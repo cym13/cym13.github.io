@@ -175,7 +175,7 @@ exit_group<span class="o">(</span><span class="m">0</span><span class="o">)</spa
 <p>Bon. Vu comme ça ça ne parait pas particulièrement utile, et pourtant il y a
 beaucoup d'informations très intéressantes. On va voir ça par partie pour
 comprendre un peu mieux ce qui se passe. <strong>L'essentiel est de ne pas chercher
-à tout comprendre</strong>. Il y a beaucoup de choses qui se passe et seule une
+à tout comprendre</strong>. Il y a beaucoup de choses qui se passent et seule une
 fraction correspond à notre problème. Il ne faut pas se focaliser sur
 l'incompris.</p>
 <p>La première ligne est un appel à exceve(). Cet appel dit au système
@@ -301,7 +301,7 @@ trouve pas.</p>
 et lesquels. Facile, juste au-dessus du open() pour /var/run/utmp on trouve :</p>
 <pre class="code C literal-block"><code><span class="n">access</span><span class="p">(</span><span class="s">&quot;/var/run/utmpx&quot;</span><span class="p">,</span> <span class="n">F_OK</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="n">ENOENT</span> <span class="p">(</span><span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span><span class="p">)</span></code></pre>
 <p>C'est le seul appel de la sorte et donc le seul fichier non trouvé. Il reste
-possible que who s'arrète simplement au premier fichier qu'il trouve sans
+possible que who s'arrête simplement au premier fichier qu'il trouve sans
 aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
 <div class="section" id="et-notre-structure-alors">
 <h3>Et notre structure alors ?</h3>

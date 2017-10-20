@@ -10,7 +10,7 @@ Crypter writeup
 
 .. _here: ../file/crypter.tgz
 
-So here is the crytper writeup. What is it about?
+So here is the crypter writeup. What is it about?
 
 ::
 

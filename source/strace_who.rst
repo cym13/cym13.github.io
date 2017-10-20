@@ -178,7 +178,7 @@ Voici un exemple sur une commande simple..
 Bon. Vu comme ça ça ne parait pas particulièrement utile, et pourtant il y a
 beaucoup d'informations très intéressantes. On va voir ça par partie pour
 comprendre un peu mieux ce qui se passe. **L'essentiel est de ne pas chercher
-à tout comprendre**. Il y a beaucoup de choses qui se passe et seule une
+à tout comprendre**. Il y a beaucoup de choses qui se passent et seule une
 fraction correspond à notre problème. Il ne faut pas se focaliser sur
 l'incompris.
 
@@ -351,7 +351,7 @@ et lesquels. Facile, juste au-dessus du open() pour /var/run/utmp on trouve :
     access("/var/run/utmpx", F_OK) = -1 ENOENT (No such file or directory)
 
 C'est le seul appel de la sorte et donc le seul fichier non trouvé. Il reste
-possible que who s'arrète simplement au premier fichier qu'il trouve sans
+possible que who s'arrête simplement au premier fichier qu'il trouve sans
 aller plus loin, mais ce n'est pas visible dans notre première expérience.
 
 Et notre structure alors ?
