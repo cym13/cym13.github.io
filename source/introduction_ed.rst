@@ -352,7 +352,7 @@ afin d'entrer la nouvelle version.
 *Substitute* ne change cependant que la première occurence par défaut. On peut
 lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en
 suffixe un nombre pour signifier l'occurence précise à remplacer. De plus,
-ommettre le symbole de fin de commande indique la volonté d'afficher le
+omettre le symbole de fin de commande indique la volonté d'afficher le
 nouveau texte :
 
 .. code:: text
