@@ -279,7 +279,7 @@ afin d'entrer la nouvelle version.</p>
 <p><em>Substitute</em> ne change cependant que la première occurence par défaut. On peut
 lui adjoindre le suffixe 'g' pour signifier toutes les occurences ou en
 suffixe un nombre pour signifier l'occurence précise à remplacer. De plus,
-ommettre le symbole de fin de commande indique la volonté d'afficher le
+omettre le symbole de fin de commande indique la volonté d'afficher le
 nouveau texte :</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; 1
 # Full data: /usr/share/iana-etc/port-numbers.iana
@@ -308,7 +308,6 @@ matahari        49000/tcp</code></pre>
 <p>On peut annuler la denrière modification avec 'u' pour 'undo'. Refaire 'u'
 annule l'annulation ce qui revient à appliquer de nouveau la modification.</p>
 <pre class="code text literal-block"><code>&gt;&gt;&gt; u
-&gt;&gt;&gt; p
 &gt;&gt;&gt; p
 mAtAhAri        49000/tcp
 &gt;&gt;&gt; u
@@ -406,8 +405,8 @@ contenu d'un autre fichier ou, comme ici avec '!', d'une commande shell.</p>
 </div>
 <div class="section" id="inserer-du-texte-au-debut-d-un-bloc">
 <h3>Insérer du texte au début d'un bloc</h3>
-<p>Moins une fonctionnalité avancées qu'un « truc » utile pour, par exemple
-commenter ou identer du texte:</p>
+<p>Moins une fonctionnalité avancée qu'un « truc » utile pour, par exemple
+commenter ou indenter du texte:</p>
 <pre class="code text literal-block"><code>$ ed
 &gt;&gt;&gt; a
 My best pony is Pinkie Pie
@@ -423,7 +422,7 @@ And Rainbow Dash is just the coolest
 <div class="section" id="deplacer-et-copier">
 <h3>Déplacer et copier</h3>
 <p>Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
-'transfer'. Le bloc est plaçé après la ligne à l'adresse indiquée, celle-ci
+'transfer'. Le bloc est placé après la ligne à l'adresse indiquée, celle-ci
 pouvant être 0.</p>
 <pre class="code text literal-block"><code>$ ed myfile
 203
