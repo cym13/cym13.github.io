@@ -247,7 +247,7 @@ handle in local_10h.
 
 Let's stop there for a second because we just discovered something very
 important: the source is a PNG file! This means that our cryptographic
-analysis just turned (partially) into a know-text attack as the structure
+analysis just turned (partially) into a known-text attack as the structure
 presents some static parts like a MAGIC number. We'll come back to that
 later.
 
@@ -386,7 +386,8 @@ approximation).
 Cryptanalysis
 =============
 
-We may have discovered the algorithm we still can't decrypt our file, can we?
+We may have discovered the algorithm but we still can't decrypt our file, can
+we?
 
 The algorithm goes like this:
 
@@ -413,8 +414,8 @@ we are able to find this time we also are able to predict any further output
 so we must find this seed.
 
 Wait a second... That call to time() wasn't long before the fwrite() one.
-This means that the time used to seed and the time used to build the malware
-must be close to each other.
+This means that the time used to seed and the time used to build the
+encrypted file must be close to each other.
 
 .. code:: bash
 
@@ -423,7 +424,7 @@ must be close to each other.
     $ date -d "Oct 20 11:31" "+%s"
     1476955860
 
-Here we have our time! Well, it's quite approximative, but it's ok for as.
+Here we have our time! Well, it's quite approximative, but it's ok for us.
 Why so? Because it is not a blackbox analysis, remember, it's a
 known-plaintext analysis! As we know that we are looking for a PNG file we
 can easily know when we have the right seed: it will simply be the one that
