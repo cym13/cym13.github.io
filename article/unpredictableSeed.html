@@ -306,7 +306,7 @@ after that for the second token.</p>
     <span class="n">auto</span> <span class="n">ws</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Website</span><span class="o">();</span>
 
     <span class="n">auto</span> <span class="n">before</span>    <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>
-    <span class="n">auto</span> <span class="n">token</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="na">getPublicToken</span><span class="o">;</span>
+    <span class="n">auto</span> <span class="n">token</span>     <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="na">getPublicToken</span><span class="o">;</span>
     <span class="n">auto</span> <span class="n">inbetween</span> <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>
     <span class="n">ws</span><span class="o">.</span><span class="na">setPrivateToken</span><span class="o">;</span>
     <span class="n">auto</span> <span class="n">after</span>     <span class="o">=</span> <span class="n">MonoTime</span><span class="o">.</span><span class="na">currTime</span><span class="o">.</span><span class="na">ticks</span><span class="o">;</span>

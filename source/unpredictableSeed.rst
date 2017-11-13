@@ -353,7 +353,7 @@ The following code demonstrates roughly the idea.
         auto ws = new Website();
 
         auto before    = MonoTime.currTime.ticks;
-        auto token = ws.getPublicToken;
+        auto token     = ws.getPublicToken;
         auto inbetween = MonoTime.currTime.ticks;
         ws.setPrivateToken;
         auto after     = MonoTime.currTime.ticks;
