@@ -9,12 +9,12 @@ Excel formulas
 --------------
 
 Did you know that Microsoft Excel has some functions that could be exploited
-by malicious actors. I'm not talking about macros here, but plain old
+by malicious actors? I'm not talking about macros here, but plain old
 formulas.
 
 We are interested in formulas for two reasons. First of all it isn't blocked
 by any anti-macro system, nor is it detected by any antivirus as being a bad
-thing. Moreover there are more clever ways to use them than just send someone
+thing. Moreover there are cleverer ways to use them than just send someone
 else an XLS file.
 
 Formula injection
