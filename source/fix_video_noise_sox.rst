@@ -17,7 +17,7 @@ We'll use youtube-dl, sox and mpv there, nothing fancy.
 Get the audio
 =============
 
-First of all we need to get the audio from the video. This is straitforward:
+First of all we need to get the audio from the video. This is straightforward:
 
 .. code:: shell
 
