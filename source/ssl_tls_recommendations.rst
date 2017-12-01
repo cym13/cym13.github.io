@@ -6,9 +6,9 @@ Introduction
 ============
 
 So you want to deploy SSL/TLS on your service. That's a very good decision.
-Services without encryption are jeopardizing not only the provider who may loose
-its data and reputation. It may also endanger the users as the confidentiality
-and the integrity of the communication is at stake.
+Services without encryption are not only jeopardizing the provider who may
+loose its data and reputation. It may also endanger the users as the
+confidentiality and the integrity of the communication is at stake.
 
 But deploying SSL/TLS is easy to mess up so here is a procedure that you may use
 to ensure that the result is conveniently secure. This will not correspond to
@@ -20,7 +20,7 @@ Choosing the configuration
 You should not write your configuration yourself
 ------------------------------------------------
 
-Unless your aware of all the possibilities of your webserver and
+Unless you're aware of all the possibilities of your webserver and
 all cryptographic results that make such algorithm safer than such other one you
 won't get it right.
 
