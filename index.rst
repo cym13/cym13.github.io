@@ -8,6 +8,12 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+January 2018
+------------
+
+`VBS Reverse Shell <article/vbs_reverse_shell.html>`_
+    P0wning a Windows box without Powershell? Easy with VBS!
+
 June 2017
 ---------
 
