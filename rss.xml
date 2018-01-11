@@ -4,8 +4,8 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Thu, 11 Jan 2018 20:15:28 +0100</lastBuildDate>
-  <pubDate>Thu, 11 Jan 2018 20:15:28 +0100</pubDate>
+  <lastBuildDate>Thu, 11 Jan 2018 20:36:57 +0100</lastBuildDate>
+  <pubDate>Thu, 11 Jan 2018 20:36:57 +0100</pubDate>
   <ttl>7200</ttl>
 
 
@@ -13,7 +13,7 @@
     <title>VBS Reverse Shell</title>
     <description>P0wning a Windows box without Powershell? Easy with VBS!</description>
     <link>https://cym13.github.io/article/vbs_reverse_shell.html</link>
-    <pubDate></pubDate>
+    <pubDate>Thu, 11 Jan 2018 20:17:26 +0100</pubDate>
   </item>
 
 

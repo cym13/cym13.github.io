@@ -48,6 +48,10 @@ What VBS has however is a way to perform web requests, so the strategy we'll
 use is to encapsulate commands and outputs in HTTP requests. This will need a
 specific server but it isn't much of an issue.
 
+Of course we could just download a compiled reverse shell through our VBS
+script and launch it, but I want to explore a pure VBS option for when
+two-stage exploitations are not an option.
+
 The payload
 ===========
 
