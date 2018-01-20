@@ -11,6 +11,10 @@ Recent articles
 January 2018
 ------------
 
+`Internal Penetration Tests <article/internal_penetration_tests.html>`_
+    Asked to perform an internal pentest with no clue where to start from?
+    Here's a guideline that you might find useful.
+
 `VBS Reverse Shell <article/vbs_reverse_shell.html>`_
     P0wning a Windows box without Powershell? Easy with VBS!
 

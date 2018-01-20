@@ -4,9 +4,17 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Thu, 11 Jan 2018 20:40:07 +0100</lastBuildDate>
-  <pubDate>Thu, 11 Jan 2018 20:40:07 +0100</pubDate>
+  <lastBuildDate>Sat, 20 Jan 2018 15:23:20 +0100</lastBuildDate>
+  <pubDate>Sat, 20 Jan 2018 15:23:20 +0100</pubDate>
   <ttl>7200</ttl>
+
+
+  <item>
+    <title>Internal Penetration Tests</title>
+    <description>Asked to perform an internal pentest with no clue where to start from? Here's a guideline that you might find useful.</description>
+    <link>https://cym13.github.io/article/internal_penetration_tests.html</link>
+    <pubDate></pubDate>
+  </item>
 
 
   <item>

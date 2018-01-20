@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Breakpoint</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="internal-penetration-tests">
+<h1>Internal Penetration Tests</h1>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>Penetration testing covers a very wide range of topics, targets and
+methodologies. Of all this possibilities there is possibly none that is more
+representative of the field than internal penetration tests. Being on a
+company's network looking for servers to take control of, then bouncing from
+an account to another until the whole network is ours is what most people
+have in mind when hearing across the cocktail &quot;Yeah, I'm paid to hack into
+banks and stuff&quot;.</p>
+<p>That said, performing such assignments can sometimes be overwhelming. I do
+not want to write a thousand page long book on internal pentests, but I'd
+like to share some tips and methods to grasp the low-hanging fruits and get a
+starting point. You'll soon find out that the method we describe here almost
+never works directly on the field and that everybody has his pet techniques
+to get the best of the customer's network.</p>
+</div>
+<div class="section" id="starting-line">
+<h2>Starting line</h2>
+<p>Ok, so you're somehow on the internal network. Could be the Wi-Fi, a VPN, a
+dangling RJ45... What matters is that your shell's waiting and your customer
+knows that you're there. These techniques absolutely do not care about being
+discreet so if you were looking for a practical black hat handbook you'd
+better get back on IRC make some friends. On the other hand, contrary to a
+black hat, we don't have months to carefully auscultate the network so we'll go
+for the fastest.</p>
+<img alt="../image/chibi_mahou.png" src="../image/chibi_mahou.png" style="width: 40%;" />
+<p><strong>The first thing you want is to know what's around you.</strong></p>
+<p>Take note of your IP range and start looking for other hosts:</p>
+<ul class="simple">
+<li><p>Fire up tcpdump or wireshark. You may record other's requests, see
+broadcast calls, etc.</p></li>
+<li><p>As soon as you get an idea of what the internal top level domain name is
+(or just guess it's &quot;.int&quot;), ask for a DNS zone transfer with <cite>dig AXFR
+int.</cite>. That will very often give you the almost full list of all existing
+hosts within the network.</p></li>
+<li><p>Perform an ARP search, both passive and active, using <a class="reference external" href="https://sourceforge.net/projects/netdiscover/">netdiscover</a>.</p></li>
+<li><p>Perform a ping sweep using nmap.</p></li>
+<li><p><a class="reference external" href="http://www.avahi.org/">Avahi-discover</a> can bring out surprising things if some station speaks the
+Hello protocol such as Macs.</p></li>
+<li><p>If IPv6 is enabled you may want to sweep it too and look for
+misconfigurations. I won't delve into it now though.</p></li>
+</ul>
+<p>At that point you should have a growing list of IPs and hostnames. It's time
+to start exploiting these information.</p>
+</div>
+<div class="section" id="identification">
+<h2>Identification</h2>
+<p>This is a quick but important step: try to identify what those hosts are.
+We're not at a point where we're firing nmap up in every direction as that's
+generally way to long. But you might do so on a sample of hosts in order to
+get a general feeling.</p>
+<p>Is the network mainly Windows based? Do we see signs of actual users on the
+network (such as UDP packets in broadcast sent by <a class="reference external" href="https://www.pcweenie.com/content/logitech-arx-my-asx">mouses</a>, Avahi hosts or the
+&quot;catherine-iphone&quot; kind of hostname)? In any case it's worth setting a
+<a class="reference external" href="https://github.com/SpiderLabs/Responder">Responder</a> up as soon as possible.</p>
+<img alt="../image/chibi_mouse.png" src="../image/chibi_mouse.png" style="width: 40%;" />
+<p>Does it look like it is mainly composed of Linux servers? We want to take
+that into account when doing our port scans later.</p>
+</div>
+<div class="section" id="weak-services-discovery">
+<h2>Weak services discovery</h2>
+<p>We don't want to just <cite>nmap -AO -T4 10.0.0.1/16</cite> our way in. Scanning the
+whole network just takes too much time. Or more precisely we want to do that
+ultimately, but first we'll perform targeted scans to identify weak points
+that will give us something to do while port-scanning the universe.</p>
+<p>This is where the identification phase comes in handy. We'll perform a
+targeted port scan of the hosts we found earlier. We'll limit ourselves to
+few ports that are often available and misconfigured.</p>
+<p>What we're interested in is:</p>
+<ul class="simple">
+<li><p>FTP</p></li>
+<li><p>Telnet</p></li>
+<li><p>HTTP</p></li>
+<li><p>HTTPS</p></li>
+<li><p>Alternate HTTP ports (8000, 8080, etc)</p></li>
+<li><p>SNMP</p></li>
+<li><p>SQL</p></li>
+<li><p>...</p></li>
+</ul>
+<p>This list is to be adapted depending on what you expect to find. For example
+if it looks like there are lots of Linux hosts it wouldn't be strange that
+some of them are available through SSH with <cite>root/&lt;empty&gt;</cite> as credentials.
+Because typing passwords or using keys is so hard you know. These kind of
+basic errors is what we're looking for in the next section.</p>
+</div>
+<div class="section" id="automatic-data-collection">
+<h2>Automatic data collection</h2>
+<p>So we have a list of hosts with web servers, lots of telnet access points
+etc... As always in internal penetration testing, the challenge is the
+amount of data generated. That's why we want to automate as many things as
+possible.</p>
+<p>So we'll /bin/bash our way through by testing default credentials on all
+hosts depending on their services. <cite>root/root</cite>, <cite>root/&lt;empty&gt;</cite>,
+<cite>root/password</cite> and <cite>admin/admin</cite> are paramount at this point. We want to try
+automatically connecting to FTP and Telnet ports using these.</p>
+<p>We also want to download each main page of each webserver we found. This will
+allow us to grep your way through them to know whether there is a login page,
+whose are printer configuration pages, how many of them are identical meaning
+that the servers that host them are probably too...</p>
+<p>Internal web services generally are a goldmine. Default passwords never let
+me down when there are passwords at all. Also, internal services are often in
+plain HTTP so if you're able to setup a Man in the Middle it becomes
+tremendously easy to get into new things.</p>
+</div>
+<div class="section" id="stepping-back-a-bit">
+<h2>Stepping back a bit</h2>
+<p>By this point you may already have a lot of NTLM hashes from Responder and a
+solid list of targets.</p>
+<p>Don't hesitate to launch a more extensive nmap scan at this point, you'll
+take some time digging trough the results anyway. Similarly it's a good point
+to start cracking passwords.</p>
+<p>Bruteforcing up to 6 or 7 characters is always a good thing when possible but
+I tend to privilege dictionary attacks. Aside from the famous <a class="reference external" href="https://wiki.skullsecurity.org/Passwords">RockYou</a> that
+surprisingly still gives results from time to time, my favorite method is to
+use <a class="reference external" href="https://github.com/cym13/1337dict">1337dict</a> which is a 1337script password generator.</p>
+<p>It turns out that the oracle database administrator's password is often
+something like <cite>dbAdm1n&#64;Oracle</cite>. Similarly John Penfield that entered the
+company in 2016 never bothered changing his mail password from the default
+<cite>jpe2016</cite>. So we want to use intelligently the data we have at our disposal:</p>
+<ul class="simple">
+<li><p>Employee names? In!</p></li>
+<li><p>Company name? In!</p></li>
+<li><p>All years or dates from the creation of the company? In!</p></li>
+<li><p>Yet keep in mind that this grows the search time exponentially.</p></li>
+</ul>
+<p>You get the idea. Efficient password cracking is an art, but terribly
+powerful when mastered.</p>
+</div>
+<div class="section" id="ok-and-now">
+<h2>Ok, and now?</h2>
+<p>So, you somehow got into something. Could be a web application, a mailbox, a
+workstation... I'll take that last example as it's the easiest to deal with.</p>
+<p>Look for accesses to other computers:</p>
+<ul class="simple">
+<li><p>What's shares are mounted? Explore them.</p></li>
+<li><p>What application or script may exchange data with other hosts? Look into
+scripts and configuration files. Most passwords are in <cite>config.ini</cite>, not
+<cite>password.txt</cite></p></li>
+<li><p>Still, look for <cite>password.txt</cite>... Many organizations keep a single XLS with
+all passwords in the Public share.</p></li>
+<li><p>Look for password history within the web browser.</p></li>
+</ul>
+<p>Then once you have more passwords you can start bouncing to other hosts,
+finding more passwords, finding more hosts...</p>
+<p>This is the point where you want to call your customer and have him
+prioritize because you're never going to have the time to exploit
+<em>everything</em>.</p>
+<img alt="../image/youmu_konpaku_sigh.png" src="../image/youmu_konpaku_sigh.png" style="width: 40%;" />
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>The true difficulty of this kind of assignments is the time. Most company
+networks have so many obvious flaws that you will rarely find yourself in
+need for actual exploits or protocol reverse engineering on the fly (note
+that I don't hope you get some of those too, they're great fun).</p>
+<p>The sheer amount of data to sort and exploit is often the main reason why we
+end up stuck wasting the day reading nmap scan reports while not actually
+knowing what to do with them. I hope this article provides some answers as to
+how to manage that complexity.</p>
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://yoai.deviantart.com/art/happy-halloween-569514306">https://yoai.deviantart.com/art/happy-halloween-569514306</a></p></li>
+<li><p><a class="reference external" href="https://ninetail-fox.deviantart.com/art/My-mouse-chibi-257200172">https://ninetail-fox.deviantart.com/art/My-mouse-chibi-257200172</a></p></li>
+<li><p><a class="reference external" href="https://yukirumo990.deviantart.com/art/Youmu-Konpaku-251134451">https://yukirumo990.deviantart.com/art/Youmu-Konpaku-251134451</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+  </body>
+</html>
