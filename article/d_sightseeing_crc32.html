@@ -92,11 +92,12 @@ import (and compile) what you don't use that way.</p>
     <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">digest</span><span class="p">.</span><span class="n">crc</span><span class="p">;</span></code></pre>
 <p>Use of UFCS (Uniform Function Call Syntax) and optional parentheses as
 explained below. Read the file by chunks, compute the crc32 which returns a
-byte array, and build a string from that. I think it's pretty
-self-explanatory.</p>
+byte array, reverse the byte order, and build a string from that. I think
+it's pretty self-explanatory.</p>
 <pre class="code d literal-block"><code>    <span class="k">return</span> <span class="n">chunks</span><span class="p">.</span><span class="n">byChunk</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
-                 <span class="p">.</span><span class="n">crc32Of</span>
-                 <span class="p">.</span><span class="n">reverse</span>
+                 <span class="p">.</span><span class="n">crc32Of</span><span class="p">[]</span>
+                 <span class="p">.</span><span class="n">retro</span>
+                 <span class="p">.</span><span class="n">array</span>
                  <span class="p">.</span><span class="n">toHexString</span>
                  <span class="p">.</span><span class="n">toLower</span><span class="p">;</span>
 <span class="p">}</span></code></pre>

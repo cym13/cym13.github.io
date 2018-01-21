@@ -30,8 +30,9 @@ string crc32(File chunks) {
     import std.digest.crc;
 
     return chunks.byChunk(8192)
-                 .crc32Of
-                 .reverse
+                 .crc32Of[]
+                 .retro
+                 .array
                  .toHexString
                  .toLower;
 }

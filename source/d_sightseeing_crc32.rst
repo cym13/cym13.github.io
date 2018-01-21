@@ -92,14 +92,15 @@ import (and compile) what you don't use that way.
 
 Use of UFCS (Uniform Function Call Syntax) and optional parentheses as
 explained below. Read the file by chunks, compute the crc32 which returns a
-byte array, and build a string from that. I think it's pretty
-self-explanatory.
+byte array, reverse the byte order, and build a string from that. I think
+it's pretty self-explanatory.
 
 .. code:: d
 
         return chunks.byChunk(8192)
-                     .crc32Of
-                     .reverse
+                     .crc32Of[]
+                     .retro
+                     .array
                      .toHexString
                      .toLower;
     }
