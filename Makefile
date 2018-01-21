@@ -10,6 +10,7 @@ article/%.html: source/%.rst template/article.tpl
 	@ if [ -e $@ ] ; then chmod +w $@ ; fi
 	rst2html5 $(RST2HTMLOPT) --template template/article.tpl $< $@
 	sed -i 's|http://cdn.mathjax.org/mathjax/latest|../resource/mathjax|' $@
+	sed -i "s|»PUB_DATE«|$$(git log --format=%aD $$'$@' | tail -1)|" $@
 	chmod -w $@
 
 %.html: %.rst template/base.tpl

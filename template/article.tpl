@@ -27,5 +27,10 @@
     <div class="content">
       %(body)s
     </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: »PUB_DATE«
+      </div>
+    </footer>
   </body>
 </html>
