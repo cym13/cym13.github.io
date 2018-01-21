@@ -22,5 +22,5 @@ rss.xml: gen_rss.py index.html $(articles)
 
 clean:
 	find . -iname "*.html" -type f -delete
-	find /source -iname "*.bak" -type f -delete
+	find ./source -iname "*.bak" -type f -delete
 	rm -f rss.xml
