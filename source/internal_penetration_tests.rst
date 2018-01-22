@@ -150,7 +150,7 @@ to start cracking passwords.
 Bruteforcing up to 6 or 7 characters is always a good thing when possible but
 I tend to privilege dictionary attacks. Aside from the famous RockYou_ that
 surprisingly still gives results from time to time, my favorite method is to
-use 1337dict_ which is a 1337script password generator.
+use 1337dict_ which is a 1337-speak password generator.
 
 It turns out that the oracle database administrator's password is often
 something like `dbAdm1n@Oracle`. Similarly John Penfield that entered the
