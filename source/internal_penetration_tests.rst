@@ -26,10 +26,10 @@ Starting line
 Ok, so you're somehow on the internal network. Could be the Wi-Fi, a VPN, a
 dangling RJ45... What matters is that your shell's waiting and your customer
 knows that you're there. These techniques absolutely do not care about being
-discreet so if you were looking for a practical black hat handbook you'd
+stealthy so if you were looking for a practical black hat handbook you'd
 better get back on IRC make some friends. On the other hand, contrary to a
-black hat, we don't have months to carefully auscultate the network so we'll go
-for the fastest.
+black hat, we don't have months to carefully auscultate the network so we'll
+go for the fastest.
 
 .. image:: ../image/chibi_mahou.png
     :width: 40%
@@ -43,7 +43,7 @@ Take note of your IP range and start looking for other hosts:
 
 - As soon as you get an idea of what the internal top level domain name is
   (or just guess it's ".int"), ask for a DNS zone transfer with `dig AXFR
-  int.`. That will very often give you the almost full list of all existing
+  int.` That will very often give you the almost full list of all existing
   hosts within the network.
 
 - Perform an ARP search, both passive and active, using netdiscover_.
