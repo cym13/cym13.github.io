@@ -32,7 +32,7 @@
 <div class="section" id="introduction">
 <h2>Introduction</h2>
 <p>Penetration testing covers a very wide range of topics, targets and
-methodologies. Of all this possibilities there is possibly none that is more
+methodologies. Of all these possibilities there is possibly none that is more
 representative of the field than internal penetration tests. Being on a
 company's network looking for servers to take control of, then bouncing from
 an account to another until the whole network is ours is what most people
@@ -50,10 +50,10 @@ to get the best of the customer's network.</p>
 <p>Ok, so you're somehow on the internal network. Could be the Wi-Fi, a VPN, a
 dangling RJ45... What matters is that your shell's waiting and your customer
 knows that you're there. These techniques absolutely do not care about being
-discreet so if you were looking for a practical black hat handbook you'd
+stealthy so if you were looking for a practical black hat handbook you'd
 better get back on IRC make some friends. On the other hand, contrary to a
-black hat, we don't have months to carefully auscultate the network so we'll go
-for the fastest.</p>
+black hat, we don't have months to carefully auscultate the network so we'll
+go for the fastest.</p>
 <img alt="../image/chibi_mahou.png" src="../image/chibi_mahou.png" style="width: 40%;" />
 <p><strong>The first thing you want is to know what's around you.</strong></p>
 <p>Take note of your IP range and start looking for other hosts:</p>
@@ -62,7 +62,7 @@ for the fastest.</p>
 broadcast calls, etc.</p></li>
 <li><p>As soon as you get an idea of what the internal top level domain name is
 (or just guess it's &quot;.int&quot;), ask for a DNS zone transfer with <cite>dig AXFR
-int.</cite>. That will very often give you the almost full list of all existing
+int.</cite> That will very often give you the almost full list of all existing
 hosts within the network.</p></li>
 <li><p>Perform an ARP search, both passive and active, using <a class="reference external" href="https://sourceforge.net/projects/netdiscover/">netdiscover</a>.</p></li>
 <li><p>Perform a ping sweep using nmap.</p></li>

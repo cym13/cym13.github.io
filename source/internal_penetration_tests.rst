@@ -6,7 +6,7 @@ Introduction
 ============
 
 Penetration testing covers a very wide range of topics, targets and
-methodologies. Of all this possibilities there is possibly none that is more
+methodologies. Of all these possibilities there is possibly none that is more
 representative of the field than internal penetration tests. Being on a
 company's network looking for servers to take control of, then bouncing from
 an account to another until the whole network is ours is what most people
