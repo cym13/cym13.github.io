@@ -8,6 +8,14 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+February 2018
+-------------
+
+`Docker for pentesters <article/docker_pentesters.html>`_
+    Docker is generally presented as a developper tool, but it can be very
+    useful to security professionnals too! Let's show how easy to use it can
+    be in that regard.
+
 January 2018
 ------------
 
