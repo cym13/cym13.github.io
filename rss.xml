@@ -4,8 +4,8 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Sat, 24 Feb 2018 11:10:59 +0100</lastBuildDate>
-  <pubDate>Sat, 24 Feb 2018 11:10:59 +0100</pubDate>
+  <lastBuildDate>Sat, 24 Feb 2018 11:19:52 +0100</lastBuildDate>
+  <pubDate>Sat, 24 Feb 2018 11:19:52 +0100</pubDate>
   <ttl>7200</ttl>
 
 
@@ -13,7 +13,7 @@
     <title>Docker for pentesters</title>
     <description>Docker is generally presented as a developper tool, but it can be very useful to security professionnals too! Let's show how easy to use it can be in that regard.</description>
     <link>https://cym13.github.io/article/docker_pentesters.html</link>
-    <pubDate></pubDate>
+    <pubDate>Sat, 24 Feb 2018 11:11:44 +0100</pubDate>
   </item>
 
 
