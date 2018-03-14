@@ -150,7 +150,7 @@ GET requests from POST ones. And that's exactly what we do:
         def handle(self):
             self.data = self.request.recv(2**14).strip().decode("UTF-8")
 
-            if len(data) == 0:
+            if len(self.data) == 0:
                 return
 
             elif self.data.splitlines()[0].startswith("GET"):
