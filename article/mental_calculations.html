@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Breakpoint: Mental calculations for IT professionnals</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="mental-calculations-for-it-professionnals">
+<h1>Mental calculations for IT professionnals</h1>
+<div class="section" id="let-s-talk-about-mental-calculations">
+<h2>Let's talk about mental calculations!</h2>
+<p><em>Uhh... I'm not too interested in that stuff, I have a computer for that.</em></p>
+<p>Well, you wouldn't be wrong to think that. But your head is a tool that rusts
+easily. I think we tend to rely too much on computers, especially in our work
+where they're ubiquitous. The ability to compute without having to think of
+it also means that we tend to trust those numbers without thinking twice
+about it. On the contrary, when not having a keyboard in the hands we tend to
+avoid computing at all.</p>
+<p>I'm often asked in my job to estimate costs, durations, numbers... I like
+being able to answer my clients without relying on my computer be it only
+because I often don't have any by hand during meetings. Besides, it's not
+nearly as hard as it seems using a few tricks and methods.</p>
+<p>We're not talking about precise results here. When dealing with real numbers
+we rarely need more than a few digits of precisions. What we're talking about
+is efficient yet educated estimates that lands within 10% of the actual
+result. That's enough to take a decision or identify a risk. It's all in the
+spirit of <a class="reference external" href="http://lesswrong.com/lw/h5e/fermi_estimates/">Fermi estimates</a>.</p>
+<p>So, what about looking at a concrete case to see some of those?</p>
+<img alt="../image/math_kawaii.png" src="../image/math_kawaii.png" style="width: 50%;" />
+</div>
+<div class="section" id="bruteforcing-a-key">
+<h2>Bruteforcing a key</h2>
+<p><em>“How long would it take to bruteforce a 128-bits key?”</em></p>
+<p>A classical issue that comes up quite often. We'll first estimate the number
+of keys that represent, then consider how fast we can test keys and finally
+get an answer.</p>
+<div class="section" id="first-trick-powers-of-two">
+<h3>First trick: powers of two.</h3>
+<p>A 128-bits key means that the key is composed of 128 bits that each can take
+two values. There are therefore 2¹²⁸ possibilities.</p>
+<p>That's an exact number but that's not easy to deal with. Let's convert it to
+a power of 10 instead.</p>
+<div class="admonition admonition-tip">
+<p class="admonition-title">Tip</p>
+<p>To convert a power of two to a power of ten, just divide it by ten and
+multiply by three. The integer part is the power of ten.</p>
+</div>
+<p>So in our case, that means:</p>
+<div class="formula">
+2<sup>128</sup>  →  128  →  128 ⁄ 10 = 12.8  →  12.8 × 3 = 38.4  →  38
+</div>
+<p>So 2¹²⁸ ≃ 10³⁸. That's way better for us because about everything is
+expressed on a base 10 so a power of ten is easier to manipulate and compare
+than a power of two. That's also why we'll use scientific notation whenever
+possible.</p>
+<p>Scientific notation of numbers is about separating their precise value
+from their order of magnitude to make them easy to compare and manipulate.
+To do that write the number as a number between 0 and 10, then multiply
+by the corresponding power of ten.</p>
+<p>For example 127348234 would be written 1.27348234×10⁸ in scientific
+notation.</p>
+<p>That notation looks more complicated, but when dealing with mental estimates
+it's a bliss. Most of the time we only care about the order of magnitude of
+the result, so converting all numbers into powers of ten is a good thing.</p>
+<p>Note that we dropped 0.4 in the process of computing the power of ten. This
+holds the &quot;value&quot; part of the scientific notation of the result and amounts
+to about 2.5 once converted back from a power of ten. There is absolutely no
+need to know that, but it's good to keep in mind that we rounded the result
+down.</p>
+</div>
+<div class="section" id="the-hypothetical-computer">
+<h3>The hypothetical computer</h3>
+<p>So how fast can we test 10³⁸ keys? That depends on the hardware, which
+evolves quite a lot... Are we using GPU? Are we using the cloud?</p>
+<p>We're estimating, so we need an answer. The question of the power of
+computation comes out often enough that having some kind of a baseline that's
+a compromise between everything that is currently possible. I call that
+machine HC-200 for “Hypothetical Computer 200-looks-so-cool&quot;.</p>
+<p>What are its specs?</p>
+<pre class="literal-block">HC-200 is a one-core 1GHz computer that can compute anything in one
+operation and requires at least one atom to be produced.</pre>
+<p><em>Uhh... That sounds stupid.</em></p>
+<img alt="../image/consider_the_following_kirino.png" src="../image/consider_the_following_kirino.png" style="width: 50%;" />
+<p>1GHz might not seem very high by today's standards, but it's on the same
+order of magnitude as most personal computers and an easy number to
+manipulate. Besides, this computer actually packs way more computing power
+than those computers: it's able to test a key in only one operation while
+that normally requires hundreds if not thousands of CPU cycles even with
+multiple cores.</p>
+<p>It has only one core but we're only using it as a mental baseline, it's easy
+to imagine many of them working in parallel: just an additionnal division.</p>
+<p>We'll maybe see in another post why we want the atomic restriction.</p>
+</div>
+<div class="section" id="back-in-track">
+<h3>Back in track</h3>
+<p>So, 1GHz means a billion (10⁹) operations a second. How many seconds do we
+need then?</p>
+<div class="formula">
+10<sup>38</sup> ⁄ 10<sup>9</sup> = 10<sup>38 − 9</sup> = 10<sup>29</sup>
+</div>
+<p>Whoa. I have no idea how much that represents. Let's express this in years
+instead.</p>
+<div class="admonition admonition-tip">
+<p class="admonition-title">Tip</p>
+<p>There are about π×10⁷ seconds in a year (π=3.14).</p>
+</div>
+<p>That's good to know! We can now write:</p>
+<div class="formula">
+10<sup>38</sup> ⁄ 3.14⋅10<sup>7</sup> = 1 ⁄ 3⋅10<sup>38 − 7</sup> = 10<sup>31</sup>
+</div>
+<p><em>Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10³⁰ ?</em></p>
+<p>Remember when earlier we rounded down? Now we round up to make for it. That's
+alright.</p>
+<div class="admonition admonition-tip">
+<p class="admonition-title">Tip</p>
+<p>Round up and down alternatively at will, it'll generally come out all
+right.</p>
+</div>
+<p>So we need 10³¹ years with one HC-200 to crack the key. Well, we have 50%
+chances it's in the first half, but that still amounts to 5×10³⁰ years, or
+one thousand billion billion billion years.</p>
+<p><em>But that was with one HC-200, what if we put a billion in parallel?</em></p>
+<p>We'd still need (<a class="reference external" href="https://en.wikipedia.org/wiki/Amdahl's_law">more than</a>)
+5×10³⁰ / 10⁹ = 5×10²¹ years, which is enough time to see through any Windows
+update in sequence (in case you want a feel of eternity).</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>We saw through a concrete case that few things are really necessary to get a
+reasonnable answer out. There were some multiplications to convert a power of
+two into a power of ten, but that aside all we did was choosing the right
+numbers, choosing when to round and addition/substractions of powers.</p>
+<p>For the sceptics, here is the answer provided with a computer with numbers as
+precise as they can be using one HC-200.</p>
+<pre class="code python literal-block"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">math</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">number_of_possibilities</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">128</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">number_of_possibilities</span>
+<span class="mi">340282366920938463463374607431768211456</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">power_of_ten</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">number_of_possibilities</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">power_of_ten</span>
+<span class="mi">38</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">seconds_in_year</span> <span class="o">=</span> <span class="mi">3600</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mf">365.25</span>    <span class="c1"># leap years too!</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">seconds_in_year</span>
+<span class="mf">31557600.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">number_of_possibilities</span> <span class="o">/</span> <span class="n">seconds_in_year</span>
+<span class="mf">1.0782897524556317e+31</span></code></pre>
+<p>So, we are 8% bellow the actual answer, well within our 10% margin. Not so
+bad huh? It's not an isolated, made-up case, any similar situation would give
+similar results.</p>
+<p>What does that mean? It means you don't need a computer to provide numerical
+answers. It means you're not slave to the machine. It's means <a class="reference external" href="https://themathlab.com/writings/short%20stories/feeling.htm">humanity's
+still got a chance</a>
+&lt;<em>insert dramatic music here fading off in the horizon here</em>&gt;.</p>
+<p>There are many more tips and tricks that I'd like to talk about so I think
+I'll do more of those!</p>
+<div class="section" id="images-source">
+<h3>Images source</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://rmblee.deviantart.com/art/MATH-IS-SO-KAWAII-DESUUUUUUU-400216158">https://rmblee.deviantart.com/art/MATH-IS-SO-KAWAII-DESUUUUUUU-400216158</a></p></li>
+<li><p><a class="reference external" href="https://warosu.org/sci/thread/9289137">https://warosu.org/sci/thread/9289137</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>

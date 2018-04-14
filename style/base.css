@@ -51,7 +51,7 @@ li {
     text-align: center;
 }
 
-.note {
+.note,.admonition {
     border-style: solid;
     border-color: #ff4422;
     font-size: 20px;
