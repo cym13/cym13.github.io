@@ -35,6 +35,10 @@ li {
     font-size: 30px;
 }
 
+.content h3 {
+    margin-top: 40px;
+}
+
 .content img {
     display: block;
     margin-left: auto;
