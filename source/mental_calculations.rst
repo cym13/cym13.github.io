@@ -1,6 +1,6 @@
-=========================================
-Mental calculations for IT professionnals
-=========================================
+========================================
+Mental calculations for IT professionals
+========================================
 
 Let's talk about mental calculations!
 =====================================
@@ -20,7 +20,7 @@ because I often don't have any by hand during meetings. Besides, it's not
 nearly as hard as it seems using a few tricks and methods.
 
 We're not talking about precise results here. When dealing with real numbers
-we rarely need more than a few digits of precisions. What we're talking about
+we rarely need more than a few digits of precision. What we're talking about
 is efficient yet educated estimates that lands within 10% of the actual
 result. That's enough to take a decision or identify a risk. It's all in the
 spirit of `Fermi estimates <http://lesswrong.com/lw/h5e/fermi_estimates/>`_.
@@ -114,7 +114,7 @@ that normally requires hundreds if not thousands of CPU cycles even with
 multiple cores.
 
 It has only one core but we're only using it as a mental baseline, it's easy
-to imagine many of them working in parallel: just an additionnal division.
+to imagine many of them working in parallel: just an additional division.
 
 We'll maybe see in another post why we want the atomic restriction.
 
@@ -165,11 +165,11 @@ Conclusion
 ==========
 
 We saw through a concrete case that few things are really necessary to get a
-reasonnable answer out. There were some multiplications to convert a power of
+reasonable answer out. There were some multiplications to convert a power of
 two into a power of ten, but that aside all we did was choosing the right
-numbers, choosing when to round and addition/substractions of powers.
+numbers, choosing when to round and addition/subtractions of powers.
 
-For the sceptics, here is the answer provided with a computer with numbers as
+For the skeptics, here is the answer provided with a computer with numbers as
 precise as they can be using one HC-200.
 
 .. code:: python

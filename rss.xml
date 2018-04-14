@@ -4,8 +4,8 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Sun, 15 Apr 2018 00:07:51 +0200</lastBuildDate>
-  <pubDate>Sun, 15 Apr 2018 00:07:51 +0200</pubDate>
+  <lastBuildDate>Sun, 15 Apr 2018 00:10:27 +0200</lastBuildDate>
+  <pubDate>Sun, 15 Apr 2018 00:10:27 +0200</pubDate>
   <ttl>7200</ttl>
 
 
@@ -21,7 +21,7 @@ Use '--' to separate paths from revisions, like this:
 
   <item>
     <title>Docker for pentesters</title>
-    <description>Docker is generally presented as a developer tool, but it can be very useful to security professionnals too! Let's show how easy to use it can be in that regard.</description>
+    <description>Docker is generally presented as a developer tool, but it can be very useful to security professionals too! Let's show how easy to use it can be in that regard.</description>
     <link>https://cym13.github.io/article/docker_pentesters.html</link>
     <pubDate>Sat, 24 Feb 2018 11:11:44 +0100</pubDate>
   </item>
