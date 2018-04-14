@@ -11,7 +11,7 @@ Recent articles
 April 2018
 ----------
 
-`Mental calculations for IT professionals <article/mental_calculations.rst>`_
+`Mental calculations for IT professionals <article/mental_calculations.html>`_
     We've lost the habit to perform mental calculations and estimates since
     working with computers. I'd like to show that it's really not hard and
     actually very useful, here by estimating the time needed to crack a key.

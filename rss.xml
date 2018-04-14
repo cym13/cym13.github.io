@@ -4,18 +4,16 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Sun, 15 Apr 2018 00:10:27 +0200</lastBuildDate>
-  <pubDate>Sun, 15 Apr 2018 00:10:27 +0200</pubDate>
+  <lastBuildDate>Sun, 15 Apr 2018 00:14:03 +0200</lastBuildDate>
+  <pubDate>Sun, 15 Apr 2018 00:14:03 +0200</pubDate>
   <ttl>7200</ttl>
 
 
   <item>
     <title>Mental calculations for IT professionals</title>
     <description>We've lost the habit to perform mental calculations and estimates since working with computers. I'd like to show that it's really not hard and actually very useful, here by estimating the time needed to crack a key.</description>
-    <link>https://cym13.github.io/article/mental_calculations.rst</link>
-    <pubDate>fatal: ambiguous argument 'article/mental_calculations.rst': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'</pubDate>
+    <link>https://cym13.github.io/article/mental_calculations.html</link>
+    <pubDate>Sun, 15 Apr 2018 00:05:27 +0200</pubDate>
   </item>
 
 
