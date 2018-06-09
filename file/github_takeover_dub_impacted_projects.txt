@@ -1,0 +1,17 @@
+https://code.dlang.org/packages/moeimg-d
+https://code.dlang.org/packages/stripe-d
+https://code.dlang.org/packages/dzmq
+https://code.dlang.org/packages/libhell
+https://code.dlang.org/packages/post-rock
+https://code.dlang.org/packages/derelict-newton
+https://code.dlang.org/packages/d-beard
+https://code.dlang.org/packages/libco
+https://code.dlang.org/packages/dopenvg
+https://code.dlang.org/packages/liblzma
+https://code.dlang.org/packages/librados
+https://code.dlang.org/packages/sass-vibe
+https://code.dlang.org/packages/zeal
+https://code.dlang.org/packages/elasticsearch-d
+https://code.dlang.org/packages/dcrypto
+https://code.dlang.org/packages/feature-test-d
+https://code.dlang.org/packages/string-transform-d
