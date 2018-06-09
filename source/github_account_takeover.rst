@@ -167,7 +167,10 @@ places listing projects.
 
 I decided to look at the `list of open-source projects`__ in the wiki, but
 with only about 1200 elements it amounts to 0.5% of all Go projects on
-Github.  Still, I found 17 impacted projects:
+Github. Still, I found 17 impacted projects. I also had a look at the
+`awesome-go`_ which brought 5 more projects (last in the list below).
+
+.. _awesome-go: https://github.com/avelino/awesome-go
 
 __ goprojects_
 
@@ -175,6 +178,9 @@ __ goprojects_
 
 .. include:: ../file/github_takeover_go_impacted_projects.txt
     :code: text
+
+I have no statistics, but judging by the number of stars those projects get
+together far more than 500 downloads a day.
 
 I won't redo the attack, you get the idea by now. It is even more worrisome
 though as at least with Dub we were able to quickly find an exhaustive list
