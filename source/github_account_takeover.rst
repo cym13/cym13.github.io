@@ -189,15 +189,20 @@ What to do
 
 **If you are a developer:**
     Please, do the responsible thing and don't let your projects behind.
-    This jeopardizes your users.
+    This jeopardizes your users. Go back and change the places where your
+    projects are registered. Notify your users.
 
 **If you are a user:**
     Always question the code you are importing. Just because it is sane at
     one point in time doesn't mean it'll still be when you reuse it. The
     developer may be wicked, hacked or undead projects may raise from their
-    tomb again to haunt you. Stay alert.
+    tomb again to haunt you.
 
-    Just kidding, we all know nobody does that, so you'll just get hacked ;)
+    I published the lists of impacted projects so that you know they exist.
+    If you are using one of them and it has come back from the dead you know
+    something is going on. It should either remain dead or change URL
+    completely to the new repository.
+
 
 **If you manage a project like Dub or Go:**
     Please don't rely on Github URLs. These are not meant to be stable.
