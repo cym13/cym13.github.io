@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+June 2018
+---------
+
+`Breaking dependencies with Github account takeover <article/github_account_takeover.html>`_
+    Let's raise dead Github projects back from the dead to take control of
+    dozens of Dub and Go projects!
+
 April 2018
 ----------
 
