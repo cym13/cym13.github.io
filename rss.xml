@@ -4,14 +4,14 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Sat, 09 Jun 2018 23:51:17 +0200</lastBuildDate>
-  <pubDate>Sat, 09 Jun 2018 23:51:17 +0200</pubDate>
+  <lastBuildDate>Sun, 10 Jun 2018 10:26:10 +0200</lastBuildDate>
+  <pubDate>Sun, 10 Jun 2018 10:26:10 +0200</pubDate>
   <ttl>7200</ttl>
 
 
   <item>
     <title>Breaking dependencies with Github account takeover</title>
-    <description>Let's raise dead Github projects back from the dead to take control of dozens of Dub and Go projects!</description>
+    <description>Let's raise Github projects back from the dead to take control of hundreds of Dub, Go and AUR packages!</description>
     <link>https://cym13.github.io/article/github_account_takeover.html</link>
     <pubDate>Sat, 9 Jun 2018 22:11:06 +0200</pubDate>
   </item>

@@ -34,10 +34,10 @@
 <ul class="simple">
 <li><p>Github allows users to change names by forwarding requests to the new
 repository;</p></li>
-<li><p>Some package managers such as D's Dub or Go imports rely on Github
-repository URLs;</p></li>
+<li><p>Some package managers such as D's Dub, Go imports or AUR rely on Github
+URLs;</p></li>
 <li><p>We can take projects over by re-creating old repositories;</p></li>
-<li><p>Non-exhaustive list of impacted projects: <a class="reference external" href="../file/github_takeover_dub_impacted_projects.txt">Dub</a> and <a class="reference external" href="../file/github_takeover_go_impacted_projects.txt">Go</a>.</p></li>
+<li><p>Non-exhaustive lists of impacted repositories: <a class="reference external" href="../file/github_takeover_dub_impacted_projects.txt">Dub</a>, <a class="reference external" href="../file/github_takeover_go_impacted_projects.txt">Go</a> and <a class="reference external" href="../file/github_takeover_aur_impacted_projects.txt">AUR</a>.</p></li>
 </ul>
 </div>
 <div class="section" id="getting-started">
@@ -150,7 +150,6 @@ tagged.</p>
 <p>And that's it. Nice, easy, and quite hard to detect if the legitimate owner
 doesn't notice it himself since we obtained the account in a proper way and
 no code was broken.</p>
-<img alt="../image/zombie_rabbit.png" src="../image/zombie_rabbit.png" style="width: 40%;" />
 </div>
 </div>
 <div class="section" id="well-go-on-then">
@@ -196,6 +195,48 @@ together far more than 500 downloads a day.</p>
 though as at least with Dub we were able to quickly find an exhaustive list
 (at a given time, of course things can change fast), but with Go all projects
 are potentially impacted with no easy way to test for legitimacy.</p>
+<img alt="../image/zombie_rabbit.png" src="../image/zombie_rabbit.png" style="width: 40%;" />
+</div>
+<div class="section" id="there-s-maur">
+<h2>There's mAUR</h2>
+<p>No let's have a look at Archlinux's semi-official package system: <a class="reference external" href="https://aur.archlinux.org/">AUR</a>.</p>
+<p>AUR is a collection of installation scripts named PKGBUILD. They allow
+installing things easily even though they are not precompiled in the official
+repositories.</p>
+<p>It is very often made clear that the security of AUR packages is the
+responsibility of the user (which by the way is utterly stupid; not that I
+don't understand the intent but no security system ever worked when leaving
+it to the user). This is why what we're discussing here much likely won't be
+considered an AUR vulnerability even though the user has pretty much no way
+to check the packages.</p>
+<p>What we're interested in are git packages. Normally with AUR you would
+specify the source of what you're installing and a set of checksums to make
+sure you effectively downloaded the right package. Some package follow the
+master branch though, so as they can't know the checksum in advance they skip
+it and no checksum verification is performed. Those packages are by
+convention specified with a &quot;-git&quot; extension.</p>
+<p>Of course that means we might be able to take some over. And by some I mean
+about 84 by my latest count. I won't burden you with the list, it's <a class="reference external" href="../file/github_takeover_aur_impacted_projects.txt">here</a>.</p>
+<p>84 is much lower than what I had imagined but it's still a good catch. I fear
+my approach wasn't that good on that one so I must have missed some. Here's
+the dirty script if anyone cares to do better:</p>
+<pre class="code sh literal-block"><code><span class="nv">pkgurl</span><span class="o">=</span><span class="s2">&quot;https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h&quot;</span>
+
+<span class="k">for</span> i in <span class="o">{</span><span class="m">0</span>..48<span class="o">}</span> <span class="p">;</span> <span class="k">do</span>
+    curl -i -s -k -X  <span class="s1">'GET'</span>                              <span class="se">\
+</span>      <span class="s2">&quot;https://aur.archlinux.org/packages/?O=</span><span class="k">$((</span>i*250<span class="k">))</span><span class="s2">&quot;</span> <span class="se">\
+</span>      <span class="s2">&quot;&amp;SeB=nd&amp;K=-git&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=1000&amp;do_Search=Go&quot;</span>
+<span class="k">done</span>                                                                     <span class="se">\
+</span><span class="p">|</span> grep <span class="s2">&quot;/packages/[^?]&quot;</span>                                                  <span class="se">\
+</span><span class="p">|</span> cut -d <span class="s1">'&quot;'</span> -f <span class="m">2</span>                                                        <span class="se">\
+</span><span class="p">|</span> sed -n <span class="s2">&quot;s|^/packages/\([^/]\+\)/|</span><span class="nv">$pkgurl</span><span class="s2">=\1|p&quot;</span>                         <span class="se">\
+</span><span class="p">|</span> xargs curl -s                                                          <span class="se">\
+</span><span class="p">|</span> sed -n <span class="s2">&quot;s|^.*source=.*\(github.com/[^</span>$<span class="s2">][^'\&quot;]\+\)['\&quot;].*|https://\1|p&quot;</span> <span class="se">\
+</span><span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> url <span class="p">;</span> <span class="k">do</span>
+    <span class="k">if</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span> <span class="p">|</span> cut -d / -f -4 <span class="p">|</span> xargs curl -s <span class="p">|</span> grep -q <span class="s2">&quot;^Not Found&quot;</span> <span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span>
+    <span class="k">fi</span>
+<span class="k">done</span></code></pre>
 <img alt="../image/chibi_zombie.png" src="../image/chibi_zombie.png" style="width: 25%;" />
 </div>
 <div class="section" id="what-to-do">
@@ -229,11 +270,18 @@ renames instead of opening vulnerabilities everywhere else please?</p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion</h2>
-<p>The story doesn't end here. Other projects rely on Github URLs. Another very
-common way to use Github account takeovers is using <a class="reference external" href="https://pages.github.com/">Github pages</a>. If you
-redirect one of your subdomain to an abandoned Github page anyone can create
-the corresponding account and obtain a subdomain of your website. This opens
-the door to many things from phishing to data disclosure.</p>
+<p>The story doesn't end here. Many other projects rely on Github URLs, and I am
+pretty sure that it will be attacked if it's not already the case.</p>
+<p>And this is not a new attack, a very common way to use Github account
+takeovers is using <a class="reference external" href="https://pages.github.com/">Github pages</a>. If you redirect one of your subdomain to
+an abandoned Github page anyone can create the corresponding account and
+obtain a subdomain of your website. This opens the door to many things from
+phishing to data disclosure.</p>
+<p>What really frightens me is how difficult such an attack is to detect. Since
+the attacker is the legitimate owner of the repository there is no way to
+link it back to its previous owner, especially if the account is well copied.
+The only possibility I see is for the owner to find that fake account, but
+why would he ever check for such things?</p>
 <div class="section" id="image-sources">
 <h3>Image sources</h3>
 <ul class="simple">

@@ -7,14 +7,16 @@ tl;dr
 
 - Github allows users to change names by forwarding requests to the new
   repository;
-- Some package managers such as D's Dub or Go imports rely on Github
-  repository URLs;
+- Some package managers such as D's Dub, Go imports or AUR rely on Github
+  URLs;
 - We can take projects over by re-creating old repositories;
-- Non-exhaustive list of impacted projects: Dub_ and Go_.
+- Non-exhaustive lists of impacted repositories: Dub_, Go_ and AUR_.
 
 .. _Dub: ../file/github_takeover_dub_impacted_projects.txt
 
 .. _Go: ../file/github_takeover_go_impacted_projects.txt
+
+.. _AUR: ../file/github_takeover_aur_impacted_projects.txt
 
 Getting started
 ===============
@@ -149,9 +151,6 @@ And that's it. Nice, easy, and quite hard to detect if the legitimate owner
 doesn't notice it himself since we obtained the account in a proper way and
 no code was broken.
 
-.. image:: ../image/zombie_rabbit.png
-    :width: 40%
-
 Well, Go on then!
 =================
 
@@ -187,6 +186,65 @@ though as at least with Dub we were able to quickly find an exhaustive list
 (at a given time, of course things can change fast), but with Go all projects
 are potentially impacted with no easy way to test for legitimacy.
 
+.. image:: ../image/zombie_rabbit.png
+    :width: 40%
+
+There's mAUR
+============
+
+No let's have a look at Archlinux's semi-official package system: AUR__.
+
+__ aurwebsite_
+
+.. _aurwebsite: https://aur.archlinux.org/
+
+AUR is a collection of installation scripts named PKGBUILD. They allow
+installing things easily even though they are not precompiled in the official
+repositories.
+
+It is very often made clear that the security of AUR packages is the
+responsibility of the user (which by the way is utterly stupid; not that I
+don't understand the intent but no security system ever worked when leaving
+it to the user). This is why what we're discussing here much likely won't be
+considered an AUR vulnerability even though the user has pretty much no way
+to check the packages.
+
+What we're interested in are git packages. Normally with AUR you would
+specify the source of what you're installing and a set of checksums to make
+sure you effectively downloaded the right package. Some package follow the
+master branch though, so as they can't know the checksum in advance they skip
+it and no checksum verification is performed. Those packages are by
+convention specified with a "-git" extension.
+
+Of course that means we might be able to take some over. And by some I mean
+about 84 by my latest count. I won't burden you with the list, it's here__.
+
+__ AUR_
+
+84 is much lower than what I had imagined but it's still a good catch. I fear
+my approach wasn't that good on that one so I must have missed some. Here's
+the dirty script if anyone cares to do better:
+
+.. code:: sh
+
+    pkgurl="https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h"
+
+    for i in {0..48} ; do
+        curl -i -s -k -X  'GET'                              \
+          "https://aur.archlinux.org/packages/?O=$((i*250))" \
+          "&SeB=nd&K=-git&outdated=&SB=n&SO=a&PP=1000&do_Search=Go"
+    done                                                                     \
+    | grep "/packages/[^?]"                                                  \
+    | cut -d '"' -f 2                                                        \
+    | sed -n "s|^/packages/\([^/]\+\)/|$pkgurl=\1|p"                         \
+    | xargs curl -s                                                          \
+    | sed -n "s|^.*source=.*\(github.com/[^$][^'\"]\+\)['\"].*|https://\1|p" \
+    | while read url ; do
+        if echo "$url" | cut -d / -f -4 | xargs curl -s | grep -q "^Not Found" ; then
+            echo "$url"
+        fi
+    done
+
 .. image:: ../image/chibi_zombie.png
     :width: 25%
 
@@ -209,7 +267,6 @@ What to do
     something is going on. It should either remain dead or change URL
     completely to the new repository.
 
-
 **If you manage a project like Dub or Go:**
     Please don't rely on Github URLs. These are not meant to be stable.
     If you do and are aware of undead projects update the redirections as
@@ -222,15 +279,24 @@ What to do
 Conclusion
 ==========
 
-The story doesn't end here. Other projects rely on Github URLs. Another very
-common way to use Github account takeovers is using `Github pages`__. If you
-redirect one of your subdomain to an abandoned Github page anyone can create
-the corresponding account and obtain a subdomain of your website. This opens
-the door to many things from phishing to data disclosure.
+The story doesn't end here. Many other projects rely on Github URLs, and I am
+pretty sure that it will be attacked if it's not already the case.
+
+And this is not a new attack, a very common way to use Github account
+takeovers is using `Github pages`__. If you redirect one of your subdomain to
+an abandoned Github page anyone can create the corresponding account and
+obtain a subdomain of your website. This opens the door to many things from
+phishing to data disclosure.
 
 __ githubpages_
 
 .. _githubpages: https://pages.github.com/
+
+What really frightens me is how difficult such an attack is to detect. Since
+the attacker is the legitimate owner of the repository there is no way to
+link it back to its previous owner, especially if the account is well copied.
+The only possibility I see is for the owner to find that fake account, but
+why would he ever check for such things?
 
 Image sources
 -------------

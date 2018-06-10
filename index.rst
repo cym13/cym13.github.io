@@ -12,8 +12,8 @@ June 2018
 ---------
 
 `Breaking dependencies with Github account takeover <article/github_account_takeover.html>`_
-    Let's raise dead Github projects back from the dead to take control of
-    dozens of Dub and Go projects!
+    Let's raise Github projects back from the dead to take control of
+    hundreds of Dub, Go and AUR packages!
 
 April 2018
 ----------
