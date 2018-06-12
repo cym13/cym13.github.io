@@ -160,7 +160,7 @@ natively supports importing libraries from Github repositories. This is very
 interesting in our case.
 
 The lack of Go repository complicates the task of listing vulnerable
-repositories. Furthermore I must say that I don't like the language much so
+repositories. Furthermore I must say that I don't know the language well so
 I'm not very familiar with its customs and whether there are recommended
 places listing projects.
 
