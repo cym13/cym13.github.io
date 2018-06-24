@@ -248,11 +248,7 @@ the dirty script if anyone cares to do better:
 It should be noted that even though the packages follow master, no update
 usually happen until someone updates the AUR package. This means we get to
 inject our malicious commit into new user's packages but not old ones until
-there is an update. Or unless he uses a handy AUR helper such as yay_ which
-follows git updates on its own. Don't get me wrong, yay is a good software,
-but it does expose users even more in that specific case.
-
-.. _yay: https://github.com/Jguer/yay
+there is an update.
 
 .. image:: ../image/chibi_zombie.png
     :width: 25%
