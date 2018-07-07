@@ -96,7 +96,7 @@ easy enough to get the job done.
 
     curl -s 'https://code.dlang.org/search?q=+' \
     | tr '"' '\n'                               \
-    | grep packages                             \
+    | grep packages/                            \
     | sed 's|^|https://code.dlang.org/|'        \
     | while read url ; do
         if dead $url ; then
@@ -104,7 +104,7 @@ easy enough to get the job done.
         fi
     done
 
-And sure enough we find 17 dead projects (list below). This may not sound
+And sure enough we find 16 dead projects (list below). This may not sound
 like much but some of them touch cryptography or online payment and together
 they totalize about 500 downloads a month. Being able to inject a backdoor
 into 500 computers a month in a stealthy way isn't something I'd refuse as an
@@ -120,6 +120,10 @@ project which doesn't appear dead anymore. This is because I used it to check
 that the vulnerability was indeed exploitable. My apologies to the owner but
 since the project hasn't received any update in 4 years and I forked the
 original it shouldn't break anything.
+
+This also caused **post-rock** to disappear from the list although it's still
+using the redirection. That's because that package is provided by the same
+user as **d-beard**.
 
 Exploitation
 ------------

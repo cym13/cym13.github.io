@@ -96,21 +96,20 @@ easy enough to get the job done.</p>
 
 curl -s <span class="s1">'https://code.dlang.org/search?q=+'</span> <span class="se">\
 </span><span class="p">|</span> tr <span class="s1">'&quot;'</span> <span class="s1">'\n'</span>                               <span class="se">\
-</span><span class="p">|</span> grep packages                             <span class="se">\
+</span><span class="p">|</span> grep packages/                            <span class="se">\
 </span><span class="p">|</span> sed <span class="s1">'s|^|https://code.dlang.org/|'</span>        <span class="se">\
 </span><span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> url <span class="p">;</span> <span class="k">do</span>
     <span class="k">if</span> dead <span class="nv">$url</span> <span class="p">;</span> <span class="k">then</span>
         <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span>
     <span class="k">fi</span>
 <span class="k">done</span></code></pre>
-<p>And sure enough we find 17 dead projects (list below). This may not sound
+<p>And sure enough we find 16 dead projects (list below). This may not sound
 like much but some of them touch cryptography or online payment and together
 they totalize about 500 downloads a month. Being able to inject a backdoor
 into 500 computers a month in a stealthy way isn't something I'd refuse as an
 attacker.</p>
 <p>Here are the impacted projects found:</p>
-<pre class="code text literal-block"><code>https://code.dlang.org/packages/moeimg-d
-https://code.dlang.org/packages/stripe-d
+<pre class="code text literal-block"><code>https://code.dlang.org/packages/stripe-d
 https://code.dlang.org/packages/dzmq
 https://code.dlang.org/packages/libhell
 https://code.dlang.org/packages/post-rock
@@ -131,6 +130,9 @@ project which doesn't appear dead anymore. This is because I used it to check
 that the vulnerability was indeed exploitable. My apologies to the owner but
 since the project hasn't received any update in 4 years and I forked the
 original it shouldn't break anything.</p>
+<p>This also caused <strong>post-rock</strong> to disappear from the list although it's still
+using the redirection. That's because that package is provided by the same
+user as <strong>d-beard</strong>.</p>
 </div>
 <div class="section" id="exploitation">
 <h3>Exploitation</h3>

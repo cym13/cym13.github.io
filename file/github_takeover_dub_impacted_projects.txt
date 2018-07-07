@@ -1,4 +1,3 @@
-https://code.dlang.org/packages/moeimg-d
 https://code.dlang.org/packages/stripe-d
 https://code.dlang.org/packages/dzmq
 https://code.dlang.org/packages/libhell
