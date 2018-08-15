@@ -41,7 +41,7 @@ I'd like to talk, can I contact you?
 ====================================
 
 Sure, you can mail me at the following address:
-Y3BpY2FyZEBvcGVubWFpbGJveC5vcmcK
+Y3BpY2FyZEBwdXJyZmVjdC5mcg==
 
 If mails aren't for you I usually hang out on irc.freenode.net under the
 nickname "piou". ##security and ##programming are great places to start.
