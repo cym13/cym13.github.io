@@ -80,7 +80,7 @@ Listing, listing...
 -------------------
 
 So, we'll start by enumerating all dead Github accounts that are still in
-used. I'm certain there are better ways to do this, but a bit of bash is
+use. I'm certain there are better ways to do this, but a bit of bash is
 easy enough to get the job done.
 
 .. code:: sh
