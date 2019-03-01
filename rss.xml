@@ -4,9 +4,17 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Fri, 01 Mar 2019 16:25:36 +0100</lastBuildDate>
-  <pubDate>Fri, 01 Mar 2019 16:25:36 +0100</pubDate>
+  <lastBuildDate>Fri, 01 Mar 2019 16:38:09 +0100</lastBuildDate>
+  <pubDate>Fri, 01 Mar 2019 16:38:09 +0100</pubDate>
   <ttl>7200</ttl>
+
+
+  <item>
+    <title>How to size a hash? More mental calculations</title>
+    <description>Determining the right size of hash to use to avoid collisions can be tricky, but it's easier than it sounds with the right mental trick.</description>
+    <link>https://cym13.github.io/article/size_hash.html</link>
+    <pubDate>Fri, 1 Mar 2019 16:26:40 +0100</pubDate>
+  </item>
 
 
   <item>

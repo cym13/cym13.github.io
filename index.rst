@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+March 2019
+----------
+
+`How to size a hash? More mental calculations <article/size_hash.html>`_
+   Determining the right size of hash to use to avoid collisions can be
+   tricky, but it's easier than it sounds with the right mental trick.
+
 June 2018
 ---------
 
