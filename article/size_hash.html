@@ -39,14 +39,14 @@ no collision will occur?</p>
 episode</a> we're doing it without any calculator.</p>
 <p>We won't delve into the security aspect of hashes here but if you're
 manipulating secrets you really want to use a safe cryptographic hash and not
-something like crc32 or sha1.</p>
+something like CRC32 or SHA1.</p>
 </div>
 <div class="section" id="first-approach">
 <h2>First approach</h2>
 <p>A fundamental property of hashes is that they have a fixed size and so a
 fixed number of possible values. A 32 bit hash will have a maximum of 2³²
 values.</p>
-<p>So we're just trying to find the right power of 2 to accomodate our number of
+<p>So we're just trying to find the right power of 2 to accommodate our number of
 users. Let's say we have a billion of those.</p>
 <p>We might remember the trick: to convert a power of 2 into a power of 10
 divide by 10 and multiply by 3.</p>
@@ -54,7 +54,7 @@ divide by 10 and multiply by 3.</p>
 <div class="formula">
 10<sup>9</sup> → 9÷3 × 10 = 30 → 2<sup>30</sup>
 </div>
-<p>So a 30 bit hash would accomodate a billion users. And to get some margin we
+<p>So a 30 bit hash would accommodate a billion users. And to get some margin we
 can opt for a 32 bit hash like CRC32.</p>
 <p>Problem solved, right?</p>
 <img alt="../image/steinsgate_mayuri.png" src="../image/steinsgate_mayuri.png" style="width: 40%;" />
@@ -95,7 +95,7 @@ divide the power by 2.</p>
 <h2>Conclusion</h2>
 <p>This is useful to size hashes and avoid disruption of service of course.
 However it's also worth noting that many protocols rely on the lack of
-colisions for security. For example a collision may mean that you can inject
+collisions for security. For example a collision may mean that you can inject
 a packet in a communication. In that case, it is worthwhile to be able to
 quickly judge the number of packets you'll need to gather to exploit that
 fact.</p>

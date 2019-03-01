@@ -15,7 +15,7 @@ episode <mental_calculations.html>`_ we're doing it without any calculator.
 
 We won't delve into the security aspect of hashes here but if you're
 manipulating secrets you really want to use a safe cryptographic hash and not
-something like crc32 or sha1.
+something like CRC32 or SHA1.
 
 First approach
 ==============
@@ -24,7 +24,7 @@ A fundamental property of hashes is that they have a fixed size and so a
 fixed number of possible values. A 32 bit hash will have a maximum of 2³²
 values.
 
-So we're just trying to find the right power of 2 to accomodate our number of
+So we're just trying to find the right power of 2 to accommodate our number of
 users. Let's say we have a billion of those.
 
 We might remember the trick: to convert a power of 2 into a power of 10
@@ -36,7 +36,7 @@ Conversely we can write:
 
    10^9 \rightarrow 9÷3×10=30 \rightarrow 2^30
 
-So a 30 bit hash would accomodate a billion users. And to get some margin we
+So a 30 bit hash would accommodate a billion users. And to get some margin we
 can opt for a 32 bit hash like CRC32.
 
 Problem solved, right?
@@ -92,7 +92,7 @@ Conclusion
 
 This is useful to size hashes and avoid disruption of service of course.
 However it's also worth noting that many protocols rely on the lack of
-colisions for security. For example a collision may mean that you can inject
+collisions for security. For example a collision may mean that you can inject
 a packet in a communication. In that case, it is worthwhile to be able to
 quickly judge the number of packets you'll need to gather to exploit that
 fact.
