@@ -39,7 +39,7 @@ Cela introduit quelques restrictions sur son utilisation (impossible de
 lancer **ptrace** sur le processus ou d'employer **LD_PRELOAD** par exemple).
 
 Cependant les processus SUID sont généralement considérés comme de gros
-risques de sécurité car la moindre vulnérabilité peut donner une escalade de
+risques de sécurité car la moindre vulnérabilité peut donner une élévation de
 privilèges. C'est une de ces vulnérabilités que nous allons voir maintenant.
 
 La fonction deliver
@@ -155,7 +155,7 @@ En pratique ça ressemble à ça:
     --------------------------------------------------------------------------
     Vérifie l'existence - Le fichier n'existe pas |
                                                   | Crée symlink malicieux
-    Ouvre le fichier - Suis le lien symbolique    |
+    Ouvre le fichier - Suit le lien symbolique    |
     Change le propriétaire                        |
                                                   | \o/ Profit !
 
@@ -199,7 +199,7 @@ Pour notre attaque nous allons créer un lien **/var/mail/user** vers
         touch "$MAILBOX"
 
         if [ "$(stat "$STEALPATH" -c '%u')" -eq 0 ] ; then
-            echo "Yeah ! Réussi !
+            echo "Yeah ! Réussi !"
             break
         fi
     done

