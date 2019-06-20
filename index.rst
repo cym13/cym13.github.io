@@ -8,6 +8,14 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+June 2019
+---------
+
+`Dirduster: short presentation <article/dirduster_presentation.html>`_
+    My web directory bruteforcing tool is finally feature complete after some
+    years of development and professional use. Here's a short presentation of
+    its goals and usage.
+
 March 2019
 ----------
 
