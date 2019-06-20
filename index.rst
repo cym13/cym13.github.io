@@ -11,6 +11,11 @@ Recent articles
 June 2019
 ---------
 
+`Opening combination locks <article/opening_combination_locks.html>`_
+    Got a 3 or 4 digit combination lock that you can't open? Not anymore!
+    Here are a few tips and tricks to open almost any combination lock you
+    may find.
+
 `Dirduster: short presentation <article/dirduster_presentation.html>`_
     My web directory bruteforcing tool is finally feature complete after some
     years of development and professional use. Here's a short presentation of
