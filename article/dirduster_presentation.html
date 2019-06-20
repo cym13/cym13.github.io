@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Breakpoint: Dirduster: short presentation</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="dirduster-short-presentation">
+<h1>Dirduster: short presentation</h1>
+<div class="section" id="tl-dr">
+<h2>tl;dr</h2>
+<p><a class="reference external" href="https://github.com/cym13/dirduster">Dirduster</a> is a fast, command-line web
+directory bruteforcing tool written in D and used professionally for years
+with much satisfaction.</p>
+</div>
+<div class="section" id="what-is-dirduster">
+<h2>What is dirduster?</h2>
+<p>When assessing the security of a website it is important to map all entry
+points. One common strategy for that is called “spidering”: start from the
+home page and recursively follow all links.</p>
+<p>This approach is not very interesting in my opinion and can even be
+dangerous. It can only find pages that are meant to be available and for
+websites that have thousands of similar pages it can be difficult to find the
+ones that are different and actually present a different kind of interaction
+(and different possible vulnerabilities).</p>
+<p>There is another approach traditionally called “dirbusting” in reference to
+the most popular tool for the job: dirbuster. Dirbusting consists in taking a
+list of common file and directory names and testing them on a URL. It's very
+effective to find forgotten or hidden administration interfaces, directories
+to be explored, files to be read. Even when the file isn't available just
+noticing a different error code can indicate what framework or tools are used
+on the website.</p>
+<p>Dirbusting is one of my main weapons to attack websites so I needed a good
+tool. Therefore I created dirduster. It is a compiled, multithreaded program
+able to perform fast dirbusting. It also has lots of configuration options
+to adapt to any situation you may encounter. And if you're wondering about
+the name, it's because it's similar to dirbuster but written in the <a class="reference external" href="https://dlang.org/">D
+programming language</a>.</p>
+</div>
+<div class="section" id="why-not-dirb-dirbuster-gobuster">
+<h2>Why not dirb, dirbuster, gobuster...?</h2>
+<p>There are lots of reasons but the basic idea is that I didn't find a tool
+that worked as well as I wanted it to.</p>
+<div class="figure">
+<img alt="../image/rd_shrug.png" src="../image/rd_shrug.png" style="width: 40%;" />
+</div>
+<div class="section" id="dirbuster">
+<h3>Dirbuster</h3>
+<p>This is by far the most popular tool to do dirbusting and I really don't like
+it.</p>
+<p>It's graphical which means that I can't easily run it via SSH on a
+captured server and leave it there in a screen session while I continue the
+assessment elsewhere for example. There exists a command-line interface that
+I never managed to get to work properly. Feature-wise it's rather complete
+although not as much as dirduster ended up to be. For example it can only do
+GET and HEAD requests and (more importantly) has no real way to filter
+results.</p>
+<p>Filtering is key. Some applications respond with non-standard error codes.
+Some applications always return 200 no matter what. A good dirbusting tool
+needs to be able to separate the wheat from the chaff. Dirbuster allows you
+to customize what error codes should be ignored, to exclude pages matching a
+given regex and its text interface is well suited to grep away any page
+matching a given size for example.</p>
+</div>
+<div class="section" id="dirb">
+<h3>Dirb</h3>
+<p>Dirb is another common tool since it is installed by default on Kali Linux.
+It's not a bad tool: it's more customizable than dirbuster and rather easy to
+grep. But it has its issues.</p>
+<p>First of all it's slow. You cannot set the number of concurrent threads in
+dirb, by default it creates as many as there are processors. Which is good
+right? Wrong. Dirbusting is not a CPU-heavy task, most of the time is spent
+waiting for an answer from the server. Each CPU could easily handle 100
+threads that wait doing nothing, but with dirb if you have two CPUs you will
+send two requests at a time, never more.</p>
+<p>Another issue is that dirb isn't well designed. It doesn't follow any
+development convention: -h and --help don't print any help, passing an option
+before the URL doesn't work, it must be placed after (which is exactly the
+opposite of any UNIX tool), etc. It's just clunky.</p>
+<p>Also it only supports one URL at a time. Launching dirb many times is
+possible of course, but it's nice to be able to test many URLs at once.</p>
+</div>
+<div class="section" id="other-tools">
+<h3>Other tools</h3>
+<p>I did it a few years ago and certainly didn't take the time to try them all.
+If you find that some other tool works better for you, go for it (but give
+dirduster a try first)!</p>
+</div>
+</div>
+<div class="section" id="how-do-you-use-it">
+<h2>How do you use it?</h2>
+<p>First of all I must admit that even though dirduster comes with some
+dictionaries (the dirbuster ones) I much prefer the raft lists from <a class="reference external" href="https://github.com/danielmiessler/SecLists">SecLists</a>. They are very effective for
+me.</p>
+<p>I generally start with a small list in --single-pass in order to get a feel
+of the application: what are errors like? What codes, what page sizes etc.</p>
+<p>If I get surprising results I make sure to match my browser's request by
+setting the corresponding headers. I then proceed to filter the results by
+return code, error strings and page size (in that order).</p>
+<p>Adding return codes in particular is easy: with --list-ignore you get the
+comma-separated list of all codes that are ignored by default by dirduster.
+You can overwrite that list by using --ignore: just pass it a new list with
+error codes that are relevant to your application.</p>
+<p>Once my filters are in place I start using bigger lists. Hopefully by that
+point I have a better idea of what to expect from the website so I can target
+specific technologies.</p>
+<p>In last resort I remove --single-pass to try finding directories recursively.
+This doesn't work on many websites though so I often don't bother. Similarly
+--directories (which tries each URL with and without a trailing forward
+slash) is sometimes useful but often not worth investing any time.</p>
+<p>Testing other methods can lead to very interesting results but it's a rather
+new feature so I have yet to determine just how useful it is in practice.</p>
+<p>And that's about it. Pipe to tee, maybe grepping to remove some duds and
+you're good to go.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?</h2>
+<p>Nothing. I will continue supporting dirduster of course, it's one of my main
+tools at work and I use it weekly, but I feel like it has the features it
+needs. I don't plan on adding more unless someone comes with a pull request
+or a very well thought argument.</p>
+<p>I hope it fits your toolbox as well as mine:
+<a class="reference external" href="https://github.com/cym13/dirduster">https://github.com/cym13/dirduster</a></p>
+<div class="section" id="image-source">
+<h3>Image source</h3>
+<ul class="simple">
+<li><p>Unknown</p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>
