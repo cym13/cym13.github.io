@@ -126,7 +126,7 @@ need then?
 
 .. math::
 
-    10^38 / 10^9 = 10^{38-9} = 10^29
+    10^38 / 10^9 = 10^{38-9} = 10^29 seconds
 
 Whoa. I have no idea how much that represents. Let's express this in years
 instead.
@@ -139,9 +139,9 @@ That's good to know! We can now write:
 
 .. math::
 
-    10^38 / 3.14 \cdot 10^7 = 1/3 \cdot 10^{38-7} = 10^31
+    10^29 / 3.14 \cdot 10^7 = 1/3 \cdot 10^{29-7} = 10^22 years
 
-*Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10³⁰ ?*
+*Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10²¹ ?*
 
 Remember when earlier we rounded down? Now we round up to make for it. That's
 alright.
@@ -151,14 +151,14 @@ alright.
     Round up and down alternatively at will, it'll generally come out all
     right.
 
-So we need 10³¹ years with one HC-200 to crack the key. Well, we have 50%
-chances it's in the first half, but that still amounts to 5×10³⁰ years, or
-one thousand billion billion billion years.
+So we need 10²² years with one HC-200 to crack the key. Well, we have 50%
+chances it's in the first half, but that still amounts to 5×10²¹ years, or
+one thousand billion billion years.
 
 *But that was with one HC-200, what if we put a billion in parallel?*
 
 We'd still need (`more than <https://en.wikipedia.org/wiki/Amdahl's_law>`_)
-5×10³⁰ / 10⁹ = 5×10²¹ years, which is enough time to see through any Windows
+5×10²¹ / 10⁹ = 5×10¹² years, which is enough time to see through any Windows
 update in sequence (in case you want a feel of eternity).
 
 Conclusion
@@ -186,6 +186,12 @@ precise as they can be using one HC-200.
     31557600.0
     >>> number_of_possibilities / seconds_in_year
     1.0782897524556317e+31
+    >>> hc200_ops = 10**9
+    >>> time_needed = number_of_possibilities / seconds_in_year / hc200_ops
+    >>> time_needed
+    5.391448762278158e+21
+    >>> 100*(time_needed - 1*10**22)/time_needed
+    7.260548686226432
 
 So, we are 8% bellow the actual answer, well within our 10% margin. Not so
 bad huh? It's not an isolated, made-up case, any similar situation would give
@@ -199,6 +205,9 @@ still got a chance
 
 There are many more tips and tricks that I'd like to talk about so I think
 I'll do more of those!
+
+*EDIT: thanks to Vincent Lopes for his diligence which caught on a big
+mistake in the final calculations where a factor had been forgotten.*
 
 Images source
 -------------

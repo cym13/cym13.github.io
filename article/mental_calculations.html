@@ -118,7 +118,7 @@ to imagine many of them working in parallel: just an additional division.</p>
 <p>So, 1GHz means a billion (10⁹) operations a second. How many seconds do we
 need then?</p>
 <div class="formula">
-10<sup>38</sup> ⁄ 10<sup>9</sup> = 10<sup>38 − 9</sup> = 10<sup>29</sup>
+10<sup>38</sup> ⁄ 10<sup>9</sup> = 10<sup>38 − 9</sup> = 10<sup>29</sup><i>seconds</i>
 </div>
 <p>Whoa. I have no idea how much that represents. Let's express this in years
 instead.</p>
@@ -128,9 +128,9 @@ instead.</p>
 </div>
 <p>That's good to know! We can now write:</p>
 <div class="formula">
-10<sup>38</sup> ⁄ 3.14⋅10<sup>7</sup> = 1 ⁄ 3⋅10<sup>38 − 7</sup> = 10<sup>31</sup>
+10<sup>29</sup> ⁄ 3.14⋅10<sup>7</sup> = 1 ⁄ 3⋅10<sup>29 − 7</sup> = 10<sup>22</sup><i>years</i>
 </div>
-<p><em>Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10³⁰ ?</em></p>
+<p><em>Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10²¹ ?</em></p>
 <p>Remember when earlier we rounded down? Now we round up to make for it. That's
 alright.</p>
 <div class="admonition admonition-tip">
@@ -138,12 +138,12 @@ alright.</p>
 <p>Round up and down alternatively at will, it'll generally come out all
 right.</p>
 </div>
-<p>So we need 10³¹ years with one HC-200 to crack the key. Well, we have 50%
-chances it's in the first half, but that still amounts to 5×10³⁰ years, or
-one thousand billion billion billion years.</p>
+<p>So we need 10²² years with one HC-200 to crack the key. Well, we have 50%
+chances it's in the first half, but that still amounts to 5×10²¹ years, or
+one thousand billion billion years.</p>
 <p><em>But that was with one HC-200, what if we put a billion in parallel?</em></p>
 <p>We'd still need (<a class="reference external" href="https://en.wikipedia.org/wiki/Amdahl's_law">more than</a>)
-5×10³⁰ / 10⁹ = 5×10²¹ years, which is enough time to see through any Windows
+5×10²¹ / 10⁹ = 5×10¹² years, which is enough time to see through any Windows
 update in sequence (in case you want a feel of eternity).</p>
 </div>
 </div>
@@ -166,7 +166,13 @@ precise as they can be using one HC-200.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">seconds_in_year</span>
 <span class="mf">31557600.0</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">number_of_possibilities</span> <span class="o">/</span> <span class="n">seconds_in_year</span>
-<span class="mf">1.0782897524556317e+31</span></code></pre>
+<span class="mf">1.0782897524556317e+31</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">hc200_ops</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">9</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">time_needed</span> <span class="o">=</span> <span class="n">number_of_possibilities</span> <span class="o">/</span> <span class="n">seconds_in_year</span> <span class="o">/</span> <span class="n">hc200_ops</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">time_needed</span>
+<span class="mf">5.391448762278158e+21</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">time_needed</span> <span class="o">-</span> <span class="mi">1</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">22</span><span class="p">)</span><span class="o">/</span><span class="n">time_needed</span>
+<span class="mf">7.260548686226432</span></code></pre>
 <p>So, we are 8% bellow the actual answer, well within our 10% margin. Not so
 bad huh? It's not an isolated, made-up case, any similar situation would give
 similar results.</p>
@@ -176,6 +182,8 @@ still got a chance</a>
 &lt;<em>insert dramatic music here fading off in the horizon here</em>&gt;.</p>
 <p>There are many more tips and tricks that I'd like to talk about so I think
 I'll do more of those!</p>
+<p><em>EDIT: thanks to Vincent Lopes for his diligence which caught on a big
+mistake in the final calculations where a factor had been forgotten.</em></p>
 <div class="section" id="images-source">
 <h3>Images source</h3>
 <ul class="simple">
