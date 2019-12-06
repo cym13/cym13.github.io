@@ -4,9 +4,17 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://cym13.github.io</link>
-  <lastBuildDate>Mon, 21 Oct 2019 19:32:53 +0200</lastBuildDate>
-  <pubDate>Mon, 21 Oct 2019 19:32:53 +0200</pubDate>
+  <lastBuildDate>Fri, 06 Dec 2019 18:56:03 +0100</lastBuildDate>
+  <pubDate>Fri, 06 Dec 2019 18:56:03 +0100</pubDate>
   <ttl>7200</ttl>
+
+
+  <item>
+    <title>HPLIP Privilege Escalation</title>
+    <description>Study of a file-based privilege escalation in HPLIP. Writable directories are still a liability!</description>
+    <link>https://cym13.github.io/article/hplip_privesc.html</link>
+    <pubDate>Fri, 6 Dec 2019 18:55:28 +0100</pubDate>
+  </item>
 
 
   <item>

