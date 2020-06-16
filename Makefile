@@ -4,7 +4,7 @@ articles = $(subst .rst,.html,$(subst source/,article/,$(sources)))
 
 RST2HTMLOPT = -t --no-doc-title --title=Breakpoint --syntax-highlight=short
 
-all: index.html about.html $(articles) rss.xml
+all: index.html about.html soc.html $(articles) rss.xml
 
 article/%.html: source/%.rst template/article.tpl
 	@ if [ -e $@ ] ; then chmod +w $@ ; fi
