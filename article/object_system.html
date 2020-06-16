@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
 <title>Breakpoint: Let's build an object system!</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -21,6 +21,7 @@
         <ul>
           <li><a href="../index.html">Index</a></li>
           <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a></li>
           <li><a href="../about.html">About</a></li>
         </ul>
       </div>
@@ -60,11 +61,11 @@ do it. We also want him to mew and purr. Let's be naive:</p>
 <span class="n">breed</span> <span class="o">=</span> <span class="s2">&quot;russian blue&quot;</span>
 
 <span class="k">def</span> <span class="nf">mew</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">purr</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></code></pre>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></code></pre>
 <p>That's great, everything is easy to access and modify. But it will soon be a
 mess if we need a second cat. We could end each variable name with _1 or _2
 but what about when we want to have an infinite number of cats (because who
@@ -81,19 +82,19 @@ age, then the name etc...</p>
 <pre class="code python literal-block"><code><span class="n">mycat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">]</span>
 
 <span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></code></pre>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span></code></pre>
 <p>That definitely looks better, but relying on a convention can be hard if
 another programmer has to look at your code.</p>
 <p>Also, the actions are left alone... We're in python, a function can be put in
 a list too!</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
 <span class="n">mycat</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">,</span> <span class="n">mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
 
@@ -102,15 +103,15 @@ a list too!</p>
 <p>The advantage is that one can change how a cat mews without changing every
 cat:</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
 <span class="n">kitty</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Kitty&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;russian blue&quot;</span><span class="p">,</span> <span class="n">mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
 
 <span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
 
 <span class="n">nyoron</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">,</span> <span class="n">purr</span><span class="p">]</span>
 
@@ -121,7 +122,7 @@ cat:</p>
 <p>The problem is that it lacks a common interface, with that structure you
 can't know in advance how to make a cat mew... Let's solve this:</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">mew</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
     <span class="n">cat</span><span class="p">[</span><span class="mi">4</span><span class="p">](</span><span class="n">cat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
@@ -144,10 +145,10 @@ thing at creation...</p>
 <h2>Constructor</h2>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
     <span class="n">cat</span> <span class="o">=</span> <span class="p">[</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">,</span> <span class="n">default_mew</span><span class="p">,</span> <span class="n">default_purr</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">cat</span>
@@ -172,7 +173,7 @@ knowing how it is implemented? We need a special function for that.</p>
 <span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
 
 <span class="n">change_mew</span><span class="p">(</span><span class="n">nyoron</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
 
@@ -189,10 +190,10 @@ the way to go.</p>
 <h2>Dictionaries</h2>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
     <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'age'</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
            <span class="s1">'name'</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
@@ -206,7 +207,7 @@ the way to go.</p>
 <span class="n">nyoron</span> <span class="o">=</span> <span class="n">make_cat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Nyoron&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;bobtail&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nyoron says nya!&quot;</span><span class="p">)</span>
 
 <span class="n">nyoron</span><span class="p">[</span><span class="s1">'mew'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nyoron_mew</span>
 
@@ -224,7 +225,7 @@ trust me, you could do (in python):</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 <span class="c1">#&gt; {'value': 42}</span></code></pre>
 </div>
 <div class="section" id="layers-of-abstraction-comeback">
@@ -235,10 +236,10 @@ calls to that method.</p>
 <p>This is easily solved with a method that we saw before.</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
     <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'age'</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
            <span class="s1">'name'</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
@@ -270,7 +271,7 @@ calls to that method.</p>
 
 
 <span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">'Nyoron says nya!'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Nyoron says nya!'</span><span class="p">)</span>
 
 <span class="n">setatt</span><span class="p">(</span><span class="n">nyoron</span><span class="p">,</span> <span class="s1">'mew'</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
 
@@ -294,10 +295,10 @@ than once, but if you know how to implement it if you need to.</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">make_cat_class</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
         <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'age'</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
                <span class="s1">'name'</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
@@ -331,7 +332,7 @@ than once, but if you know how to implement it if you need to.</p>
     <span class="k">return</span> <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">](</span><span class="n">cat</span><span class="p">,</span> <span class="s1">'purr'</span><span class="p">)()</span>
 
 <span class="k">def</span> <span class="nf">nyoron_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">'Nyoron says nya!'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Nyoron says nya!'</span><span class="p">)</span>
 
 <span class="n">cat</span><span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">](</span><span class="n">nyoron</span><span class="p">,</span> <span class="s1">'mew'</span><span class="p">,</span> <span class="n">nyoron_mew</span><span class="p">)</span>
 
@@ -352,7 +353,7 @@ of them:</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 <span class="c1">#&gt;{'__module__': '__console__',</span>
 <span class="c1">#  '__init__': &lt;function A.__init__ at 0x7fc88f053a60&gt;,</span>
 <span class="c1">#  '__dict__': &lt;attribute '__dict__' of 'A' objects&gt;,</span>
@@ -378,10 +379,10 @@ that their default mewing is &quot;Nya!&quot;. They also give luck.</p>
 <pre class="code python literal-block"><code><span class="k">def</span> <span class="nf">make_cat_class</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">breed</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;mews!&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
         <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'age'</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
                <span class="s1">'name'</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
@@ -407,13 +408,13 @@ that their default mewing is &quot;Nya!&quot;. They also give luck.</p>
     <span class="c1"># We don't need to redefine everything, just what we want to change</span>
     <span class="k">def</span> <span class="nf">make_cat</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">default_mew</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;says nya!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;says nya!&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">default_purr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;purrs!&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">give_luck</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;gives you luck!&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;gives you luck!&quot;</span><span class="p">)</span>
 
         <span class="n">cat</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'age'</span><span class="p">:</span>   <span class="n">age</span><span class="p">,</span>
                <span class="s1">'name'</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
@@ -481,7 +482,7 @@ Confused? Look back at our previous example with the A class:</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 <span class="c1">#&gt;{'__module__': '__console__',</span>
 <span class="c1">#  '__init__': &lt;function A.__init__ at 0x7fc88f053a60&gt;,</span>
 <span class="c1">#  '__dict__': &lt;attribute '__dict__' of 'A' objects&gt;,</span>
