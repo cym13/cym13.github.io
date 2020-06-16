@@ -3,16 +3,16 @@
 <channel>
   <title>Breakpoint</title>
   <description>Stepping through security</description>
-  <link>https://cym13.github.io</link>
-  <lastBuildDate>Mon, 20 Apr 2020 19:29:07 +0200</lastBuildDate>
-  <pubDate>Mon, 20 Apr 2020 19:29:07 +0200</pubDate>
+  <link>https://breakpoint.purrfect.fr</link>
+  <lastBuildDate>Tue, 16 Jun 2020 19:02:54 +0200</lastBuildDate>
+  <pubDate>Tue, 16 Jun 2020 19:02:54 +0200</pubDate>
   <ttl>7200</ttl>
 
 
   <item>
     <title>HPLIP Privilege Escalation</title>
     <description>Study of a file-based privilege escalation in HPLIP. Writable directories are still a liability!</description>
-    <link>https://cym13.github.io/article/hplip_privesc.html</link>
+    <link>https://breakpoint.purrfect.fr/article/hplip_privesc.html</link>
     <pubDate>Fri, 6 Dec 2019 18:55:28 +0100</pubDate>
   </item>
 
@@ -20,7 +20,7 @@
   <item>
     <title>Opening combination locks</title>
     <description>Got a 3 or 4 digit combination lock that you can't open? Not anymore! Here are a few tips and tricks to open almost any combination lock you may find.</description>
-    <link>https://cym13.github.io/article/opening_combination_locks.html</link>
+    <link>https://breakpoint.purrfect.fr/article/opening_combination_locks.html</link>
     <pubDate>Fri, 21 Jun 2019 01:02:12 +0200</pubDate>
   </item>
 
@@ -28,7 +28,7 @@
   <item>
     <title>Dirduster: short presentation</title>
     <description>My web directory bruteforcing tool is finally feature complete after some years of development and professional use. Here's a short presentation of its goals and usage.</description>
-    <link>https://cym13.github.io/article/dirduster_presentation.html</link>
+    <link>https://breakpoint.purrfect.fr/article/dirduster_presentation.html</link>
     <pubDate>Thu, 20 Jun 2019 20:44:39 +0200</pubDate>
   </item>
 
@@ -36,7 +36,7 @@
   <item>
     <title>How to size a hash? More mental calculations</title>
     <description>Determining the right size of hash to use to avoid collisions can be tricky, but it's easier than it sounds with the right mental trick.</description>
-    <link>https://cym13.github.io/article/size_hash.html</link>
+    <link>https://breakpoint.purrfect.fr/article/size_hash.html</link>
     <pubDate>Fri, 1 Mar 2019 16:26:40 +0100</pubDate>
   </item>
 
@@ -44,7 +44,7 @@
   <item>
     <title>Breaking dependencies with Github account takeover</title>
     <description>Let's raise Github projects back from the dead to take control of hundreds of Dub, Go and AUR packages!</description>
-    <link>https://cym13.github.io/article/github_account_takeover.html</link>
+    <link>https://breakpoint.purrfect.fr/article/github_account_takeover.html</link>
     <pubDate>Sat, 9 Jun 2018 22:11:06 +0200</pubDate>
   </item>
 
@@ -52,7 +52,7 @@
   <item>
     <title>Mental calculations for IT professionals</title>
     <description>We've lost the habit to perform mental calculations and estimates since working with computers. I'd like to show that it's really not hard and actually very useful, here by estimating the time needed to crack a key.</description>
-    <link>https://cym13.github.io/article/mental_calculations.html</link>
+    <link>https://breakpoint.purrfect.fr/article/mental_calculations.html</link>
     <pubDate>Sun, 15 Apr 2018 00:05:27 +0200</pubDate>
   </item>
 
@@ -60,7 +60,7 @@
   <item>
     <title>Docker for pentesters</title>
     <description>Docker is generally presented as a developer tool, but it can be very useful to security professionals too! Let's show how easy to use it can be in that regard.</description>
-    <link>https://cym13.github.io/article/docker_pentesters.html</link>
+    <link>https://breakpoint.purrfect.fr/article/docker_pentesters.html</link>
     <pubDate>Sat, 24 Feb 2018 11:11:44 +0100</pubDate>
   </item>
 
@@ -68,7 +68,7 @@
   <item>
     <title>Internal Penetration Tests</title>
     <description>Asked to perform an internal pentest with no clue where to start from? Here's a guideline that you might find useful.</description>
-    <link>https://cym13.github.io/article/internal_penetration_tests.html</link>
+    <link>https://breakpoint.purrfect.fr/article/internal_penetration_tests.html</link>
     <pubDate>Sat, 20 Jan 2018 15:27:54 +0100</pubDate>
   </item>
 
@@ -76,7 +76,7 @@
   <item>
     <title>VBS Reverse Shell</title>
     <description>P0wning a Windows box without Powershell? Easy with VBS!</description>
-    <link>https://cym13.github.io/article/vbs_reverse_shell.html</link>
+    <link>https://breakpoint.purrfect.fr/article/vbs_reverse_shell.html</link>
     <pubDate>Thu, 11 Jan 2018 20:17:26 +0100</pubDate>
   </item>
 
@@ -84,7 +84,7 @@
   <item>
     <title>D sightseeing: crc32</title>
     <description>Let's have a glance at a real although very short D program to discuss some of its features.</description>
-    <link>https://cym13.github.io/article/d_sightseeing_crc32.html</link>
+    <link>https://breakpoint.purrfect.fr/article/d_sightseeing_crc32.html</link>
     <pubDate>Thu, 15 Jun 2017 23:38:09 +0200</pubDate>
   </item>
 
@@ -92,7 +92,7 @@
   <item>
     <title>SSL/TLS Configuration Recommendations</title>
     <description>How to configure SSL/TLS on your server in order to make it secure? Here is the way to do it quick and cleanly.</description>
-    <link>https://cym13.github.io/article/ssl_tls_recommendations.html</link>
+    <link>https://breakpoint.purrfect.fr/article/ssl_tls_recommendations.html</link>
     <pubDate>Thu, 15 Jun 2017 20:07:34 +0200</pubDate>
   </item>
 
@@ -100,7 +100,7 @@
   <item>
     <title>Hacking the simplest database</title>
     <description>Julia Evans proposed the simplest database, let's take it down! A case study of simple file manipulations in bash.</description>
-    <link>https://cym13.github.io/article/hacking_simplest_database.html</link>
+    <link>https://breakpoint.purrfect.fr/article/hacking_simplest_database.html</link>
     <pubDate>Sun, 11 Jun 2017 22:46:18 +0200</pubDate>
   </item>
 
@@ -108,7 +108,7 @@
   <item>
     <title>Fixing video noise with sox</title>
     <description>How to use sox for something simple and practical: fixing the noise in a youtube video.</description>
-    <link>https://cym13.github.io/article/fix_video_noise_sox.html</link>
+    <link>https://breakpoint.purrfect.fr/article/fix_video_noise_sox.html</link>
     <pubDate>Mon, 29 May 2017 20:09:18 +0200</pubDate>
   </item>
 
@@ -116,7 +116,7 @@
   <item>
     <title>Why we need authenticated cryptography</title>
     <description>Simple demonstration of how an attacker could tamper with an encrypted message to his benefit without ever decrypting it in the absence of message authentication.</description>
-    <link>https://cym13.github.io/article/demo_bank.html</link>
+    <link>https://breakpoint.purrfect.fr/article/demo_bank.html</link>
     <pubDate>Sun, 2 Apr 2017 11:49:11 +0200</pubDate>
   </item>
 
@@ -124,7 +124,7 @@
   <item>
     <title>Weaponizing Excel Webservice</title>
     <description>Excel formula injections are common in programs generating XLS files, but often considered harmless. This discusses a new technique that greatly improve the Red Team situation.</description>
-    <link>https://cym13.github.io/article/excel_webservice.html</link>
+    <link>https://breakpoint.purrfect.fr/article/excel_webservice.html</link>
     <pubDate>Sat, 1 Apr 2017 00:30:08 +0200</pubDate>
   </item>
 
@@ -132,7 +132,7 @@
   <item>
     <title>Privilege Escalations</title>
     <description>How to identify flawed resource management leading to privilege escalation. Part of the Fast Security Source Code Review series.</description>
-    <link>https://cym13.github.io/article/scr_privesc.html</link>
+    <link>https://breakpoint.purrfect.fr/article/scr_privesc.html</link>
     <pubDate>Wed, 22 Mar 2017 01:05:29 +0100</pubDate>
   </item>
 
@@ -140,7 +140,7 @@
   <item>
     <title>Fast Security Source Code Review</title>
     <description>Introduction to the main concepts behind a fast security review. Intended for developers as well as pentesters.</description>
-    <link>https://cym13.github.io/article/source_code_review.html</link>
+    <link>https://breakpoint.purrfect.fr/article/source_code_review.html</link>
     <pubDate>Wed, 22 Mar 2017 00:59:39 +0100</pubDate>
   </item>
 
@@ -148,7 +148,7 @@
   <item>
     <title>How secure is unpredictableSeed?</title>
     <description>D's unpredictableSeed is sometimes used to compensate for the lack of a CSPRNG in the standard library. But how secure is that really?</description>
-    <link>https://cym13.github.io/article/unpredictableSeed.html</link>
+    <link>https://breakpoint.purrfect.fr/article/unpredictableSeed.html</link>
     <pubDate>Sun, 26 Feb 2017 18:52:38 +0100</pubDate>
   </item>
 
@@ -156,7 +156,7 @@
   <item>
     <title>Crypter writeup</title>
     <description>"A file was encrypted. You have the encryption software and an encrypted file. Decrypt that file." Detailed writeup using radare2.</description>
-    <link>https://cym13.github.io/article/crypter_writeup.html</link>
+    <link>https://breakpoint.purrfect.fr/article/crypter_writeup.html</link>
     <pubDate>Sat, 25 Feb 2017 03:16:43 +0100</pubDate>
   </item>
 
@@ -164,7 +164,7 @@
   <item>
     <title>Exploiting Gource</title>
     <description>Improvised code review of the Gource git repository viewer. It is meant as a way to show how one can perform quick and targeted code reviews.</description>
-    <link>https://cym13.github.io/article/exploiting_gource.html</link>
+    <link>https://breakpoint.purrfect.fr/article/exploiting_gource.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
 
@@ -172,7 +172,7 @@
   <item>
     <title>Let's build an Object System!</title>
     <description>What makes an object system tick? What does it mean to be object oriented? What are classes really?</description>
-    <link>https://cym13.github.io/article/object_system.html</link>
+    <link>https://breakpoint.purrfect.fr/article/object_system.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
 
@@ -180,7 +180,7 @@
   <item>
     <title>Mail.local et TOCTTOU</title>
     <description>Une explication détaillée d'exploitation de programme SUID root via une TOCTTOU pour obtenir une élévation de privilège.</description>
-    <link>https://cym13.github.io/article/mail_local_tocttou.html</link>
+    <link>https://breakpoint.purrfect.fr/article/mail_local_tocttou.html</link>
     <pubDate>Sat, 25 Feb 2017 00:52:02 +0100</pubDate>
   </item>
 
@@ -188,7 +188,7 @@
   <item>
     <title>Comment who fonctionne-t-il ?</title>
     <description>Strace est un outil puissant mais qui peut être difficile à manipuler. Nous voyons donc un cas concret en étudiant le fonctionnement de la commande "who".</description>
-    <link>https://cym13.github.io/article/strace_who.html</link>
+    <link>https://breakpoint.purrfect.fr/article/strace_who.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
 
@@ -196,7 +196,7 @@
   <item>
     <title>Puppy writeup</title>
     <description>Quelqu'un sur irc a proposé hier un petit challenge de steganographie. La victime du jour ? Un chiot qui renferme, nous dit-on, des secrets.</description>
-    <link>https://cym13.github.io/article/puppy_writeup.html</link>
+    <link>https://breakpoint.purrfect.fr/article/puppy_writeup.html</link>
     <pubDate>Sat, 25 Feb 2017 01:52:33 +0100</pubDate>
   </item>
 
@@ -204,7 +204,7 @@
   <item>
     <title>Introduction à l'éditeur de texte ed</title>
     <description>Ed est un éditeur puissant mais terriblement déconcertant au premier abord. Cet article présente les commandes essentielles et un peu plus pour bien débuter avec l'Éditeur.</description>
-    <link>https://cym13.github.io/article/introduction_ed.html</link>
+    <link>https://breakpoint.purrfect.fr/article/introduction_ed.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
 
@@ -212,7 +212,7 @@
   <item>
     <title>Shell streams and redirections</title>
     <description>Shell streams are the most powerful feature of bash. Knowing about redirections is a capital step toward an efficient use of command-line.</description>
-    <link>https://cym13.github.io/article/shell_streams_and_redirections.html</link>
+    <link>https://breakpoint.purrfect.fr/article/shell_streams_and_redirections.html</link>
     <pubDate>Sat, 25 Feb 2017 01:37:33 +0100</pubDate>
   </item>
 

@@ -3,7 +3,7 @@
 import time
 import xml.dom.minidom
 
-BLOG_URL        = "https://cym13.github.io"
+BLOG_URL        = "https://breakpoint.purrfect.fr"
 DATE_FORMAT     = "%a, %d %b %Y %H:%M:%S %z"
 LAST_BUILD_DATE = time.strftime(DATE_FORMAT)
 
