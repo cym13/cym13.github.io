@@ -5,7 +5,7 @@
 if [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
     echo "Stream of Consciousness"
     echo
-    echo "Usage: soc"
+    echo "Usage: soc [TEXT]"
     exit
 fi
 
@@ -15,7 +15,17 @@ tmp="$(mktemp --suffix='.rst')"
 timestamp=""
 
 function edit() {
-    vim "$tmp"
+    if [ -z "$@" ] ; then
+        "$EDITOR" "$tmp"
+    else
+        echo "$@" > "$tmp"
+    fi
+
+    if ! grep -q . "$tmp" ; then
+        echo "Nothing to publish"
+        exit 0
+    fi
+
     timestamp="$(date)"
 
     sed -i "1i----\n\n**${timestamp}**\n" "$tmp"
@@ -25,7 +35,7 @@ function edit() {
 
 function preview() {
     make
-    sensible-browser "file://$PWD/soc.html"
+    "$BROWSER" "file://$PWD/soc.html"
 }
 
 function update_rss() {
@@ -74,14 +84,18 @@ function publish() {
         git add soc.rst soc.html soc_rss.xml
         git commit -m "SoC update"
         git push
+        return 0
+    else
+        git checkout soc.rst soc.html
+        return 1
     fi
 }
 
 function main() {
-    edit
+    edit "$@"
     preview
     publish
     rm "$tmp"
 }
 
-main
+main "$@"
