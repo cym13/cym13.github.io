@@ -44,8 +44,8 @@ function update_rss() {
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>Breakpoint</title>
-  <description>Stream of consciousness</description>
+  <title>Breakpoint - Stream of Consciousness</title>
+  <description>Stream of Consciousness</description>
   <link>https://breakpoint.purrfect.fr/soc.html</link>
   <lastBuildDate>Tue 16 Jun 2020 08:12:21 PM CEST</lastBuildDate>
   <pubDate>Tue 16 Jun 2020 08:12:21 PM CEST</pubDate>
