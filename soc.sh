@@ -78,15 +78,17 @@ EOF
 }
 
 function publish() {
-    read -p "Publish? [y/N] " publish
+    read -p "Publish? [y/N/c] " publish
     if [ "$publish" = "y" ] || [ "$publish" = "Y" ] ; then
         update_rss
         git add soc.rst soc.html soc_rss.xml
         git commit -m "SoC update"
         git push
         return 0
-    else
+    elif [ "$publish" = "c" ] || [ "$publish" = "C" ] ; then
         git checkout soc.rst soc.html
+        return 0
+    else
         return 1
     fi
 }
@@ -94,7 +96,9 @@ function publish() {
 function main() {
     edit "$@"
     preview
-    publish
+    while ! publish ; do
+        "$EDITOR" soc.rst
+    done
     rm "$tmp"
 }
 
