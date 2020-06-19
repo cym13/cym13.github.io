@@ -55,8 +55,10 @@ function update_rss() {
 EOF
     fi
 
-    sed -i "/<lastBuildDate>/s/>[^<]*</>$timestamp</" soc_rss.xml
-    sed -i "0,/<pubDate>/s/<pubDate>[^<]*</<pubDate>$timestamp</" soc_rss.xml
+    rss_time="$(date -d "$timestamp" "+%a, %d %b %Y %H:%M:%S +0200")"
+
+    sed -i "/<lastBuildDate>/s/>[^<]*</>$rss_time</" soc_rss.xml
+    sed -i "0,/<pubDate>/s/<pubDate>[^<]*</<pubDate>$rss_time</" soc_rss.xml
 
     tmp_rss="$(mktemp)"
 
@@ -68,7 +70,7 @@ EOF
         <title>${timestamp}</title>
         <description>${description}</description>
         <link>https://breakpoint.purrfect.fr/soc.html</link>
-        <pubDate>${timestamp}</pubDate>
+        <pubDate>${rss_time}</pubDate>
       </item>
 EOF
 
