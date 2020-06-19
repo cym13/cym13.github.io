@@ -61,7 +61,7 @@ But as previously established
    x^x = 2/\pi \implies e = 2/\pi
 
 Which is false. Therefore since supposing the existence of a solution leads
-only to contradiction we prooved that no real number is solution.
+only to contradiction we proved that no real number is solution.
 
 .. math:: \nexists x \in \mathbb{R}, x^x=i
 
