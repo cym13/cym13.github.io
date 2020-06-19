@@ -6,6 +6,10 @@
 
     <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="rss.xml"/>
     <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
   </head>
   <body>
     <header class="site-header">
@@ -18,9 +22,18 @@
       </div>
       <div class="wrap">
         <ul>
-          <li><a href="index.html">Index</a></li>
+          <li>
+              <a href="index.html">Index</a>
+              <a href="rss.xml">
+                  <img src="image/rss.png" />
+              </a>
+          </li>
           <li><a href="https://github.com/cym13">Github</a></li>
-          <li><a href="soc.html">SoC</a></li>
+          <li><a href="soc.html">SoC</a>
+              <a href="soc_rss.xml">
+                  <img src="image/rss.png" />
+              </a>
+          </li>
           <li><a href="about.html">About</a></li>
         </ul>
       </div>

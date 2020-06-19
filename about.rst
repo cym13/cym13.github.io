@@ -37,6 +37,14 @@ Sure, just indicate where you took that from and what you changed. Any
 original content on this blog is under the `creative common 3.0 unported
 <https://creativecommons.org/licenses/by/3.0/>`_ license.
 
+Where does that RSS icon come from?
+===================================
+
+It is derived from `this icon
+<https://www.flaticon.com/free-icon/rss-feed-symbol_110>`_ which is an open
+design by `freepik <https://www.flaticon.com/authors/freepik>`_. Thank you
+for providing quality, open work.
+
 I'd like to talk, can I contact you?
 ====================================
 
