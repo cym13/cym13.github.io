@@ -8,6 +8,13 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+June 2020
+---------
+
+`Stirling mug top <article/stirling_mug_top.html>`_
+    Stirling engines are simple, safe and dependable. What if we used them to
+    transform our tea into phone chargers?
+
 December 2019
 -------------
 
