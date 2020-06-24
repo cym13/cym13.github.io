@@ -5,6 +5,7 @@
 <title>Breakpoint: Mental calculations for IT professionals</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
 
     <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
     <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
@@ -85,7 +86,7 @@ multiply by three. The integer part is the power of ten.</p>
 </div>
 <p>So in our case, that means:</p>
 <div class="formula">
-2<sup>128</sup>  →  128  →  128 ⁄ 10 = 12.8  →  12.8 × 3 = 38.4  →  38
+2<sup>128</sup>  →  128  →  <span class="fraction"><span class="ignored">(</span><span class="numerator">128</span><span class="ignored">)/(</span><span class="denominator">10</span><span class="ignored">)</span></span> = 12.8  →  12.8 × 3 = 38.4  →  38
 </div>
 <p>So 2¹²⁸ ≃ 10³⁸. That's way better for us because about everything is
 expressed on a base 10 so a power of ten is easier to manipulate and compare
@@ -134,7 +135,7 @@ to imagine many of them working in parallel: just an additional division.</p>
 <p>So, 1GHz means a billion (10⁹) operations a second. How many seconds do we
 need then?</p>
 <div class="formula">
-10<sup>38</sup> ⁄ 10<sup>9</sup> = 10<sup>38 − 9</sup> = 10<sup>29</sup><i>seconds</i>
+<span class="fraction"><span class="ignored">(</span><span class="numerator">10<sup>38</sup></span><span class="ignored">)/(</span><span class="denominator">10<sup>9</sup></span><span class="ignored">)</span></span> = 10<sup>38 − 9</sup> = 10<sup>29</sup><i>seconds</i>
 </div>
 <p>Whoa. I have no idea how much that represents. Let's express this in years
 instead.</p>
@@ -144,7 +145,7 @@ instead.</p>
 </div>
 <p>That's good to know! We can now write:</p>
 <div class="formula">
-10<sup>29</sup> ⁄ 3.14⋅10<sup>7</sup> = 1 ⁄ 3⋅10<sup>29 − 7</sup> = 10<sup>22</sup><i>years</i>
+<span class="fraction"><span class="ignored">(</span><span class="numerator">10<sup>29</sup></span><span class="ignored">)/(</span><span class="denominator">3.14</span><span class="ignored">)</span></span>10<sup>7</sup> = <span class="fraction"><span class="ignored">(</span><span class="numerator">1</span><span class="ignored">)/(</span><span class="denominator">3</span><span class="ignored">)</span></span>10<sup>29 − 7</sup> = 10<sup>22</sup><i>years</i>
 </div>
 <p><em>Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10²¹ ?</em></p>
 <p>Remember when earlier we rounded down? Now we round up to make for it. That's

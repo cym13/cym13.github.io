@@ -58,7 +58,8 @@ So in our case, that means:
 
 .. math::
 
-    2^128\ \rightarrow\ 128\ \rightarrow\ 128/10 = 12.8\ \rightarrow\ 12.8×3 = 38.4\ \rightarrow\ 38
+    2^128\ \rightarrow\ 128\ \rightarrow\ \frac{128}{10} = 12.8
+    \ \rightarrow\ 12.8×3 = 38.4\ \rightarrow\ 38
 
 So 2¹²⁸ ≃ 10³⁸. That's way better for us because about everything is
 expressed on a base 10 so a power of ten is easier to manipulate and compare
@@ -126,7 +127,7 @@ need then?
 
 .. math::
 
-    10^38 / 10^9 = 10^{38-9} = 10^29 seconds
+    \frac{10^38}{10^9} = 10^{38-9} = 10^29 seconds
 
 Whoa. I have no idea how much that represents. Let's express this in years
 instead.
@@ -139,7 +140,7 @@ That's good to know! We can now write:
 
 .. math::
 
-    10^29 / 3.14 \cdot 10^7 = 1/3 \cdot 10^{29-7} = 10^22 years
+    \frac{10^29}{3.14} 10^7 = \frac{1}{3} 10^{29-7} = 10^22 years
 
 *Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10²¹ ?*
 

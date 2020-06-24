@@ -66,35 +66,35 @@ Then,
 
    \ln(x^x) = \ln(i)
 
-   x\ln(x) = \ln(i) = \ln(e^{i\pi/2}) = i\pi/2
+   x\ln(x) = \ln(i) = \ln(e^{i\frac{\pi}{2}}) = i\frac{\pi}{2}
 
-   x\ln(x) = i\pi/2
+   \implies x\ln(x) = i\frac{\pi}{2}
 
 But
 
-.. math:: x^x=i \implies x\ln(x)=x^x \pi/2
+.. math:: x^x=i \implies x\ln(x)=\frac{\pi}{2} x^x
 
 Then, by taking the derivative on both sides
 
-.. math:: (2/\pi) \cdot (1+\ln(x)) = x^x \cdot (1+\ln(x))
+.. math:: \frac{2}{\pi} (1+\ln(x)) = x^x \cdot (1+\ln(x))
 
 We can't simplify if 1+ln(x)=0 which happens for x=e^-1, so let's consider
 that case first.
 
 .. math::
 
-    x = e^{-1} \implies e^{-1}\cdot\ln(e^{-1}) = i\pi/2
+    x = e^{-1} \implies e^{-1}\cdot\ln(e^{-1}) = i\frac{\pi}{2}
 
-    \implies -e^{-1} = i\pi/2
+    \implies -e^{-1} = i\frac{\pi}{2}
 
 which is false. So e^-1 can't be solution of our equation. Let's continue
 with x≠e^-1 by simplifying left and right the (1+\ln(x)) term:
 
 .. math::
 
-    2/\pi = x^x
+    \frac{2}{\pi} = x^x
 
-    2/\pi = (2/\pi) \cdot x \ln(x)
+    \frac{2}{\pi} = \frac{2}{\pi} x\ln(x)
 
     1 = x\ln(x)
 
@@ -104,7 +104,7 @@ But as previously established
 
 .. math::
 
-   x^x = 2/\pi \implies e = 2/\pi
+   x^x = \frac{2}{\pi} \implies e = \frac{2}{\pi}
 
 Which is false. Therefore since supposing the existence of a solution leads
 only to contradiction we proved that no real number is solution.

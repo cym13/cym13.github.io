@@ -5,6 +5,7 @@
 <title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="style/base.css"/>
     <link rel="stylesheet" type="text/css" href="style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="style/math.css"/>
 
     <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="rss.xml"/>
     <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="soc_rss.xml"/>
@@ -92,34 +93,34 @@ country.</p>
 ln(<i>x</i><sup><i>x</i></sup>) = ln(<i>i</i>)
 </div>
 <div class="formula">
-<i>x</i>ln(<i>x</i>) = ln(<i>i</i>) = ln(<i>e</i><sup><i>i</i><i>π</i> ⁄ 2</sup>) = <i>i</i><i>π</i> ⁄ 2
+<i>x</i>ln(<i>x</i>) = ln(<i>i</i>) = ln(<i>e</i><sup><i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span></sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <div class="formula">
-<i>x</i>ln(<i>x</i>) = <i>i</i><i>π</i> ⁄ 2
+  ⇒  <i>x</i>ln(<i>x</i>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <p>But</p>
 <div class="formula">
-<i>x</i><sup><i>x</i></sup> = <i>i</i>  ⇒  <i>x</i>ln(<i>x</i>) = <i>x</i><sup><i>x</i></sup><i>π</i> ⁄ 2
+<i>x</i><sup><i>x</i></sup> = <i>i</i>  ⇒  <i>x</i>ln(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span><i>x</i><sup><i>x</i></sup>
 </div>
 <p>Then, by taking the derivative on both sides</p>
 <div class="formula">
-(2 ⁄ <i>π</i>)⋅(1 + ln(<i>x</i>)) = <i>x</i><sup><i>x</i></sup>⋅(1 + ln(<i>x</i>))
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>(1 + ln(<i>x</i>)) = <i>x</i><sup><i>x</i></sup>⋅(1 + ln(<i>x</i>))
 </div>
 <p>We can't simplify if 1+ln(x)=0 which happens for x=e^-1, so let's consider
 that case first.</p>
 <div class="formula">
-<i>x</i> = <i>e</i><sup> − 1</sup>  ⇒  <i>e</i><sup> − 1</sup>⋅ln(<i>e</i><sup> − 1</sup>) = <i>i</i><i>π</i> ⁄ 2
+<i>x</i> = <i>e</i><sup> − 1</sup>  ⇒  <i>e</i><sup> − 1</sup>⋅ln(<i>e</i><sup> − 1</sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <div class="formula">
-  ⇒   − <i>e</i><sup> − 1</sup> = <i>i</i><i>π</i> ⁄ 2
+  ⇒   − <i>e</i><sup> − 1</sup> = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <p>which is false. So e^-1 can't be solution of our equation. Let's continue
 with x≠e^-1 by simplifying left and right the (1+ln(x)) term:</p>
 <div class="formula">
-2 ⁄ <i>π</i> = <i>x</i><sup><i>x</i></sup>
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <i>x</i><sup><i>x</i></sup>
 </div>
 <div class="formula">
-2 ⁄ <i>π</i> = (2 ⁄ <i>π</i>)⋅<i>x</i>ln(<i>x</i>)
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span><i>x</i>ln(<i>x</i>)
 </div>
 <div class="formula">
 1 = <i>x</i>ln(<i>x</i>)
@@ -129,7 +130,7 @@ with x≠e^-1 by simplifying left and right the (1+ln(x)) term:</p>
 </div>
 <p>But as previously established</p>
 <div class="formula">
-<i>x</i><sup><i>x</i></sup> = 2 ⁄ <i>π</i>  ⇒  <i>e</i> = 2 ⁄ <i>π</i>
+<i>x</i><sup><i>x</i></sup> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>  ⇒  <i>e</i> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>
 </div>
 <p>Which is false. Therefore since supposing the existence of a solution leads
 only to contradiction we proved that no real number is solution.</p>

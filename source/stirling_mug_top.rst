@@ -52,7 +52,9 @@ The energy needed to heat 1g of water by 1°C at 25°C is 1 calorie (by
 definition) or about 4 Joules. So heating our cup of tea from the ambient
 25°C up to 95°C takes about
 
-.. math:: ((95\text{°C}-25\text{°C}) \times 300\text{g})/4 \approx 5000\text{J}
+.. math::
+
+   \frac{(95\text{°C}-25\text{°C}) \times 300\text{g}}{4} \approx 5000\text{J}
 
 Therefore our hot cup of tea is a "battery" of 5000J. As we said, in perfect
 conditions our Stirling engine should be able to convert 50% of that energy
