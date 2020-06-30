@@ -11,6 +11,11 @@ Recent articles
 June 2020
 ---------
 
+`Review of the D library Crypto <article/review_crypto_d.html>`_
+    Crypto is a cryptography library for the D programming language. I
+    performed a review of the implementation of RSA that showed many issues.
+    This article discusses these issues in details.
+
 `Stirling mug top <article/stirling_mug_top.html>`_
     Stirling engines are simple, safe and dependable. What if we used them to
     transform our tea into phone chargers?
