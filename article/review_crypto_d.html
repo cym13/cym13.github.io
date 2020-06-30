@@ -1,0 +1,678 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+<title>Breakpoint: Review of Crypto for D</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+    <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+
+        <ul>
+          <li>
+              <a href="../index.html">Index</a>
+              <a href="../rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a>
+              <a href="../soc_rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="review-of-crypto-for-d">
+<h1>Review of Crypto for D</h1>
+<div class="section" id="context">
+<h2>Context</h2>
+<p>I have always liked cryptography and code review and often take time
+reviewing open source code to help nurture a safer environment. About a year
+ago I decided to have a look at a cryptography library for D: <a class="reference external" href="https://github.com/shove70/crypto">shove70/crypto</a> (also present on DUB at
+<a class="reference external" href="https://code.dlang.org/packages/crypto">https://code.dlang.org/packages/crypto</a>).</p>
+<p>The version at the time was v0.2.7. I focused on RSA as a first step and
+found many issues that I communicated to the author on August 6, 2019. I
+was hopeful when I saw some first changes on the 8th of August and decided to
+give the author some more time to fix all issues.</p>
+<p>A year later, v0.2.9, this is my updated review of the library. I do not
+claim to have found all possible issues but I am confident in the issues I do
+point out. Furthermore I intend no personal attack here, the author has
+proved very nice in all our exchanges. But I feel a responsibility toward the
+users to state things as they stand.</p>
+<div class="section" id="wait-i-m-a-user-what-should-i-know">
+<h3>Wait, I'm a user, what should I know?</h3>
+<p>Long story short, I strongly recommend not to use this library.</p>
+<ul class="simple">
+<li><p>RSA's key generation is unsafe because there are issues with prime numbers
+generation and selection</p></li>
+<li><p>RSA's padding is broken and has important consequences such as
+allowing attackers to modify encrypted messages without knowing the secret
+key or decrypting some messages</p></li>
+<li><p>No padding fit for RSA is implemented in the library even though correct
+padding is critical in RSA</p></li>
+<li><p>The code is very confuse, with functions names that do not correspond at
+all to what is implemented as well as dead code and lots of &quot;optimizations&quot;
+of cryptographic algorithms</p></li>
+</ul>
+<p>While I recognize the effort this implementation of RSA is broken from start
+to finish and puts its users in danger.</p>
+<p>If you have used this library in production code and RSA in particular, then
+you should question the confidentiality and integrity of all messages
+encrypted this way. These messages are <strong>not</strong> safe.</p>
+<p>If you are looking at a safer alternative I recommend looking at
+<a class="reference external" href="https://code.dlang.org/packages/botan">botan</a> which I have not thoroughly
+reviewed yet but seems to avoid most pitfalls presented here. Furthermore it
+is a port of a popular library that was audited so there is less room for
+mistakes.</p>
+<hr class="docutils" />
+<p>The rest of the article will be very technical with code and math involved.
+Sadly not much have changed since my first review so I will indicate any
+modification explicitly. We will start with prime number generation,
+continue with RSA key generation to end with RSA padding. I hope you enjoy
+the ride, grab a tea, it should be fun (in a somewhat hellish way).</p>
+<div class="figure">
+<img alt="../image/pinkie_pie_sitting.png" src="../image/pinkie_pie_sitting.png" style="width: 40%;" />
+<p class="caption">Also, there will be ponies. Because it is going to be hard and we can
+all really use some friends.</p>
+</div>
+</div>
+</div>
+<div class="section" id="prime-number-generation">
+<h2>Prime number generation</h2>
+<div class="section" id="general-strategy">
+<h3>General strategy</h3>
+<p>Prime number generation is the basis of key generation in RSA. <strong>Crypto</strong>
+uses a two step strategy based on probable prime generation, which means that
+it uses algorithms that check that a number is prime with a high enough
+probability.</p>
+<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">bool</span> <span class="nf">isProbablePrime</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="n">size_t</span> <span class="n">confidence</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">bool</span> <span class="n">passed</span> <span class="o">=</span> <span class="n">millerRabinPrimeTest</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">confidence</span><span class="p">);</span>
+
+    <span class="cm">/**
+    When n &lt; 10_000_000_000_000_000,
+    there is no need to lucasLehmerTest, And trust the result of millerRabinPrimeTest.
+    */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">passed</span> <span class="o">||</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">10_000_000_000_000_000</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">passed</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">lucasLehmerTest</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<span class="p">}</span></code></pre>
+<p>As we can see the first step is performed by <em>millerRabinPrimeTest</em> which,
+contrary to what its name suggests, does not implement the Miller-Rabin prime
+test but the Fermat one. This function is discussed later.</p>
+<p>We also see that the Lucas-Lehmer test is only used if n is bigger than 10¹⁶.
+Why? I do not know. Well implemented, Lucas-Lehmer a test that is good enough
+by itself, faster than Fermat or Miller-Rabin, but it only works for <a class="reference external" href="https://en.wikipedia.org/wiki/Mersenne_numbers">Mersenne
+numbers</a>...
+And I do not see why it is limited to arbitrarily big numbers. Furthermore
+Lucas-Lehmer is a deterministic test, not a probabilistic one, so it is
+strange to use it in a function named <em>isProbablePrime</em>... If you are confused
+so was I. But I promise it will get clearer by the end of this section.</p>
+<p>I am getting a bit ahead of myself though. This Lucas-Lehmer test is an
+addition compared to the first review so I will review it for the first time in
+this article. Spoiler alert: it is not even a Lucas-Lehmer test.</p>
+</div>
+<div class="section" id="miller-rabin-prime-test-fermat-test">
+<h3>“Miller-Rabin prime test”: Fermat test</h3>
+<p>Prime number generation is done in the function
+<em>BigIntHelper.millerRabinPrimeTest</em> within <em>bigint.d</em>. Contrary to what the
+name suggests it actually performs a <a class="reference external" href="https://en.wikipedia.org/wiki/Fermat_primality_test">Fermat primality test</a>, not a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test">Miller-Rabin test</a>.</p>
+<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">bool</span> <span class="nf">millerRabinPrimeTest</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="n">size_t</span> <span class="n">confidence</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">enforce</span><span class="p">(</span><span class="n">confidence</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;confidence must be a positive integer greater than 0.&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">BigInt</span><span class="o">[]</span> <span class="n">bases</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1_373_653</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">9_080_191</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">31</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">73</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">4_759_123_141</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">2_152_302_898_747</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">341_550_071_728_320</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">46_856_248_255_981</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+                 <span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">10_000_000_000_000_000</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">24251</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">smallPrimesTable</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">prime</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">prime</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**
+        Although in theory base should be between 2 and n - 1, because
+        confidence is optimized before call, the larger n is, the smaller
+        confidence is, so the requirement for base cannot be too small,
+        so the minimum value does not use 2, but uses n / 2 instead.
+        */</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigInt</span><span class="o">[</span><span class="n">confidence</span><span class="o">]</span><span class="p">;</span>
+        <span class="kn">import</span> <span class="nn">std.algorithm.iteration</span> <span class="p">:</span> <span class="n">each</span><span class="p">;</span>
+        <span class="n">bases</span><span class="p">.</span><span class="na">each</span><span class="o">!</span><span class="p">((</span><span class="n">ref</span> <span class="n">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">randomGenerate</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)));</span>
+        <span class="c1">//bases.each!((ref b) =&gt; (b = randomGenerate(BigInt(2), n - 1)));
+</span>    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">bases</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">base</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)));</span>
+<span class="p">}</span></code></pre>
+<p>The Fermat test is not a correct choice:</p>
+<ul class="simple">
+<li><p>It has false positives: Carmichael numbers will never be identified as
+composite numbers.</p></li>
+<li><p>It is not faster than other better primality tests.</p></li>
+</ul>
+<p>Furthermore the confidence numbers chosen are much too low. This is partly
+&quot;justified&quot; by an &quot;optimization&quot; consisting in choosing random tests between
+<em>n/2</em> and <em>n-1</em> instead of between 1 and <em>n-1</em>. This process has no effect
+whatsoever. The following section provides a proof of why.</p>
+<hr class="docutils" />
+<p>The Fermat primality test for a possible prime <em>p</em> works by taking random
+numbers <em>a1,a2,...,an</em> and checking that for for each of those numbers
+<em>ak^(p-1)-1</em> is a multiple of <em>p</em>. This property is always true for a prime
+number or a <a class="reference external" href="https://en.wikipedia.org/wiki/Carmichael_number">Carmichael number</a>. This property is also
+verified for many composite numbers, just not for every number between <em>1</em>
+and <em>p-1</em>. I will call “liar” a number <em>ak</em> for which <em>ak^(p-1)-1</em> is a
+multiple of <em>p</em> even though <em>p</em> is not prime.</p>
+<div class="formula">
+<i>liars</i> = {<i>a</i><sub><i>k</i></sub> ∈ ℕ|∃<i>q</i> ∈ ℕ, <i>a</i><span class="scripts"><sup class="script"><i>p</i> − 1</sup><sub class="script"><i>k</i></sub></span> − 1 = <i>pq</i>, <i>p</i><span class="text"> not prime</span>}
+</div>
+<p>For example 77=7×11 but 34^(76)-1 is a multiple of 77 and the same goes for
+43: 34 and 43 are liars when testing 77. 1 and 76 are also trivial liars.</p>
+<img alt="../image/prime_liers.png" src="../image/prime_liers.png" style="width: 70%;" />
+<p>What I will show is that for any odd number <em>n</em> there are exactly as many
+liars below <em>n/2</em> as there are above.</p>
+<p>If <em>n</em> does not have any liar, then the property is verified.</p>
+<p>Let's suppose that <em>n</em> has at least one liar: <em>a</em>.</p>
+<p>We have:</p>
+<div class="formula">
+<i>a</i><sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+</div>
+<p>Let's consider the number symmetric to <em>a</em> relatively to <em>n/2</em>: <em>n-a</em></p>
+<div class="formula">
+<i>n</i> − <i>a</i> =  − <i>a</i><span class="text"> mod </span><i>n</i>
+</div>
+<div class="formula">
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − <i>a</i>)<sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+</div>
+<div class="formula">
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − 1)<sup><i>n</i> − 1</sup>⋅<i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+</div>
+<p>But n is odd, so</p>
+<div class="formula">
+( − 1)<sup><i>n</i> − 1</sup> = 1
+</div>
+<p>giving</p>
+<div class="formula">
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = <i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+</div>
+<div class="formula">
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+</div>
+<p>So for any liar a we have proved that <em>n-a</em> is also a liar.
+Furthermore if <em>a &lt; n/2</em> then <em>n-a &gt; n/2</em> and inversely. Therefore there are
+exactly as many liars below <em>n/2</em> as there are above.</p>
+<hr class="docutils" />
+<p>This means that taking random numbers only between n/2 and n-1 has no effect
+regarding the chances to find a liar: the space is twice as little but there
+are twice as less liars resulting in a constant ratio and equal probability.
+This “optimization” optimizes absolutely nothing, it just serves to confuse
+the reader.</p>
+<p>Aside from that, there is an addition in this new version: a pre-test using a
+list of small primes (from 2 to 241). It performs the Fermat test with each
+of these primes. I really have no idea why. I think the intent was to perform
+trial division by small primes but it is not trying to divide n so who knows.
+At the moment I cannot say that it serves any purpose.</p>
+</div>
+<div class="section" id="lucas-lehmer-test-baillie-psw">
+<h3>“Lucas-Lehmer test”? Baillie-PSW!</h3>
+<p>Without much surprise, the function <em>lucasLehmerTest</em> does not perform a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Lucas%E2%80%93Lehmer_primality_test">Lucas-Lehmer test</a>.</p>
+<p>So, I had some trouble identifying what the test was exactly due to the
+extreme dryness of the code but it seems to be a <a class="reference external" href="https://en.wikipedia.org/wiki/Lucas_pseudoprime#Implementing_a_Lucas_probable_prime_test">Lucas probable prime test</a>
+within a <a class="reference external" href="https://en.wikipedia.org/wiki/Baillie%E2%80%93PSW_primality_test">Baillie-PSW test</a>.</p>
+<img alt="../image/fluttershy_wut.png" src="../image/fluttershy_wut.png" style="width: 40%;" />
+<p>Let's back down a bit.</p>
+<p>The first review that I communicated to the author included only the Fermat
+test discussed previously and I indicated that it was not sufficient. What I
+think happened then is that the author read the wikipedia article of the
+Fermat primality test, saw a reference to the Baillie-PSW and thought &quot;here
+is a good way to improve my prime generation&quot;. And it is!</p>
+<p>The basic idea of Baillie-PSW is that, since both Fermat and Lucas-Lehmer have
+false positives but these false positives do not overlap, whatever
+number passes both tests is almost surely prime.</p>
+<p>This test has 3 steps:</p>
+<ol class="arabic simple">
+<li><p>Trial division by small primes</p></li>
+<li><p>Base 2 strong probable prime test which is a special case of the Fermat test</p></li>
+<li><p>Lucas probable prime test using a special Lucas sequence</p></li>
+</ol>
+<p>Remember that we saw a table of small primes being used earlier? I think it
+was an attempt at step 1. It does not work that way though, but it makes sense
+within the Baillie-PSW test.</p>
+<p>As for step 2 it is a special case of Fermat's test which is implemented in
+the function <em>millerRabinTest</em>. So we implemented step 2? Sadly no, that
+attempt fails too. Baillie-PSW requires <a class="reference external" href="https://en.wikipedia.org/wiki/Strong_pseudoprime">strong probable primes base 2</a> which is not what we are
+producing.</p>
+<p>Now, step 3 seems correctly implemented at first sight. However we have not
+checked that the number is a strong probable prime base 2 since step 2 is
+botched. Therefore the input of our Lucas probable prime test is not in the
+correct form to get the certitude we expect from that algorithm.</p>
+<p>I should mention that nothing in Baillie-PSW justifies skipping step 3 for
+numbers smaller than 10¹⁶.</p>
+<p>Besides, I admit that knowing all these issues, I did not spend much time
+checking the implementation of Lucas probable prime test. I hope you can
+forgive that moment of laziness.</p>
+<p>Feel free to read it yourself, fresh from <em>bigint.d</em>:</p>
+<pre class="code java literal-block"><code><span class="cm">/**
+Returns true if n is a Lucas-Lehmer probable prime.
+    The following assumptions are made:
+    BigInt n is a positive, odd number. So it can only be call after
+    millerRabinPrimeTest is passed.
+*/</span>
+<span class="kd">static</span> <span class="n">bool</span> <span class="nf">lucasLehmerTest</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">immutable</span> <span class="n">BigInt</span> <span class="n">nPlusOne</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">jacobiSymbol</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// 5, -7, 9, -11, ...
+</span>        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="n">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">lucasLehmerSequence</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">nPlusOne</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">static</span> <span class="n">BigInt</span> <span class="nf">lucasLehmerSequence</span><span class="p">(</span><span class="kd">const</span> <span class="kt">int</span> <span class="n">z</span><span class="p">,</span> <span class="kd">const</span> <span class="n">BigInt</span> <span class="n">k</span><span class="p">,</span> <span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">bool</span> <span class="nf">testBit</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="kt">int</span> <span class="n">m</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">digit</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="na">getDigit</span><span class="o">!</span><span class="n">uint</span><span class="p">(</span><span class="n">m</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">5</span><span class="p">));</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">digit</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">m</span> <span class="o">&amp;</span> <span class="mi">31</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">BigInt</span> <span class="n">d</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span>
+    <span class="n">BigInt</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">u2</span><span class="p">;</span>
+    <span class="n">BigInt</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v2</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">k</span><span class="p">.</span><span class="na">uintLength</span> <span class="o">*</span> <span class="n">uint</span><span class="p">.</span><span class="na">sizeof</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">v2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+        <span class="n">v2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="n">u2</span><span class="p">;</span> <span class="n">v</span> <span class="o">=</span> <span class="n">v2</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">u2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+
+            <span class="n">u2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">v2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+            <span class="n">v2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+
+            <span class="n">u</span> <span class="o">=</span> <span class="n">u2</span><span class="p">;</span> <span class="n">v</span> <span class="o">=</span> <span class="n">v2</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">u</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+</div>
+<div class="section" id="so-what-s-the-conclusion-on-prime-generation">
+<h3>So... What's the conclusion on prime generation?</h3>
+<p>See, the issue when you start implementing fantasies into cryptographic code
+is that while it is most certainly bad it can be quite hard to say how bad
+exactly.</p>
+<p>What I can say is that no step of the prime number generation was implemented
+correctly. It is therefore my professional opinion that this algorithm should
+not be trusted to produce consistently strong primes, or even primes at all.</p>
+<img alt="../image/sweetie_bell_look_up.png" src="../image/sweetie_bell_look_up.png" style="width: 30%;" />
+</div>
+</div>
+<div class="section" id="key-generation">
+<h2>Key generation</h2>
+<p>The relevant part of the key generation process, as implemented, is the
+following:</p>
+<p>The process at the moment is essentially:</p>
+<ul class="simple">
+<li><p>Determine how many primality tests will be done based on key size</p></li>
+<li><p>Generate probable prime numbers</p></li>
+<li><p>Use 65337 as public exponent</p></li>
+<li><p>Compute the private exponent using Euler's totient</p></li>
+<li><p>Encode the key pair</p></li>
+</ul>
+<p>Here is the relevant code from <em>rsa.d</em>:</p>
+<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">RSAKeyPair</span> <span class="nf">generateKeyPair</span><span class="p">(</span><span class="n">uint</span> <span class="n">bitLength</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">assert</span><span class="p">((</span><span class="n">bitLength</span> <span class="o">&gt;=</span> <span class="mi">128</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s">&quot;Bitlength is required to be a multiple of 8 and not less than 128.&quot;</span>
+      <span class="o">~</span> <span class="s">&quot;It’s recommended that it be no less than 2048.&quot;</span><span class="p">);</span>
+
+    <span class="n">BigInt</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+
+    <span class="n">BigInt</span> <span class="nf">ex_gcd</span><span class="p">(</span><span class="n">BigInt</span> <span class="n">a</span><span class="p">,</span> <span class="n">BigInt</span> <span class="n">b</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/* gcd ... */</span>
+    <span class="p">}</span>
+
+    <span class="n">BigInt</span> <span class="nf">cal</span><span class="p">(</span><span class="n">BigInt</span> <span class="n">a</span><span class="p">,</span> <span class="n">BigInt</span> <span class="n">k</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/* private exponent computation ... */</span>
+    <span class="p">}</span>
+
+    <span class="n">size_t</span> <span class="n">confidence</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">)</span>       <span class="n">confidence</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">27</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">512</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">768</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">1024</span><span class="p">)</span> <span class="n">confidence</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">else</span>                        <span class="n">confidence</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+
+    <span class="n">BigInt</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">d</span><span class="p">;</span>
+
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">confidence</span><span class="p">));</span>
+    <span class="k">do</span>
+    <span class="p">{</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">confidence</span><span class="p">));</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span><span class="p">;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">cal</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">RSAKeyPair</span><span class="p">(</span><span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span> <span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="p">));</span>
+<span class="p">}</span></code></pre>
+<p>This process is rather text-book, but books are simplified. There is a number
+of flaws in this process. Essentially there are techniques to easily factor
+prime numbers that verify some properties. The most prevalent of these
+properties are:</p>
+<ul class="simple">
+<li><p>(p-1) or (q-1) has many small factors</p></li>
+<li><p>(p+1) or (q+1) has many small factors</p></li>
+<li><p>p and q are close to each other in absolute value (|p-q|&lt;2^(bitLength/2-100))</p></li>
+</ul>
+<p>The smaller the prime number, the more important these properties are, so it
+is strongly discouraged to use probable primes for keys smaller than 2048
+bit long.</p>
+<p><strong>As it is, the primes randomly generated but no condition is enforced.</strong></p>
+<p>The default key length has been updated from 1024 to 2048 which makes these
+checks a bit less necessary, but the library does not warn the user
+that their key generation is unsafe if they decide to use a smaller key size.</p>
+<p>I would recommend refusing key sizes under 1024, or accepting them with
+warning that these keys are too small for modern use as well as implementing
+weak prime detection in all cases.</p>
+<img alt="../image/applebloom_cute.png" src="../image/applebloom_cute.png" style="width: 30%;" />
+</div>
+<div class="section" id="padding">
+<h2>Padding</h2>
+<p>RSA needs padding for different reasons than a block cipher and therefore
+block cipher paddings are not adequate for RSA. A bad padding could go as far
+as leaking <a class="reference external" href="https://en.wikipedia.org/wiki/Coppersmith%27s_attack#Coppersmith%E2%80%99s_short-pad_attack">the message</a>
+or even the <a class="reference external" href="https://crypto.stackexchange.com/questions/12688/can-you-explain-bleichenbachers-cca-attack-on-pkcs1-v1-5">private key</a>.</p>
+<p>Here I made a mistake in my first review. I mistakenly thought that the
+default RSA padding used is &quot;Customized&quot;. In fact each message is prefixed by
+one random byte. Upon decryption that random byte is simply discarded.</p>
+<p>In <em>rsa.d</em>:</p>
+<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">ubyte</span><span class="o">[]</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">string</span> <span class="n">T</span><span class="p">)(</span><span class="n">RSAKeyInfo</span> <span class="n">key</span><span class="p">,</span> <span class="n">ubyte</span><span class="o">[]</span> <span class="n">data</span><span class="p">,</span> <span class="n">bool</span> <span class="n">mixinXteaMode</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="cm">/* ... */</span>
+        <span class="p">{</span>
+            <span class="c1">// Prevent preamble 0, and make the encrypto results random
+</span>            <span class="n">ubyte</span> <span class="n">preamble</span> <span class="o">=</span> <span class="n">rnd</span><span class="p">.</span><span class="na">next</span><span class="o">!</span><span class="n">ubyte</span><span class="p">(</span><span class="mh">0x01</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">);</span>
+            <span class="n">blockSize</span> <span class="o">=</span> <span class="p">(</span><span class="n">keySize</span> <span class="o">&lt;=</span> <span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">)</span> <span class="o">?</span> <span class="n">keySize</span> <span class="p">:</span> <span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">;</span>
+
+            <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">ubyte</span><span class="o">[]</span> <span class="n">block</span> <span class="o">=</span> <span class="o">[</span><span class="n">preamble</span><span class="o">]</span> <span class="o">~</span> <span class="n">data</span><span class="o">[</span><span class="mi">0</span> <span class="p">..</span> <span class="n">blockSize</span><span class="o">]</span><span class="p">;</span>
+                <span class="n">BigInt</span> <span class="n">t</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">fromBytes</span><span class="p">(</span><span class="n">block</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">key</span><span class="p">.</span><span class="na">modulus</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">blockSize</span><span class="o">--</span><span class="p">;</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">blockSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Key bits is too small.&quot;</span><span class="p">);</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">t</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span></code></pre>
+<p>This short padding is not safe and we will discuss two attacks that rely
+on padding exploitation alone.</p>
+<div class="section" id="padding-bruteforcing">
+<h3>Padding bruteforcing</h3>
+<p>First of all, why is there padding here at all? Padding-less RSA is well
+known under the name &quot;Textbook RSA&quot; and has many well-documented flaws. One
+of them is that two identical messages will produce two identical ciphertexts.
+Since in RSA the attacker is supposed to have the public key (it is public
+after all) he can encrypt as many messages as he wants and compare them to
+an unknown ciphertext until he gets an identical ciphertext. He then knows
+that the two messages are the same, effectively decrypting the message.</p>
+<p>This attack works particularly well on protocols that are highly
+repetitive or have few possible messages (&quot;ACCEPT&quot;/&quot;DENY&quot;).</p>
+<p>Given the comment &quot;make the encrypto results random&quot; it is clear that the
+author knew about this issue and wanted to make it so two messages produce
+two different ciphertexts.</p>
+<p>However one byte of randomness is not much. It only represents 256
+possibilities. This does make it harder in many situations, but when few
+messages are possible an attacker can quite easily encrypt each possibility
+256 times for comparison.</p>
+</div>
+<div class="section" id="message-modification">
+<h3>Message modification</h3>
+<p>Given an encrypted message it is possible to create a different encrypted
+message, derived from the first, without any key (not even the public one).</p>
+<p>To understand how we must first think about our padding in mathematical
+terms. In RSA our message is not an array of bytes but a number. Adding a
+value <em>s</em> before that corresponds to the addition of our number-message <em>m</em>
+and <em>s</em> shifted to the left (so multiplied by some power of 2 in base 2) by
+an amount relative to the length of <em>m</em> written in base 2 (so <em>log2(m)</em>,
+let's call it <em>l</em>). All of this is taken to a large power that we will call
+<em>e</em> to produce a ciphertext: <em>c</em>.</p>
+<div class="formula">
+<i>c</i> = (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+</div>
+<p>The question we must now ask is, how can we produce another valid message
+<em>c'</em> (therefore, of the same structure) given these conditions? Let's see
+what happens when multiplying that encrypted message by 2^e:</p>
+<div class="formula">
+<i>c</i> = (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+2<sup><i>e</i></sup> × <i>c</i> = 2<sup><i>e</i></sup> × (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+ = (2 × (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>))<sup><i>e</i></sup>
+</div>
+<div class="formula">
+ = (2<i>s</i> × 2<sup><i>l</i></sup> + 2<i>m</i>)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+2<sup><i>e</i></sup> × <i>c</i> = <i>c</i>’<sup><i>e</i></sup>
+</div>
+<p>If <em>2s</em> still fits in one byte, that padding byte will be discarded and we
+will have successfully crafted the message <em>2m</em> (or <em>m</em> with an added 0 at
+the end) without knowing <em>m</em>. Otherwise if <em>2s</em> doesn't fit in one byte then
+we will get <em>2m</em> prefixed with a bit of padding left attached, which is still
+an interesting result. In either case the padding is not able to detect the
+modification.</p>
+<p>To take a concrete example, let's consider the message 0x42. That message is
+padded with a random byte, 0x12 for example, to form the padded message
+0x1242. The encrypted message can then be written schematically:</p>
+<div class="formula">
+<i>c</i> = (0<i>x</i>1242)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+2<sup><i>e</i></sup> × <i>c</i> = 2<sup><i>e</i></sup> × (0<i>x</i>1242)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+ = (2 × 0<i>x</i>1242)<sup><i>e</i></sup>
+</div>
+<div class="formula">
+ = (0<i>x</i>2482)<sup><i>e</i></sup>
+</div>
+<p>Upon decryption of this modified message the first byte (0x24) is discarded
+leaving the message 0x84. All we had to do was multiply by 2^e.</p>
+<p>This message malleability may not sound very dangerous, but with a bit of work
+to identify other deterministic changes it can prove a very effective attack
+to modify all or part of the message through its encryption.</p>
+<p>I have <a class="reference external" href="https://breakpoint.purrfect.fr/article/demo_bank.html">talked before</a>
+about how important it is for encryption to be authenticated to avoid
+modifications. If you have not read it that article proposes a short demo of
+attack through encryption to steal money by modifying unknown encrypted
+messages. It may be a toy example but I have seen similar issues in real
+life.</p>
+<hr class="docutils" />
+<p>Other issues may exist with this padding, but even from the first results it
+is clear that it should not be used as it is. Padding is critical in RSA and
+improvising a solution is not the way to go.</p>
+<p><strong>Bonus exercise</strong></p>
+<p><em>Try seeing why the &quot;Customized&quot; padding (which appends NUL bytes then the
+message length to the message) would not be a good fit for RSA. Hint: you can
+apply a reasoning very similar to the one outlined here.</em></p>
+<img alt="../image/starlight_glimmer_defiant.png" src="../image/starlight_glimmer_defiant.png" style="width: 30%;" />
+</div>
+</div>
+<div class="section" id="solutions">
+<h2>Solutions</h2>
+<p>Given that the library wants to support short (&lt;=1024 bits) keys I believe
+it should switch entirely to generating provable primes that enforce the
+different properties we discussed. This means however scratching most of the
+code already written. Another alternative would be to use Miller-Rabin but in
+that case I strongly advise checking the prime conditions and disallowing
+short keys. Keys shorter than 1024 bits should not be used in 2020 anyway
+given that we have reached the computing power necessary to attack them
+consistently.</p>
+<p>In any case it is best to follow a strong standard. In that case I
+recommend <a class="reference external" href="https://csrc.nist.gov/publications/detail/fips/186/4/final">FIPS 186-4</a> section B.3.1,
+B.3.4 and B.3.5. This US standard is generally considered very strong.</p>
+<p>Regarding padding, different properties are required depending on whether
+the keys are used for encryption or signature. I recommend implementing
+the two standards <a class="reference external" href="https://tools.ietf.org/html/rfc8017#section-7.1">OAEP</a>
+for encryption and <a class="reference external" href="https://tools.ietf.org/html/rfc8017#section-8.1">PSS</a>
+for signature as described in <a class="reference external" href="https://tools.ietf.org/html/rfc8017">RFC8017</a>.</p>
+<p>Note that key generation must also be modified for signatures, so I am mainly
+indicating PSS as a general reference.</p>
+<p>The current padding should be changed as it is absolutely dangerous.
+Similarly name confusions and useless code only add to the difficulty of
+verifying that the algorithms are implemented correctly. They must be fixed
+and removed.</p>
+<p>The avid reader will find more RSA-related attacks and studies in the
+splendid paper <a class="reference external" href="http://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf">Twenty Years of Attacks on the RSA Cryptosystem</a> by Dan Boneh.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>While I salute the effort made in creating and maintaining a useful library,
+I think the issues identified show clearly that the author is no
+cryptographer. I do not blame anyone for getting things wrong, nobody is
+expected to get cryptography right the first time (not even cryptographers),
+which is why the mantra &quot;do not roll your own cryptography&quot; is so often
+repeated. However I cannot recommend anyone to use a library written by
+someone that does not understand the consequences of his code and I regret
+leaving these issues unfixed for a year.</p>
+<p>The best way to implement cryptography is to absolutely refrain from
+inventing anything and strive to follow a strong, proven standard as closely
+as possible. It is also easier to spot implementation errors that way.</p>
+<p>So, if I had only one advice for programmers wanting to write cryptographic
+code:</p>
+<div class="admonition admonition-please">
+<p class="admonition-title">Please</p>
+<p>Leave your brain at home.</p>
+</div>
+<p>Cryptographic code is definitely important and programmers should not be
+afraid of implementing cryptographic primitives. However it <strong>must</strong> follow
+the guidelines down to the last detail. This is not the place for smart
+optimizations, or for taking ideas left and right and expecting them to
+fit together. It does not work that way.</p>
+<p>That said, if you do write cryptographic code and would like someone to take
+a look feel free to reach me. I always make time for free software that
+cannot afford security code review through traditional means.</p>
+<p>I hope you enjoyed this case study. Please do not hold it against the author
+of <strong>Crypto</strong>, I may be harsh in my criticism but he was really nice in all
+our exchanges and his attempt, misguided as it is, tries to fill a real need
+of our ecosystem.</p>
+<img alt="../image/rarity_look_up_gentle.png" src="../image/rarity_look_up_gentle.png" style="width: 40%;" />
+<hr class="docutils" />
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.gamer.ru/questions/gallery/page3">http://www.gamer.ru/questions/gallery/page3</a></p></li>
+<li><p><a class="reference external" href="https://www.deviantart.com/yanoda/art/Unamused-Fluttershy-298158404">https://www.deviantart.com/yanoda/art/Unamused-Fluttershy-298158404</a></p></li>
+<li><p><a class="reference external" href="https://www.deviantart.com/myardius/art/Sweetie-Belle-looking-up-315460579">https://www.deviantart.com/myardius/art/Sweetie-Belle-looking-up-315460579</a></p></li>
+<li><p><a class="reference external" href="https://www.deviantart.com/iamadinosaurrarrr/art/Apple-Bloom-Being-Cute-358019405">https://www.deviantart.com/iamadinosaurrarrr/art/Apple-Bloom-Being-Cute-358019405</a></p></li>
+<li><p><a class="reference external" href="https://www.equestriadaily.com/2018/01/editorial-why-i-love-me-some-starlight.html">https://www.equestriadaily.com/2018/01/editorial-why-i-love-me-some-starlight.html</a></p></li>
+<li><p><a class="reference external" href="https://www.deviantart.com/the-smiling-pony/art/Rarity-01-252735198">https://www.deviantart.com/the-smiling-pony/art/Rarity-01-252735198</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>
