@@ -415,10 +415,8 @@ not be trusted to produce consistently strong primes, or even primes at all.
 Key generation
 ==============
 
-The relevant part of the key generation process, as implemented, is the
+The key generation process, as implemented currently, is essentially the
 following:
-
-The process at the moment is essentially:
 
 - Determine how many primality tests will be done based on key size
 
