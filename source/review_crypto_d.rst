@@ -302,7 +302,7 @@ think happened then is that the author read the wikipedia article of the
 Fermat primality test, saw a reference to the Baillie-PSW and thought "here
 is a good way to improve my prime generation". And it is!
 
-The basic idea of Baillie-PSW is that, since both Fermat and Lucas-Lehmer have
+The basic idea of Baillie-PSW is that, since both Fermat and Lucas have
 false positives but these false positives do not overlap, whatever
 number passes both tests is almost surely prime.
 
