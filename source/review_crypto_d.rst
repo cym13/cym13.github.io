@@ -494,7 +494,8 @@ The smaller the prime number, the more important these properties are, so it
 is strongly discouraged to use probable primes for keys smaller than 2048
 bit long.
 
-**As it is, the primes randomly generated but no condition is enforced.**
+**As it is, the primes used are randomly generated for all key size and no
+condition is enforced.**
 
 The default key length has been updated from 1024 to 2048 which makes these
 checks a bit less necessary, but the library does not warn the user
@@ -502,7 +503,8 @@ that their key generation is unsafe if they decide to use a smaller key size.
 
 I would recommend refusing key sizes under 1024, or accepting them with
 warning that these keys are too small for modern use as well as implementing
-weak prime detection in all cases.
+weak prime detection in all cases. I would also recommend implementing the
+three checks mentionned at least.
 
 .. image:: ../image/applebloom_cute.png
     :width: 30%
@@ -560,7 +562,7 @@ of them is that two identical messages will produce two identical ciphertexts.
 Since in RSA the attacker is supposed to have the public key (it is public
 after all) he can encrypt as many messages as he wants and compare them to
 an unknown ciphertext until he gets an identical ciphertext. He then knows
-that the two messages are the same, effectively decrypting the message.
+that the two messages are the same, which amounts to decrypting the message.
 
 This attack works particularly well on protocols that are highly
 repetitive or have few possible messages ("ACCEPT"/"DENY").
@@ -572,21 +574,21 @@ two different ciphertexts.
 However one byte of randomness is not much. It only represents 256
 possibilities. This does make it harder in many situations, but when few
 messages are possible an attacker can quite easily encrypt each possibility
-256 times for comparison.
+256 times for comparison, bypassing the security.
 
 Message modification
 --------------------
 
 Given an encrypted message it is possible to create a different encrypted
-message, derived from the first, without any key (not even the public one).
+message, derived from the first, without any key.
 
 To understand how we must first think about our padding in mathematical
 terms. In RSA our message is not an array of bytes but a number. Adding a
 value *s* before that corresponds to the addition of our number-message *m*
 and *s* shifted to the left (so multiplied by some power of 2 in base 2) by
-an amount relative to the length of *m* written in base 2 (so *log2(m)*,
-let's call it *l*). All of this is taken to a large power that we will call
-*e* to produce a ciphertext: *c*.
+an amount relative to the length of *m* written in base 2 (let's call it
+*l*). All of this is taken to a large power that we will call *e* to produce
+a ciphertext: *c*.
 
 .. math:: c = (s×2^l + m)^e
 
@@ -634,7 +636,7 @@ This message malleability may not sound very dangerous, but with a bit of work
 to identify other deterministic changes it can prove a very effective attack
 to modify all or part of the message through its encryption.
 
-I have `talked before <https://breakpoint.purrfect.fr/article/demo_bank.html>`_
+I have `written before <https://breakpoint.purrfect.fr/article/demo_bank.html>`_
 about how important it is for encryption to be authenticated to avoid
 modifications. If you have not read it that article proposes a short demo of
 attack through encryption to steal money by modifying unknown encrypted
@@ -649,9 +651,9 @@ improvising a solution is not the way to go.
 
 **Bonus exercise**
 
-*Try seeing why the "Customized" padding (which appends NUL bytes then the
-message length to the message) would not be a good fit for RSA. Hint: you can
-apply a reasoning very similar to the one outlined here.*
+*Try seeing why the "Customized" padding (which appends NUL bytes followed by
+the message length to the original message) would not be a good fit for RSA.
+Hint: you can apply a reasoning very similar to the one outlined here.*
 
 .. image:: ../image/starlight_glimmer_defiant.png
     :width: 30%
@@ -662,28 +664,29 @@ Solutions
 Given that the library wants to support short (<=1024 bits) keys I believe
 it should switch entirely to generating provable primes that enforce the
 different properties we discussed. This means however scratching most of the
-code already written. Another alternative would be to use Miller-Rabin but in
-that case I strongly advise checking the prime conditions and disallowing
-short keys. Keys shorter than 1024 bits should not be used in 2020 anyway
-given that we have reached the computing power necessary to attack them
-consistently.
+code already written.
 
-In any case it is best to follow a strong standard. In that case I
+Another alternative would be to use Miller-Rabin but in that case I strongly
+advise checking the prime conditions and disallowing short keys. Keys shorter
+than 2048 bits should not be used in 2020 anyway given that we have reached
+the computing power necessary to attack them consistently.
+
+Furthermore it is best to follow a strong standard. In that case I
 recommend `FIPS 186-4
 <https://csrc.nist.gov/publications/detail/fips/186/4/final>`_ section B.3.1,
 B.3.4 and B.3.5. This US standard is generally considered very strong.
 
-Regarding padding, different properties are required depending on whether
-the keys are used for encryption or signature. I recommend implementing
-the two standards `OAEP <https://tools.ietf.org/html/rfc8017#section-7.1>`_
-for encryption and `PSS <https://tools.ietf.org/html/rfc8017#section-8.1>`_
-for signature as described in `RFC8017 <https://tools.ietf.org/html/rfc8017>`_.
+Regarding padding, the current padding should be changed as it is absolutely
+dangerous.  Different properties are required depending on whether the keys
+are used for encryption or signature. I recommend implementing the two
+standards `OAEP <https://tools.ietf.org/html/rfc8017#section-7.1>`_ for
+encryption and `PSS <https://tools.ietf.org/html/rfc8017#section-8.1>`_ for
+signature as described in `RFC8017 <https://tools.ietf.org/html/rfc8017>`_.
 
-Note that key generation must also be modified for signatures, so I am mainly
-indicating PSS as a general reference.
+Note that there are other issues to tackle for proper signature support, so I
+am mainly indicating PSS as a general reference.
 
-The current padding should be changed as it is absolutely dangerous.
-Similarly name confusions and useless code only add to the difficulty of
+Also name confusions and useless code only add to the difficulty of
 verifying that the algorithms are implemented correctly. They must be fixed
 and removed.
 
