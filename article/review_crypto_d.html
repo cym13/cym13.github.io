@@ -528,10 +528,10 @@ message, derived from the first, without any key.</p>
 <p>To understand how we must first think about our padding in mathematical
 terms. In RSA our message is not an array of bytes but a number. Adding a
 value <em>s</em> before that corresponds to the addition of our number-message <em>m</em>
-and <em>s</em> shifted to the left (so multiplied by some power of 2 in base 2) by
-an amount relative to the length of <em>m</em> written in base 2 (let's call it
-<em>l</em>). All of this is taken to a large power that we will call <em>e</em> to produce
-a ciphertext: <em>c</em>.</p>
+and our padding <em>s</em> shifted to the left (so multiplied by some power of 2 in
+base 2) by an amount relative to the length of <em>m</em> written in base 2 (let's
+call it <em>l</em>). All of this is taken to a large power that we will call <em>e</em> to
+produce a ciphertext: <em>c</em>.</p>
 <div class="formula">
 <i>c</i> = (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
 </div>

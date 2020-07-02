@@ -583,10 +583,10 @@ message, derived from the first, without any key.
 To understand how we must first think about our padding in mathematical
 terms. In RSA our message is not an array of bytes but a number. Adding a
 value *s* before that corresponds to the addition of our number-message *m*
-and *s* shifted to the left (so multiplied by some power of 2 in base 2) by
-an amount relative to the length of *m* written in base 2 (let's call it
-*l*). All of this is taken to a large power that we will call *e* to produce
-a ciphertext: *c*.
+and our padding *s* shifted to the left (so multiplied by some power of 2 in
+base 2) by an amount relative to the length of *m* written in base 2 (let's
+call it *l*). All of this is taken to a large power that we will call *e* to
+produce a ciphertext: *c*.
 
 .. math:: c = (s×2^l + m)^e
 
