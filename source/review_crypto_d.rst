@@ -625,7 +625,7 @@ padded with a random byte, 0x12 for example, to form the padded message
 
            = (2 × 0x1242)^e
 
-           = (0x2482)^e
+           = (0x2484)^e
 
 Upon decryption of this modified message the first byte (0x24) is discarded
 leaving the message 0x84. All we had to do was multiply by 2^e.
