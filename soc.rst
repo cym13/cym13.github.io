@@ -6,6 +6,32 @@ Stream of Consciousness
 
 ----
 
+**Sun 05 Jul 2020 01:30:27 PM CEST**
+
+`Sora Yori mo Tooi Basho
+<https://myanimelist.net/anime/35839/Sora_yori_mo_Tooi_Basho>`_, “A place
+further than the universe”...
+
+There are many feel good stories following the life of a group of high school
+girls, but none like SoraYori. It's a story of unlikely peple running away
+to discover something more in their lives. The kind of story that would
+motivate anyone to try anything. A story about learning what friendship
+means, what making a choice means, what being alive means. A story about
+doing the impossible no matter what.
+
+A story about Antartica.
+
+Each of the four unlikely friends has a strong personnal development which is
+hard to do in only 13 episodes yet the producers manage it perfectly. The
+show is well written to the point where even background characters feel alive
+and unique. The artistic direction is also extremely good and I found myself
+thinking several times that they way the image was framed or cut was very
+ingenious. It served to present its subject with emotion and tact.
+
+Definitive recommendation to anyone.
+
+----
+
 **Fri 19 Jun 2020 03:07:25 PM CEST**
 
 You know how in fantasy stories there's always a huge prophecy that the hero
