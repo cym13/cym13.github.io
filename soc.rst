@@ -6,6 +6,14 @@ Stream of Consciousness
 
 ----
 
+**Sun 05 Jul 2020 10:55:52 PM CEST**
+
+Since Boehm GC scans the stack for things that look like pointers to objects,
+could we "plant" an address to a dead struct then remove it to trigger a
+double free just by manipulating stack data?
+
+----
+
 **Sun 05 Jul 2020 01:30:27 PM CEST**
 
 `Sora Yori mo Tooi Basho

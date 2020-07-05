@@ -4,9 +4,17 @@
   <title>Breakpoint - Stream of Consciousness</title>
   <description>Stream of Consciousness</description>
   <link>https://breakpoint.purrfect.fr/soc.html</link>
-  <lastBuildDate>Sun, 05 Jul 2020 13:30:27 +0200</lastBuildDate>
-  <pubDate>Sun, 05 Jul 2020 13:30:27 +0200</pubDate>
+  <lastBuildDate>Sun, 05 Jul 2020 22:55:52 +0200</lastBuildDate>
+  <pubDate>Sun, 05 Jul 2020 22:55:52 +0200</pubDate>
   <ttl>7200</ttl>
+      <item>
+        <title>Sun 05 Jul 2020 10:55:52 PM CEST</title>
+        <description>Since Boehm GC scans the stack for things that look like pointers to objects,
+could we "plant" an address to a dead struct then remove it to trigger a
+double free just by manipulating stack data?</description>
+        <link>https://breakpoint.purrfect.fr/soc.html</link>
+        <pubDate>Sun, 05 Jul 2020 22:55:52 +0200</pubDate>
+      </item>
       <item>
         <title>Sun 05 Jul 2020 01:30:27 PM CEST</title>
         <description>`Sora Yori mo Tooi Basho
