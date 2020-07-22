@@ -294,6 +294,13 @@ within a `Baillie-PSW test
 .. image:: ../image/fluttershy_wut.png
     :width: 40%
 
+*EDIT 2020/07/20: a nice redditor* `noticed
+<https://www.reddit.com/r/crypto/comments/hiky2t/help_identifying_a_primality_test_given_its/fyuynh4/>`_
+*that this is actually directly ported from
+Java's standard library* `BigInteger.java
+<https://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/math/BigInteger.java>`_
+*including the wrong name and associated comment!*
+
 Let's back down a bit.
 
 The first review that I communicated to the author included only the Fermat
