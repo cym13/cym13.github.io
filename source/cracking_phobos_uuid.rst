@@ -15,7 +15,7 @@ tl;dr for busy people
   easy, looks like it should work and does work in virtually any other
   language.
 
-- Legitimately, people will ask "Ok, it's bad in theory, but how hard is it
+- Legitimately, people will ask "OK, it's bad in theory, but how hard is it
   in practice". I show in this article that it is possible to guess the next
   UUID to be generated with a maximum of 8192 requests after having gathered
   156 UUIDs: a very practical attack indeed compared to the original 2¹²⁸
@@ -47,19 +47,69 @@ that I will not list use insecure UUIDs.
 
 The thing is, while they should not do so, I cannot fault them for thinking
 that it is correct. In most languages UUIDs are generated from secure
-randomness and are a reasonnable way to generate secure secrets. But that is
+randomness and are a reasonable way to generate secure secrets. But that is
 not the case in D and this means that these projects are vulnerable.
 
 In this post we'll see how we can predict future UUIDs from previous
 ones. It's a bit of work certainly, but it's not that hard. Here's our
-roadmap:
+road map:
 
-- Identify: see how random UUIDs are made in Phobos
-- Prepare: crack raw MT19937
-- Attack: predict future UUIDs from past ones
+- Identify_: see how random UUIDs are made in Phobos
+- Prepare_: crack raw MT19937
+- Attack_: predict future UUIDs from past ones
+- Defend_: see how to fix this in your project and in Phobos
 
 This will be quite the long and technical post, but come along anyway, it is
 sure to be interesting!
+
+A word on randomness
+--------------------
+
+Before going further we need to be clear about what we mean by
+cryptographically secure randomness and how it differs from regular
+randomness.
+
+Normal randomness is generally defined by only one assumption: to have no or
+low bias. This means that if you were to generate lots of numbers, the number
+of times you see each specific output should be evenly matched. This property
+is sufficient for most applications, from a random dog name generator to
+Monte-Carlo simulations.
+
+However cryptographic randomness requires more though:
+
+- It must not have any bias
+- It must not be possible to predict future outputs from old ones
+- It must not be possible to recover past outputs from current ones
+
+(The proper `definition`_ is a bit stronger than this, but this will suffice
+in the context of our article.)
+
+.. _definition: https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator#Definitions
+
+If there's a bias, then I have information about what numbers are generated
+without having to gather a single number. I do not think I need to explain
+how predicting future numbers can be an issue for a system generating secrets
+such as session tokens. The last item though can surprise, but consider this:
+if it is possible to recover past outputs from current ones and you use these
+random numbers for password reset tokens (for example), then I can ask a
+reset of another user's password, then ask a reset of mine and determine what
+the previous entry was, disclosing that user's password reset token.
+
+Why aren't cryptographically secure pseudo-random number generators (CSPRNG)
+used for everything if they're more secure? Because enforcing these
+conditions also makes them much slower than conventional PRNGs and many
+applications don't need these guarantees.
+
+MT19937 is not a cryptographically secure pseudo-random number generator and
+can't be used as one. It's not a matter of choosing the right seed, or
+reseeding often (actually, reseeding often would be a benefit to us as we'll
+see at the end). It has some bias (not much admittedly), but most importantly
+it's both possible to predict the future and recover the past from just a few
+outputs.
+
+.. image:: ../image/chibi_cat_hurry_up.png
+
+.. _Identify:
 
 Structure of a UUID
 ===================
@@ -70,7 +120,7 @@ The standard
 Universally Unique Identifiers (UUID) are a category of identifiers defined
 in `RFC 4122 <https://tools.ietf.org/html/rfc4122.html>`_. Their goal is, as
 the name suggests, to provide a way got generate IDs that are guaranteed to
-be different even accross systems that can't communicate together. You've
+be different even across systems that can't communicate together. You've
 probably seen them, they look like this:
 **0d3120f8-f209-43f2-949d-e70dcf228403**
 
@@ -137,49 +187,9 @@ Xorshift192 (`code here
 So our main target is Mersenne Twister 19937, possibly the most common PRNG
 in use.
 
-A word on randomness
---------------------
+.. image:: ../image/chibi_cat_me_want.png
 
-We have already talked a lot about randomness and before going further we
-need to be clear about what we mean by cryptographically secure randomness.
-
-Normal randomness is generally defined by only one assumption: to have no or
-low bias. This means that if you were to generate lots of numbers, the number
-of times you see each specific output should be evenly matched. This property
-is sufficient for most applications, from a random dog name generator to
-Monte-Carlo simulations.
-
-Without Cryptographic randomness requires more though:
-
-- It must not have any bias
-- It must not be possible to predict future outputs from old ones
-- It must not be possible to recover past outputs from current ones
-
-(The proper `definition`_ differs a bit from this, but this will suffice in
-the context of our article.)
-
-.. _definition: https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator#Definitions
-
-If there's a bias, then I have information about what numbers are generated
-without having to gather a single number. I do not think I need to explain
-how predicting future numbers can be an issue for a system generating secrets
-such as session tokens. The last item though can surprise, but consider this:
-if it is possible to recover past outputs from current ones and you use these
-random numbers for password reset tokens (for example), then I can ask a
-reset of another user's password, then ask a reset of mine and determine what
-the previous entry was, disclosing that user's password reset token.
-
-Why aren't cryptographically secure pseudo-random number generators (CSPRNG)
-used for everything if they're more secure? Because enforcing these
-conditions also makes them much slower than conventionnal PRNGs and many
-applications don't need these guarantees.
-
-MT19937 is not a cryptographically secure pseudo-random number generator and
-can't be used as one. It's not a matter of choosing the right seed, or
-reseeding often (actually, reseeding often would be a benefit to us as we'll
-see at the end). It has some bias (not much admitedly), but most importantly
-it's both possible to predict the future and recover the past from just a few
-outputs.
+.. _Prepare:
 
 Cracking MT19937
 ================
@@ -239,7 +249,7 @@ One thing isn't apparent in this diagram, and it is how *next* and *index*
 are combined to produce *y*. *y* is composed of the most significant bit of
 *index* and all bits from *next* except its most significant one.
 
-Each time a new number is outputed, both of these processes go one step to
+Each time a new number is outputted, both of these processes go one step to
 the left, walking the state array in reverse order. After *n* iterations it
 loops back to the end of the array.
 
@@ -279,7 +289,7 @@ In code, this gives:
         return z;
     }
 
-Sliding things left and right... Let's just slide the other way arround (with
+Sliding things left and right... Let's just slide the other way around (with
 a twist to account for overlaps.
 
 .. code:: java
@@ -315,6 +325,8 @@ And just like that, the first hurdle is behind us. Easy. All we need to do to
 predict all future numbers is to collect 624 consecutive numbers, unscramble
 them and use them to seed our own MersenneTwisterEngine. But that is not our
 goal, so let's move on.
+
+.. image:: ../image/chibi_cat_disillusioned.png
 
 Predicting one number
 =====================
@@ -385,6 +397,10 @@ value "index" will have, so 624 outputs later. Now, let's move to the meat of
 the challenge: can we still do this efficiently when we start removing bits
 due to how UUIDs are formatted?
 
+.. image:: ../image/chibi_cat_catching_prey.png
+
+.. _Attack:
+
 Cracking MT19937 UUIDs
 ======================
 
@@ -429,7 +445,7 @@ value. There is no missing bit here.
 .. image:: ../image/uuid_parts_p2.png
     :width: 60%
 
-And finally P3 benefits from similarily great conditions with no missing bit.
+And finally P3 benefits from similarly great conditions with no missing bit.
 
 .. image:: ../image/uuid_parts_p3.png
     :width: 60%
@@ -444,7 +460,7 @@ this is an easy task. This will provide a list of 8192 candidates.
     chance that they weren't changed and the UUID is still valid: a
     collision. This means that, by running statistical tests as you tweak
     your values you can measure how many bits you have right by how many
-    times collisions occured. This proved very very useful in this case. Of
+    times collisions occurred. This proved very very useful in this case. Of
     course visualizing data as bits is also a good idea.*
 
 And so finally here is the code allowing us to predict UUIDs from a list of
@@ -545,8 +561,15 @@ A similar strategy can be applied for filenames in symlink attacks, password
 reset tokens (the best since you can ask to reset another account, there is
 no need to wait), API endpoints that are supposed to be unguessable etc.
 
+.. image:: ../image/chibi_cat_computer_savy.png
+
+.. _Defend:
+
 Mitigations
 ===========
+
+Proper solution: use the CSPRNG from your system
+------------------------------------------------
 
 Secrets must be generated using cryptographic randomness. On Windows this
 means CryptGenRandom, on Linux getrandom() or /dev/urandom, on unix
@@ -558,9 +581,109 @@ As a project manager you should consider introducing such a dependency since
 there's no substitute for a good CSPRNG and no CSPRNG can be properly seeded
 without relying on the system.
 
+However the best way to solve this particular issue would be for Phobos to
+provide this interface to the system CSPRNG directly. People take the path of
+least resistance, that's a fact that we have to work with. At the moment it
+is significantly harder for people to use secure randomness instead of just
+going for std.random.uniform(), often "temporarily". If std.uuid is to
+change, and it should, it must rely on the system CSPRNG and not something
+else.
+
+I know that there is some reluctance to introduce anything related to
+cryptography in the standard library, but here we are not talking about
+reimplementing an algorithm. It is a case where not acting is provably
+causing more damage than providing a standard solution. Especially at the web
+era, access to cryptographic randomness is a must.
+
+Improper solution: let's use the CPU's CSPRNG
+---------------------------------------------
+
+*The CPU generally embeds a CSPRNG nowadays no? Why not use this instead of
+dealing with OS specific resources?*
+
+There are several reasons. For example the system has access to more
+entropy and uses the CPU as a source of entropy if available so the system
+CSPRNG is guaranteed to be at least as good as the CPU and often better.
+
+Furthermore there have been cases even recently of flaws in CPU CSPRNG.
+That's even without considering the fact that it is closed-source which is
+never a good thing for security.
+
+But the main reason is more simple: what if the CPU doesn't provide a CSPRNG?
+Not all CPUs do, far from it, so what are you supposed to do? Fallback
+silently on a method that we know causes issues? That would be giving a false
+sense of security even more harmful than what is currently done.
+
+Improper solution: let's write our own CSPRNG
+---------------------------------------------
+
+*Still, having to deal with platform-specific code is a pain. Can't I just
+write my own CSPRNG instead of depending on the system?*
+
+Nobody should roll their own crypto and expect it to be usable in production.
+But let's suppose that you wrote this difficult and critical component
+correctly: how are you providing it with entropy?
+
+The only sane source is to draw from the system's CSPRNG, so you're still
+not better than if you used it directly, you just added another layer of
+bugs.
+
+You might try to collect entropy elsewhere, but you're bound to have less
+access to it than the system, and any such collection involves platform
+specific code anyway. There's nothing to be gained from this.
+
+Improper solution: let's reseed often
+-------------------------------------
+
+*This attack requires you to read many values. I just need to reseed more
+often so that the value you're predicting never comes out.*
+
+There is this common misconception that the issue with non-cryptographic PRNG
+can be solved by reseeding often. It's true that if you reseed after less
+than 624 outputs the attack we outlined is not possible. However it opens the
+way to several attacks that are much easier that what we did.
+
+First of all reseeding is only as good as the seed's randomness. You
+therefore fall into the same traps as we discussed earlier: if you want it to
+be unpredictable you need cryptographic randomness, and therefore you need to
+draw from the system's CSPRNG anyway.
+
+But there's a more pernicious effect. The way seeding happens is that the
+seed is scrambled repeatedly to provide each of the 624 internal states of
+MT19937. So instead of attacking the scrambling of MT19937 and its hundreds
+of internal states, we only need to attack the scrambling of the seeding
+method, which is much easier to reverse. `This article by ambionics
+<https://www.ambionics.io/blog/php-mt-rand-prediction>`_ uses this strategy
+to determine the entire internal state by reading only 2 values.
+
+A non-cryptographic PRNG is not suited for cryptographic tasks. It's a fool's
+errand to try to twist it into being secure when it is neither its purpose
+nor its strength.
+
+.. image:: ../image/chibi_cat_sleeping.png
 
 Conclusion
 ==========
 
+As we have seen, it is fairly easy to predict Phobos UUIDs. While the RFC
+does not require UUIDs to be unpredictable, practice shows that many people
+expect them to be cryptographically secure. This causes many security issues
+in many projects.
 
+I strongly recommend that Phobos adds a proper standard interface to the
+system's CSPRNG. That's the only way to solve not only the core of the UUID
+issue but also many similar issues that stem from the fact that it is
+currently much easier to use a regular PRNG than a CSPRNG, even when one is
+absolutely required.
 
+----
+
+Image sources
+-------------
+
+All schemas were made by me and are provided under the `creative commons
+3.0 unported license <https://creativecommons.org/licenses/by/3.0/>`_ like
+any other original content on this blog.
+
+All cat pictures in this article come from
+https://chatsticker.com/sticker/tibi-neko-sticker-no-language-ver-1.
