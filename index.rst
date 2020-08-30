@@ -8,6 +8,14 @@ ponies and whatever lies in between.
 Recent articles
 ===============
 
+August 2020
+-----------
+
+`Cracking Phobos UUID <article/cracking_phobos_uuid.html>`_
+    The standard D library provides a random UUID implementation that relies
+    on regular pseudo-number generation and is not cryptographically secure.
+    We show how this can be exploited in practice to predict future UUIDs.
+
 June 2020
 ---------
 
