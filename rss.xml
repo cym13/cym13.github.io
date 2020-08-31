@@ -4,8 +4,8 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://breakpoint.purrfect.fr</link>
-  <lastBuildDate>Sun, 30 Aug 2020 15:32:02 +0200</lastBuildDate>
-  <pubDate>Sun, 30 Aug 2020 15:32:02 +0200</pubDate>
+  <lastBuildDate>Mon, 31 Aug 2020 13:35:22 +0200</lastBuildDate>
+  <pubDate>Mon, 31 Aug 2020 13:35:22 +0200</pubDate>
   <ttl>7200</ttl>
 
 
@@ -13,7 +13,7 @@
     <title>Cracking Phobos UUID</title>
     <description>The standard D library provides a random UUID implementation that relies on regular pseudo-number generation and is not cryptographically secure. We show how this can be exploited in practice to predict future UUIDs.</description>
     <link>https://breakpoint.purrfect.fr/article/cracking_phobos_uuid.html</link>
-    <pubDate>Sun, 30 Aug 2020 15:32:02 +0200</pubDate>
+    <pubDate>Mon, 24 Aug 2020 10:08:40 +0200</pubDate>
   </item>
 
 
