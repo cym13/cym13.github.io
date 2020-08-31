@@ -75,7 +75,7 @@ of times you see each specific output should be evenly matched. This property
 is sufficient for most applications, from a random dog name generator to
 Monte-Carlo simulations.
 
-However cryptographic randomness requires more though:
+However cryptographic randomness requires more:
 
 - It must not have any bias
 - It must not be possible to predict future outputs from old ones
@@ -290,7 +290,7 @@ In code, this gives:
     }
 
 Sliding things left and right... Let's just slide the other way around (with
-a twist to account for overlaps.
+a twist to account for overlaps).
 
 .. code:: java
 
@@ -404,7 +404,7 @@ due to how UUIDs are formatted?
 Cracking MT19937 UUIDs
 ======================
 
-The main issue with UUIDs come, of course, from the fact that some
+The main issue with UUIDs comes, of course, from the fact that some
 information is missing. There is nothing we can do to magically summon up
 these missing bits, but if few enough are missing we can enumerate all
 possibilities. This will give us a list of candidate UUIDs to try against the

@@ -110,7 +110,7 @@ low bias. This means that if you were to generate lots of numbers, the number
 of times you see each specific output should be evenly matched. This property
 is sufficient for most applications, from a random dog name generator to
 Monte-Carlo simulations.</p>
-<p>However cryptographic randomness requires more though:</p>
+<p>However cryptographic randomness requires more:</p>
 <ul class="simple">
 <li><p>It must not have any bias</p></li>
 <li><p>It must not be possible to predict future outputs from old ones</p></li>
@@ -276,7 +276,7 @@ we never need to worry about the updating (orange) process in that scenario.</p>
     <span class="k">return</span> <span class="n">z</span><span class="p">;</span>
 <span class="p">}</span></code></pre>
 <p>Sliding things left and right... Let's just slide the other way around (with
-a twist to account for overlaps.</p>
+a twist to account for overlaps).</p>
 <pre class="code java literal-block"><code><span class="n">uint</span> <span class="nf">unscramble</span><span class="p">(</span><span class="n">uint</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">immutable</span> <span class="n">b</span> <span class="o">=</span> <span class="mh">0x9d2c5680</span><span class="p">;</span>
     <span class="n">immutable</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0xefc60000</span><span class="p">;</span>
@@ -373,7 +373,7 @@ due to how UUIDs are formatted?</p>
 </div>
 <div class="section" id="cracking-mt19937-uuids">
 <span id="attack"></span><h2>Cracking MT19937 UUIDs</h2>
-<p>The main issue with UUIDs come, of course, from the fact that some
+<p>The main issue with UUIDs comes, of course, from the fact that some
 information is missing. There is nothing we can do to magically summon up
 these missing bits, but if few enough are missing we can enumerate all
 possibilities. This will give us a list of candidate UUIDs to try against the
