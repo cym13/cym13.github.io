@@ -4,9 +4,40 @@
   <title>Breakpoint - Stream of Consciousness</title>
   <description>Stream of Consciousness</description>
   <link>https://breakpoint.purrfect.fr/soc.html</link>
-  <lastBuildDate>Sun, 05 Jul 2020 22:55:52 +0200</lastBuildDate>
-  <pubDate>Sun, 05 Jul 2020 22:55:52 +0200</pubDate>
+  <lastBuildDate>Wed, 09 Sep 2020 14:40:10 +0200</lastBuildDate>
+  <pubDate>Wed, 09 Sep 2020 14:40:10 +0200</pubDate>
   <ttl>7200</ttl>
+      <item>
+        <title>Wed Sep  9 02:40:10 PM CEST 2020</title>
+        <description>I feel like many people would like some way to donate back to the community
+without giving money. Seeding distribution torrents is a good way to do so,
+but major distributions are already covered quite nicely.
+
+I'm thinking, what about a system that does the following:
+
+- 1) reads the list of distribution torrents on
+     `distrowatch &lt;https://distrowatch.com/news/torrents.xml&gt;`_
+
+- 2) rates distributions by priority using a ratio
+     (popularity / lack of seeders)
+
+- 3) given a set amount of disk space determined by the user, dynamically
+  downloads as many distributions as possible in that space, ordered by
+  priority, and seeds them
+
+- 4) periodically updates the priority list, cleans up from the disk
+  distributions that no longer fit the bill, and downloads the new ones
+
+
+That would provide people with a completely automated "community give-back"
+platform that would actually help projects in need instead of adding to the
+mass of Ubuntu seeders (with all respects due to ubuntu seeders, you're
+needed too).
+
+It's not an easy project, but I think it's an attainable goal.</description>
+        <link>https://breakpoint.purrfect.fr/soc.html</link>
+        <pubDate>Wed, 09 Sep 2020 14:40:10 +0200</pubDate>
+      </item>
       <item>
         <title>Sun 05 Jul 2020 10:55:52 PM CEST</title>
         <description>Since Boehm GC scans the stack for things that look like pointers to objects,

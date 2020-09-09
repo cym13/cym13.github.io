@@ -6,6 +6,37 @@ Stream of Consciousness
 
 ----
 
+**Wed Sep  9 02:40:10 PM CEST 2020**
+
+I feel like many people would like some way to donate back to the community
+without giving money. Seeding distribution torrents is a good way to do so,
+but major distributions are already covered quite nicely.
+
+I'm thinking, what about a system that does the following:
+
+1) reads the list of distribution torrents on
+   `distrowatch <https://distrowatch.com/news/torrents.xml>`_
+
+2) rates distributions by priority using a ratio
+   (popularity / lack of seeders)
+
+3) given a set amount of disk space determined by the user, dynamically
+   downloads as many distributions as possible in that space, ordered by
+   priority, and seeds them
+
+4) periodically updates the priority list, cleans up from the disk
+   distributions that no longer fit the bill, and downloads the new ones
+
+
+That would provide people with a completely automated "community give-back"
+platform that would actually help projects in need instead of adding to the
+mass of Ubuntu seeders (with all respects due to Ubuntu seeders, you're
+needed too).
+
+It's not an easy project, but I think it's an attainable goal.
+
+----
+
 **Sun 05 Jul 2020 10:55:52 PM CEST**
 
 Since Boehm GC scans the stack for things that look like pointers to objects,
@@ -21,7 +52,7 @@ double free just by manipulating stack data?
 further than the universe”...
 
 There are many feel good stories following the life of a group of high school
-girls, but none like SoraYori. It's a story of unlikely peple running away
+girls, but none like SoraYori. It's a story of unlikely people running away
 to discover something more in their lives. The kind of story that would
 motivate anyone to try anything. A story about learning what friendship
 means, what making a choice means, what being alive means. A story about
@@ -29,7 +60,7 @@ doing the impossible no matter what.
 
 A story about Antartica.
 
-Each of the four unlikely friends has a strong personnal development which is
+Each of the four unlikely friends has a strong personal development which is
 hard to do in only 13 episodes yet the producers manage it perfectly. The
 show is well written to the point where even background characters feel alive
 and unique. The artistic direction is also extremely good and I found myself
@@ -44,14 +75,14 @@ Definitive recommendation to anyone.
 
 You know how in fantasy stories there's always a huge prophecy that the hero
 will defeat the forces of evil? It always bugs me that, when the main
-character and prophesized hero comes, basically no country bothers raising an
+character and prophesied hero comes, basically no country bothers raising an
 army or trying to deal with the issue by itself. It's all „Well, we can't do
 anything about it anyway, it's all in the hero's hands”. And fortunately it
 turns out ok because prophecies in fantasy novels are always right.
 
 I'd like a board game about that. Let's call it Prophecy.
 
-Players could be "prophesized hero" but we'd have no way to know which is the
+Players could be "prophesied hero" but we'd have no way to know which is the
 actual hero (or if one even is a hero). The goal would be to stop waves of
 monsters and finally the demon Lord after a set number of rounds.
 
@@ -160,18 +191,18 @@ longevity but diversity and while I had no issue finding really good canned
 fish, beef was another matter entirely.
 
 And now I think I know why. It's pretty strange stuff. The can I used was as
-"pur" beef as you can get, 98.7% beast and a dash of salt and E250. The smell
+"pure" beef as you can get, 98.7% beast and a dash of salt and E250. The smell
 is not nice. You can get used to it I think. It's has a vibrant red color
 which, for some reason, didn't change at all when cooked in a hot pan. This
 is unusual. Beef turns grey normally when cooked. This did not change color a
-bit. There's no colourant indicated though. Weird.
+bit. There's no colorant indicated though. Weird.
 
 I had some rice and pasta leftovers so I mixed them all in a hot pan with a
 dash of olive oil and the meat. Really basic, just to get a feel of the food.
 I ended up adding quite a lot of black pepper and garlic as well as some hot
 pepper and salt. I would really have liked an onion but there was none to be
 found. Generally trying to overspice food is not a good sign, and rightly so,
-but now it kind of smell like american hamburgers, where there is more spice
+but now it kind of smell like American hamburgers, where there is more spice
 and herbs than actual meat.
 
 Weird. Not bad though. Bit too much to pepper.
