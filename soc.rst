@@ -6,6 +6,45 @@ Stream of Consciousness
 
 ----
 
+**Sat Sep 26 02:42:09 PM CEST 2020**
+
+I'm completely battered from a sleepless night due to an unexpected
+intervention on a client's network, but somehow I still managed to turn an
+old jean into a proper new pocket for one of my favorite pants. The fabric
+was flimsy and easily torn apart by the various items I keep in my pocket
+everyday.
+
+It was my first real sewing project and I'm very glad with how it turned out.
+It was also quite easy overall:
+
+- Cut the old pocket
+- Reproduce its shape on the jean's fabric, leaving a bit more fabric to
+  reattach it to the pants afterward. Also prepare the mirror image of that
+  part.
+- I first used a blanket stitch to sew the two halves of my pocket inside
+  out (interior outside), that helps reduce tearing
+- I then collapsed the pocket on itself like a sock to get the interior
+  inside and used a back stitch along the edge to reinforce the blanket
+  stitch and protect it from items within the pocket
+- The most tedious part was attaching the pocket back to the leg, I used a
+  back stitch for that which was good, but not as clean as I'd have liked it
+  to be. I should think about that part more the next time I attempt it.
+
+(reference video for the basics of sewing:
+https://www.youtube.com/watch?v=1FknfumFPX8 
+
+All in all a very clean result from the outside, it doesn't look like it's
+going to tear easily and the visual result is quite nice even though my
+techniques definitely needs some work. The entire project took maybe 3 or 4
+hours.
+
+I think I'll get more sewing supplies and try other things, such as sewing
+some elastic fabric to create a sub-pocket that holds my knife tight in
+place. This could be less work than a full fledged pocket while still
+improving drastically the longevity by restricting motion.
+
+----
+
 **Wed Sep  9 02:40:10 PM CEST 2020**
 
 I feel like many people would like some way to donate back to the community
