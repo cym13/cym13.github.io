@@ -6,6 +6,49 @@ Stream of Consciousness
 
 ----
 
+**Sat Oct 10 12:27:39 PM CEST 2020**
+
+Youtube channel recommendation time! I'm not really big on Youtube, but there
+are some quality content creators out there that I think deserve mention. So
+here's a disparate list focusing on probably less mainstream channels.
+
+- `Bernadette Banner
+  <https://www.youtube.com/channel/UCSHtaUm-FjUps090S7crO4Q>`_, hand sewing
+  historical costumes in a calm and soothing atmosphere. I mean, just listen
+  to the music!
+
+- `Rex Krueger <https://www.youtube.com/channel/UCj4SLNED1DiNPHComZTCbzw>`_,
+  making woodwork more accessible by teaching simple techniques and
+  researching affordable hand tools.
+
+- `Economics Explained
+  <https://www.youtube.com/channel/UCZ4AMrDcNrfy3X6nsU8-rPg>`_, great resource
+  to understand why our world works the way it does with an Australian
+  accent.
+
+- `Tech Ingredients
+  <https://www.youtube.com/channel/UCVSHXNNBitaPd5lYz48--yg>`_, If you're
+  into long videos taking engineering and physics projects and pushing them
+  really far really well, this is the channel for you.
+
+- Experimental biohacking, GMO design, quantum physics, organic materials...
+  what is there not to love at the `Thought Emporium
+  <https://www.youtube.com/channel/UCV5vCi3jPJdURZwAOO_FNfQ>`_?
+
+- `Rhystic Studies
+  <https://www.youtube.com/channel/UC8e0Sg8TmRRFJytjEGhmVTg>`_ analyses the
+  art of Magic the Gathering cards. I find it quite enlightening to see such
+  art analysis of a trading card game.  Definitely worth watching if you're
+  interested in colors and framing of a painting to communicate an idea
+
+- `3blue1brown <https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw>`_
+  is probably the most well known math channel, but it's not that well known
+  outside of the math groups. If you did some math in your studies but left
+  at some point feeling "I don't get why anyone would study these abstract
+  ideas" then this channel is for you.
+
+----
+
 **Sat Oct 10 11:17:02 AM CEST 2020**
 
 So, yesterday I was discussing what math research is all about and I decided
