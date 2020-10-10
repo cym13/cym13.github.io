@@ -49,6 +49,87 @@
 <h1>Stream of Consciousness</h1>
 <p><em>Random ramble at the edge of reason.</em></p>
 <hr class="docutils" />
+<p><strong>Sat Oct 10 11:17:02 AM CEST 2020</strong></p>
+<p>So, yesterday I was discussing what math research is all about and I decided
+on this example: let's imagine that there's a room with a hundred boxes, that
+are either empty or full, but you cannot see which without opening the box.
+The room master comes and asks &quot;How many boxes should you open to tell me
+whether there's at least one full box in this room?&quot;.</p>
+<p>Now, the question is difficult, and you really cannot say. If no box is full
+you have to open them all to prove it, if even one box is full you could find
+it on your first try or on the last. On average if one box only is full you'd
+have to open about 50 boxes to know... that's a lot. With a sigh you decide
+to start opening boxes. The 20th happens to be full. You turn to the master
+and say &quot;I found one after opening 20, so clearly I needed 20&quot;. The master
+then says &quot;But now, can you tell me how many full boxes there are in the room
+in total?&quot;.</p>
+<p>You first want to answer &quot;Of course not without opening all of them.&quot; but a
+thought catches your mind. You already opened 20 boxes, one of which was
+full. You now know that there's a maximum of 81 full boxes in the room
+including the one you already found. But it would be a real feat of chance to
+have opened precisely the 19 empty boxes of the room first, so there being
+81 full boxes is really improbable. For the same reason 80 full boxes or 79
+full boxes are a little more probable but not by much. The box could very
+well be the only one in the room, but on the other hand you only looked at a
+fifth of the boxes so maybe 2 is more probable than 1? You start getting an
+intuition. Maybe you can't tell with certitude how many boxes there are, but
+you could find the number of boxes that is the most probable.</p>
+<p>You start reasoning... You found 1 full box in 20 so, assuming that ratio
+stands, if there's about 1 full box every 20 boxes there must be around 5
+full boxes among the 100 of the room. You cannot be certain of course, but
+you could compute the probability that there's 1 or 2 or 3 and that you found
+the first full box on the 20th try and it would show that 5 is the most
+probable count in the room. All from one full box (and 19 empty of course).</p>
+<p>This intuition is interesting, and it has applications! For example, a
+website I use quite often is <a class="reference external" href="https://www.suggestmemovie.com/">https://www.suggestmemovie.com/</a>. The concept is
+simple, it has a movie database, reload the page and it'll show a movie at
+random. I happen to be quite picky so I generally keep reloading and noticed
+that quite often I'd get movies that were already proposed. Nothing really
+strange there, randomness can very well hit the same place twice, but in the
+same fashion as for the boxes I recognized that it said something about how
+many movies there was in the database, so I could estimate its size based on
+how rare duplicates were. If you would like to do the same, there's a related
+technique named Mark-Recapture that is very common in ecology
+<a class="reference external" href="https://en.wikipedia.org/wiki/Mark_and_recapture">https://en.wikipedia.org/wiki/Mark_and_recapture</a></p>
+<p>But the reason I'm writing this today is that there's another angle to all
+that story. Let's come back to our room full of boxes. That time the master
+asks another question: &quot;You found a full box by opening 20. How many should
+you open to tell me that this is the only full box in the room?&quot;. Confident
+after your first success, you start thinking. Of course opening only one box
+could be sufficient, if the next box is full then there's more than one. And
+if you open all but one and they were all empty it's very unlikely that you
+managed not to open the only other full box of the room. So it's probably
+empty as well and you can stop a bit before... but when?</p>
+<p>You knew that if you found 1 box in 20, that 1/20 ratio gave you 5/100 so you
+estimated that there had to be 5 full boxes in the room. So the question is,
+how many empty boxes should you have to have a ratio that's closer from 1/100
+than 2/100? In other word, if 1/x=1.5/100, what is x? A cross product quickly
+yields x=66.666... so about 67 boxes. If you open 47 more empty boxes, you
+can quit ahead saying that, although there could be other full boxes, the
+most probable is that the one you found was the only one.</p>
+<p>It's interesting because we've turned a problem about numbering unknown
+things, a search problem, into an optimization problem. We could extend this
+to the case where there's more than one full box of course, and now we have a
+method to probabilistically find all full boxes without looking at all of
+them. We can even adjust more precisely the probability we seek to increase
+our confidence in the result just by opening a bit more or a bit less boxes.
+A bit. Bit.  These boxes full or open start to look an awful lot like 0s and
+1s... Could we use this for data compression for example?</p>
+<p>Let's consider some data, in binary form. We could randomly sample bits until
+we found all 1s (using the exact same method as above), then forcibly replace
+all remaining bits with 0s. There is some loss of information here, maybe
+they weren't all 0s, but the error rate we accept can be measured and adjusted.
+So far we haven't compressed anything, we still have the exact same number of
+bits, but we have almost all 1s... The hope is that losing the rest of them
+simplifies the data at hand by creating more pattern that, in turn, get
+easier to compress. In particular, if we do that reading data sequentially
+(from highest bits from the lowest ones) we would create trails of 0s in the
+lowest bits... Could that lead to some improvement? I doubt this method will
+ever be useful for compression, it's easier to get rid of the lowest bits
+altogether which is known to have garbage compression rates anyway, but I
+think it is very interesting to consider the possibility and see how an
+abstract problem can have so diverse ramifications.</p>
+<hr class="docutils" />
 <p><strong>Sat Sep 26 02:42:09 PM CEST 2020</strong></p>
 <p>I'm completely battered from a sleepless night due to an unexpected
 intervention on a client's network, but somehow I still managed to turn an
