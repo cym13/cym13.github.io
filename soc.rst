@@ -6,6 +6,39 @@ Stream of Consciousness
 
 ----
 
+**Thu Oct 22 09:49:13 PM CEST 2020**
+
+Isn't it strange that we all have (mostly) clearly defined areas of our
+brains that happen to both have the same functions from human to human, but
+also be at the same place?
+
+Maybe it doesn't seem strange yet, but computer neural networks for example
+don't work that way at all. They start in a generic state and build random
+connections that are later strengthened by repeated exposition to stimulus
+and comparison to the right answer. This process does result in different
+zones, but they are random: training two identical neural networks with the
+same data will result in different zones.
+
+Furthermore these zones do not follow human logic at all. For example let's
+take a network trained to recognize hand-written digits. We could expect a
+human to assign a zone to straight vertical lines, a zone to curves, a zone
+to angles, a zone to loops... But if we actually train that neural network and
+study the resulting zones we see that they correspond to unclear areas of the
+image, without rhyme or reason as far as humans are concerned.
+
+Yet our brains have well defined areas that we all (except exceptions) happen
+to share and all in the same place. The information of "the map of the brain"
+must therefore be stored somewhere, and the only place is our DNA. The other
+possibility is that the map is not stored, but there is a physical or
+biological reason that this organization is the only one possible, for
+example if any other configuration results in a deadly biochemical
+reaction... This seems highly unlikely and therefore I would favor the
+genetic hypothesis.
+
+How strange!
+
+----
+
 **Sat Oct 10 12:27:39 PM CEST 2020**
 
 Youtube channel recommendation time! I'm not really big on Youtube, but there
