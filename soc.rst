@@ -6,6 +6,30 @@ Stream of Consciousness
 
 ----
 
+**Wed Nov  4 12:19:36 PM CET 2020**
+
+Somehow I find myself dealing with imperial units a lot lately, so here are
+some tricks to easily compute the (approximate) corresponding SI values:
+
+- Pounds to kg: divide by 2, 100 pounds = 50kg
+
+- Inches to cm: multiply by 5 then divide by 2, 5 inches = 12.5 cm
+
+- Farenheit to Celsius: subtract 32, divide by 2 then add 10%.
+  120°F -> 120-32=88, 88/2=44, 10% of 44 = 4.4, 120°F=48.4°C
+
+- Miles to km: take the next Fibonacci number: 1 1 2 5 8 13 21 34 55 89 144…
+  So for example 80 mph = 130km/h since 8 is followed by 13 in the sequence.
+
+That last trick may sound strange, but it so happens that the conversion
+ratio is very close to the golden ratio φ=1.6180… and the ratio of one
+Fibonacci number to the previous one goes closer to φ as we advance in the
+sequence. It's easy enough to find the first numbers by successively adding
+in your head or on paper and then you've got a conversion table laid before
+you. 90km/h? 55mph. Easy.
+
+----
+
 **Thu Oct 22 09:49:13 PM CEST 2020**
 
 Isn't it strange that we all have (mostly) clearly defined areas of our
