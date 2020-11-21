@@ -6,6 +6,15 @@ Stream of Consciousness
 
 ----
 
+**Sat Nov 21 02:24:05 PM CET 2020**
+
+Note for later: NetGear Orbi passwords are made of two english words in
+lowercase followed by 3 digits. For example bravecream283. If we limit
+ourselves to the 10000 most common english words, that's 10¹¹ possibilities.
+This sounds very much manageable.
+
+----
+
 **Wed Nov  4 12:19:36 PM CET 2020**
 
 Somehow I find myself dealing with imperial units a lot lately, so here are
