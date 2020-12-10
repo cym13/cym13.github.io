@@ -572,10 +572,12 @@ Proper solution: use the CSPRNG from your system
 ------------------------------------------------
 
 Secrets must be generated using cryptographic randomness. On Windows this
-means CryptGenRandom, on Linux getrandom() or /dev/urandom, on unix
+means `RtlGenRandom`_, on Linux getrandom() or /dev/urandom, on unix
 /dev/random. There are libraries that implement a cross-platform wrapper
 correctly such as libsodium (see `sodium
 <https://code.dlang.org/packages/sodium>`_ for D bindings).
+
+.. _RtlGenRandom: https://docs.microsoft.com/en-gb/archive/blogs/michael_howard/cryptographically-secure-random-number-on-windows-without-using-cryptoapi
 
 As a project manager you should consider introducing such a dependency since
 there's no substitute for a good CSPRNG and no CSPRNG can be properly seeded

@@ -514,7 +514,7 @@ no need to wait), API endpoints that are supposed to be unguessable etc.</p>
 <div class="section" id="proper-solution-use-the-csprng-from-your-system">
 <h3>Proper solution: use the CSPRNG from your system</h3>
 <p>Secrets must be generated using cryptographic randomness. On Windows this
-means CryptGenRandom, on Linux getrandom() or /dev/urandom, on unix
+means <a class="reference external" href="https://docs.microsoft.com/en-gb/archive/blogs/michael_howard/cryptographically-secure-random-number-on-windows-without-using-cryptoapi">RtlGenRandom</a>, on Linux getrandom() or /dev/urandom, on unix
 /dev/random. There are libraries that implement a cross-platform wrapper
 correctly such as libsodium (see <a class="reference external" href="https://code.dlang.org/packages/sodium">sodium</a> for D bindings).</p>
 <p>As a project manager you should consider introducing such a dependency since
