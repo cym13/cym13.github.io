@@ -1,4 +1,5 @@
 html {
+    /* Constrat ratio: 11.71 AAA according to WCAG */
     background-color: #222222;
     color: #dddddd;
 }
@@ -9,7 +10,10 @@ body {
 }
 
 a {
-    color: #ff4422;
+    /* Normally we would aim for a contrast ratio over 7 with the background
+     * in accordance with WCAG but none of those give me something orange so
+     * we'll compromise at 5 */
+    color: #ff5522;
 }
 
 li {
