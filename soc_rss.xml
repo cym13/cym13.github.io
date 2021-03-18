@@ -4,9 +4,19 @@
   <title>Breakpoint - Stream of Consciousness</title>
   <description>Stream of Consciousness</description>
   <link>https://breakpoint.purrfect.fr/soc.html</link>
-  <lastBuildDate>Sat, 21 Nov 2020 14:24:05 +0200</lastBuildDate>
-  <pubDate>Sat, 21 Nov 2020 14:24:05 +0200</pubDate>
+  <lastBuildDate>Thu, 18 Mar 2021 19:21:20 +0200</lastBuildDate>
+  <pubDate>Thu, 18 Mar 2021 19:21:20 +0200</pubDate>
   <ttl>7200</ttl>
+      <item>
+        <title>Thu Mar 18 07:21:20 PM CET 2021</title>
+        <description>I was finally able to put some order into bm to fix that horrendous import
+performance and it feels good. Turns out it was as simple as making sure only
+one database commit was performed. Three lines of code for months of
+frustration, I have finally divided by 10 the time required to sync my
+bookmarks.</description>
+        <link>https://breakpoint.purrfect.fr/soc.html</link>
+        <pubDate>Thu, 18 Mar 2021 19:21:20 +0200</pubDate>
+      </item>
       <item>
         <title>Sat Nov 21 02:24:05 PM CET 2020</title>
         <description>Note for later: NetGear Orbi passwords are made of two english words in

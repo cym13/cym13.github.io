@@ -6,6 +6,16 @@ Stream of Consciousness
 
 ----
 
+**Thu Mar 18 07:21:20 PM CET 2021**
+
+I was finally able to put some order into bm to fix that horrendous import
+performance and it feels good. Turns out it was as simple as making sure only
+one database commit was performed. Three lines of code for months of
+frustration, I have finally divided by 10 the time required to sync my
+bookmarks.
+
+----
+
 **Sat Nov 21 02:24:05 PM CET 2020**
 
 Note for later: NetGear Orbi passwords are made of two english words in
