@@ -6,6 +6,15 @@ Stream of Consciousness
 
 ----
 
+**Tue Mar 23 11:13:29 AM CET 2021**
+
+Phishing thought... If I have a target domain that uses sendgrid or similar,
+the DKIM will be ok, the SPF will authorize sendgrid... Could I use my own
+sendgrid account to spoof that domain for phishing mail? I think so. Phishing
+protection is hard.
+
+----
+
 **Thu Mar 18 07:21:20 PM CET 2021**
 
 I was finally able to put some order into bm to fix that horrendous import
