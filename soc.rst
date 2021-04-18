@@ -6,6 +6,13 @@ Stream of Consciousness
 
 ----
 
+**Sun Apr 18 06:14:41 PM CEST 2021**
+
+New 3x3x3 personnal best 17.78s, first ever blind 3x3x3 solve, that is a good
+weekend for speedcubing.
+
+----
+
 **Tue Mar 23 11:13:29 AM CET 2021**
 
 Phishing thought... If I have a target domain that uses sendgrid or similar,
