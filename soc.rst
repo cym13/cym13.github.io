@@ -6,6 +6,20 @@ Stream of Consciousness
 
 ----
 
+**Thu Aug 12 11:14:06 AM CEST 2021**
+
+My programming must read list:
+
+- Structure and Interpretation of Computer Programs
+- Game Programming Design Patterns
+- 500 lines or less
+- Security Engineering
+- Don't Just Roll the Dice
+- Computer Networks by Tanenbaum
+- The Art of Computer Programming
+
+----
+
 **Sun Apr 18 06:14:41 PM CEST 2021**
 
 New 3x3x3 personnal best 17.78s, first ever blind 3x3x3 solve, that is a good
