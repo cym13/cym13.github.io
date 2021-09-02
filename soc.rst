@@ -6,6 +6,24 @@ Stream of Consciousness
 
 ----
 
+**Thu Sep  2 11:25:19 AM CEST 2021**
+
+So, I decided to make good coffee. And I finally did. Peruvian medium roast,
+12g hand-grinded on a Timemore C2 (setting 20), brewed in a French press by
+steeping 4 minutes in 320mL boiling water, breaking the crust, removing the
+foam then letting sit for 5 more minutes.
+
+It was a blast. Light, sweet, tea-like but fuller, sweeter, with strong
+chocolate notes (I know I sound like a snob, but really, chocolate) that came
+stronger as the cup cooled down and the chocolate aftertaste remains in my
+mouth since I finished it an hour ago.
+
+It had no bitterness. In fact it maybe lacked bitterness, so I'm going to
+grind finer until I can get some of that bitterness through, but that's an
+impressive cup of coffee on its own for me.
+
+----
+
 **Thu Aug 12 11:14:06 AM CEST 2021**
 
 My programming must read list:
