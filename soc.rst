@@ -6,6 +6,13 @@ Stream of Consciousness
 
 ----
 
+**Wed Nov 17 01:46:17 PM CET 2021**
+
+Ok, I'm getting the hang of it. Exceptional shave with my new Parker A1R
+razor and Feather blades. I don't think I'm going back, it's just that cool.
+
+----
+
 **Thu Sep  2 11:25:19 AM CEST 2021**
 
 So, I decided to make good coffee. And I finally did. Peruvian medium roast,
