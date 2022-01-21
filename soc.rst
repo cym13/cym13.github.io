@@ -6,6 +6,47 @@ Stream of Consciousness
 
 ----
 
+**Fri Jan 21 11:48:24 AM CET 2022**
+
+I noticed that Emmanuel Macron often has his suit jacket open during public
+speaches. It would be more classical to have it closed, so why is he doing
+that? Maybe it is a play on familiarity: opening the jacket is less formal
+and therefore brings it closer to the people. He may also be hot, as I'm sure
+these meetings are quite intensive although I doubt so little thought is put
+into that as he is known to be very good at controling his image.
+
+I think that the real reason is that the President both likes raising his
+arms and wearing cheap suits as he `publicly advertised
+<https://www.leparisien.fr/paris-75/paris-75002/paris-l-effet-macron-profite-au-tailleur-du-nouveau-president-de-la-republique-16-05-2017-6954936.php>`_
+buying them for no more than 350€. Now there is no issue with this tailor,
+and the president is free to buy whatever he wants, but you get what you pay
+for. These suits are not made entirely to measure and clearly the armscye
+(the hole where the sleeve attaches to the shoulder) is too big for him. This
+means that the sleeve looks fine when he's standing but as soon as he raises
+his arms it takes the hole jacket with it.
+
+.. image:: https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.TzobB_JbHAfGXjQr0AvwIQHaGP%26pid%3DApi&f=1
+
+.. image:: https://www.tpi.it/app/uploads/2018/05/Libia-elezioni.jpg
+
+In political meetings he really likes the power pose of standing with both
+arms raised high, and that would look totally ridiculous with the jacket
+closed as it would be raised up to his nose so he keeps it open to limit the
+visual effect.
+
+.. image:: https://size.blogspirit.net/blog.tdg.ch/jncuenod/560/media/02/01/2937670198.jpg
+
+Sure, there have been a controversy about the price of Fillon's custom suits
+but I think Macron's example shows that there is a practical reason why
+politics of the past went this route: photos are an important medium to
+propagate an image of political figures. Details like this one
+make the difference between passing for a respectable man or a slob, and with
+the president it's the entire country's image that is impacted internationally.
+
+tl;dr: let the people that represent us wear nice things please.
+
+----
+
 **Wed Nov 17 01:46:17 PM CET 2021**
 
 Ok, I'm getting the hang of it. Exceptional shave with my new Parker A1R
