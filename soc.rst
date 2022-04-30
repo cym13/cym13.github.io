@@ -6,6 +6,15 @@ Stream of Consciousness
 
 ----
 
+**Sat Apr 30 06:31:16 PM CEST 2022**
+
+I just had the chance to save a weak bee. Putting a bit of honey in water in
+a plate then bringing the bee to it. It drank a lot then took a 20min nap and
+after some effort was able to fly off back on its feet. It's a good trick to
+know :)
+
+----
+
 **Mon Mar 21 09:54:58 AM CET 2022**
 
 Interesting. Water is important for coffee and my water is shit. Bottled water
