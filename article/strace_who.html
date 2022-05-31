@@ -318,14 +318,14 @@ loggé avec un système utilisant utmp alors il est possible que who ne le
 trouve pas.</p>
 <p>La question se pose donc de savoir si <strong>who</strong> lis d'autres fichiers ou non,
 et lesquels. Facile, juste au-dessus du open() pour /var/run/utmp on trouve :</p>
-<pre class="code C literal-block"><code><span class="n">access</span><span class="p">(</span><span class="s">&quot;/var/run/utmpx&quot;</span><span class="p">,</span> <span class="n">F_OK</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="n">ENOENT</span> <span class="p">(</span><span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span><span class="p">)</span></code></pre>
+<pre class="code C literal-block"><code><span class="n">access</span><span class="p">(</span><span class="s">&quot;/var/run/utmpx&quot;</span><span class="p">,</span> <span class="n">F_OK</span><span class="p">)</span> <span class="o">=</span> <span class="mi">-1</span> <span class="n">ENOENT</span> <span class="p">(</span><span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span><span class="p">)</span></code></pre>
 <p>C'est le seul appel de la sorte et donc le seul fichier non trouvé. Il reste
 possible que who s'arrête simplement au premier fichier qu'il trouve sans
 aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
 <div class="section" id="et-notre-structure-alors">
 <h3>Et notre structure alors ?</h3>
 <p>Tout est là, dans le man de utmp :</p>
-<pre class="code C literal-block"><code><span class="k">struct</span> <span class="n">utmp</span> <span class="p">{</span>
+<pre class="code C literal-block"><code><span class="k">struct</span> <span class="nc">utmp</span> <span class="p">{</span>
     <span class="kt">short</span>   <span class="n">ut_type</span><span class="p">;</span>              <span class="cm">/* Type of record */</span>
     <span class="kt">pid_t</span>   <span class="n">ut_pid</span><span class="p">;</span>               <span class="cm">/* PID of login process */</span>
     <span class="kt">char</span>    <span class="n">ut_line</span><span class="p">[</span><span class="n">UT_LINESIZE</span><span class="p">];</span> <span class="cm">/* Device name of tty - &quot;/dev/&quot; */</span>
@@ -335,7 +335,7 @@ aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
     <span class="kt">char</span>    <span class="n">ut_host</span><span class="p">[</span><span class="n">UT_HOSTSIZE</span><span class="p">];</span> <span class="cm">/* Hostname for remote login, or
                                      kernel version for run-level
                                      messages */</span>
-    <span class="k">struct</span>  <span class="n">exit_status</span> <span class="n">ut_exit</span><span class="p">;</span>  <span class="cm">/* Exit status of a process
+    <span class="k">struct</span>  <span class="nc">exit_status</span> <span class="n">ut_exit</span><span class="p">;</span>  <span class="cm">/* Exit status of a process
                                      marked as DEAD_PROCESS; not
                                      used by Linux init (1 */</span>
     <span class="cm">/* The ut_session and ut_tv fields must be the same size when
@@ -350,7 +350,7 @@ aller plus loin, mais ce n'est pas visible dans notre première expérience.</p>
     <span class="p">}</span> <span class="n">ut_tv</span><span class="p">;</span>                      <span class="cm">/* Time entry was made */</span>
 <span class="cp">#else
 </span>     <span class="kt">long</span>   <span class="n">ut_session</span><span class="p">;</span>           <span class="cm">/* Session ID */</span>
-     <span class="k">struct</span> <span class="n">timeval</span> <span class="n">ut_tv</span><span class="p">;</span>        <span class="cm">/* Time entry was made */</span>
+     <span class="k">struct</span> <span class="nc">timeval</span> <span class="n">ut_tv</span><span class="p">;</span>        <span class="cm">/* Time entry was made */</span>
 <span class="cp">#endif
 </span>
     <span class="kt">int32_t</span> <span class="n">ut_addr_v6</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>        <span class="cm">/* Internet address of remote

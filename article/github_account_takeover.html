@@ -243,7 +243,7 @@ my approach wasn't that good on that one so I must have missed some. Here's
 the dirty script if anyone cares to do better:</p>
 <pre class="code sh literal-block"><code><span class="nv">pkgurl</span><span class="o">=</span><span class="s2">&quot;https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h&quot;</span>
 
-<span class="k">for</span> i in <span class="o">{</span><span class="m">0</span>..48<span class="o">}</span> <span class="p">;</span> <span class="k">do</span>
+<span class="k">for</span> i <span class="k">in</span> <span class="o">{</span><span class="m">0</span>..48<span class="o">}</span> <span class="p">;</span> <span class="k">do</span>
     curl -i -s -k -X  <span class="s1">'GET'</span>                              <span class="se">\
 </span>      <span class="s2">&quot;https://aur.archlinux.org/packages/?O=</span><span class="k">$((</span>i*250<span class="k">))</span><span class="s2">&quot;</span> <span class="se">\
 </span>      <span class="s2">&quot;&amp;SeB=nd&amp;K=-git&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=1000&amp;do_Search=Go&quot;</span>
