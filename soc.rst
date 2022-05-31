@@ -6,6 +6,15 @@ Stream of Consciousness
 
 ----
 
+**Tue May 31 10:38:46 PM CEST 2022**
+
+It's been a long time since I last posted articles and I'm very glad to be
+back with the Dusty Files series. Hopefully this look on the past will also
+reveal new interesting opportunities! We're starting with a rather short case
+but more is to come!
+
+----
+
 **Sat Apr 30 06:31:16 PM CEST 2022**
 
 I just had the chance to save a weak bee. Putting a bit of honey in water in
