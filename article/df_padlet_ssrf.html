@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8"/>
+<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+<title>Breakpoint: Dusty File: Padlet Server-Side Request Forgery</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
+
+    <link rel="icon" href="../image/favicon.ico" type="image/x-icon"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+    <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+
+        <ul>
+          <li>
+              <a href="../index.html">Index</a>
+              <a href="../rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a>
+              <a href="../soc_rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="section" id="dusty-file-padlet-server-side-request-forgery">
+<h1>Dusty File: Padlet Server-Side Request Forgery</h1>
+<p><em>This article is part of the Dusty Files series. It does not tackle a current
+security issue but an old case that is old enough to become publicly
+available.</em></p>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>I was browsing my bugbounty and other research related files recently and
+noticed several of them that I think should be made public and may be of
+interest to some readers. This is the purpose of that series: the Dusty
+Files. I'm not sure yet how many I'll include but hopefully it'll prove
+fun, and to kick it off I'd like to come back two years ago during the
+Covid-19 pandemic.</p>
+<p>France, like many countries, was in full lockdown. The situation wasn't ideal
+for many professions that aren't normally performed remotely, like teaching
+in an elementary school. A teacher I know was explaining the new software
+they were testing to organize communications with their classroom: Padlet.</p>
+<p><a class="reference external" href="https://padlet.com">Padlet.com</a> allows its users to create multimedia
+dashboards with a sticker note mindset and to open these dashboards to
+collaboration. I decided to have a look as I was sure the website would grow
+in popularity over the pandemic. This allowed me to find a nice Server-Side
+Request Forgery which is thankfully fixed.</p>
+</div>
+<div class="section" id="the-vulnerability">
+<h2>The vulnerability</h2>
+<p>While reviewing padlet.com I noticed that a preview image is generated for
+any resource posted on the website through this url:</p>
+<blockquote>
+<p><a class="reference external" href="https://padlet.com/static/v1/api/links?url=http://example.com">https://padlet.com/static/v1/api/links?url=http://example.com</a></p>
+</blockquote>
+<p>Following the trail of that feature I identified that the API that fetches
+the URL and generates a preview is at the following URL:</p>
+<blockquote>
+<p><a class="reference external" href="https://media.padletcdn.com/15/render/cropped_0,format_png/http%3A%2F%2example.com">https://media.padletcdn.com/15/render/cropped_0,format_png/http%3A%2F%2example.com</a></p>
+</blockquote>
+<p>Such feature is interesting because the website fetches content based on a
+user-provided URL. This is the basis of a Server-Side Request Forgery (SSRF).</p>
+<p>A Server-Side Request Forgery (SSRF) vulnerability happens when an attacker
+is able to get a server to perform web requests on his behalf. This can be
+exploited in a variety of ways, from discovering internal addresses and
+services to exfiltrating information as we will see.</p>
+<p>Now, in our case there are some limitations in place, in particular it is not
+possible to pass an IP address to that API, only a domain name. No problem:
+we'll just use a domain that resolves to the internal IP address we're
+interseted in. To do that we can use services such as nip.io that generate a
+dynamic DNS name for any ip address. That way we can fetch localhost:</p>
+<blockquote>
+<p><a class="reference external" href="https://media.padletcdn.com/15/render/cropped_0,format_png/http%3A%2F%2F127.0.0.1.nip.io">https://media.padletcdn.com/15/render/cropped_0,format_png/http%3A%2F%2F127.0.0.1.nip.io</a></p>
+</blockquote>
+<div class="figure">
+<img alt="../image/padlet_localhost.png" src="../image/padlet_localhost.png" style="width: 40%;" />
+<p class="caption">Main page of localhost generated by the service</p>
+</div>
+<p>Yes, that's the 9th Symphony from Beethoven. Why? Why not?</p>
+<img alt="../image/octavia_rocking_out.png" src="../image/octavia_rocking_out.png" style="width: 40%;" />
+<p>Anyway, by making the server contact a server that I own I identified its
+external IP address (37.71.215.132). This address range is related to
+Google's cloud platform. This cloud has a metadata service at a fixed domain
+name which is only available internally (metadata.google.internal). I
+therefore asked this service for the server's configuration.</p>
+<p>Normally a special header is necessary to access this server in order to
+block this attack. However that's only for the v1 API, the v1beta1 API on the
+other hand happily responds with our information:</p>
+<p><a class="reference external" href="https://media.padletcdn.com/15/render/cropped_0,format_png/http%3A%2F%2Fmetadata.google.internal%2FcomputeMetadata%2Fv1beta1%2Finstance?alt=json&amp;recursive=true">https://media.padletcdn.com/15/render/cropped_0,format_png/
+http%3A%2F%2Fmetadata.google.internal%2FcomputeMetadata%2Fv1beta1%2Finstance?alt=json&amp;recursive=true</a></p>
+<div class="figure">
+<img alt="../image/padlet_config.png" src="../image/padlet_config.png" style="width: 100%;" />
+<p class="caption">Cloud configuration</p>
+</div>
+<p>Knowing the internal IP range it was then possible to start scanning it to
+find other hosts, always using our SSRF and nip.io.</p>
+<pre class="code bash literal-block"><code><span class="c1"># Note: fake internal IP address
+</span><span class="nv">base_url</span><span class="o">=</span><span class="s2">&quot;https://media.padletcdn.com/15/render/cropped_0,format_png/&quot;</span>
+wget <span class="s2">&quot;</span><span class="nv">$base_url</span><span class="s2">&quot;</span>/http%3A%2F%2F10.0.0.<span class="si">${</span><span class="nv">1</span><span class="p">..255</span><span class="si">}</span>.nip.io</code></pre>
+<p>I found 30 seperate hosts that way on the same range as that server. Of
+course the exact number is of little significance as the cloud probably
+dynamically starts and stops new instances all the time.</p>
+<p>All theses hosts presented the same Beethoven piece as localhost so I believe
+them to be copies of the same instance.</p>
+</div>
+<div class="section" id="remediation">
+<h2>Remediation</h2>
+<p>Server-Side Request Forgery remediation requires validation of user inputs.
+However that is hard to do well, so the main recommendation in such case is
+to resolve the domain name down to an IPv6 address and only then check that
+this address is not internal before retrieving any content.</p>
+<p>Furthermore retrieving the content should ideally be done using the already
+resolved IP address. Otherwise it would still be possible to attack the
+vulnerability through DNS rebinding:</p>
+<ul class="simple">
+<li><p>The attacker asks for <a class="reference external" href="http://malicio.us">http://malicio.us</a> which is a domain he controls that
+has a very short TTL to ensure that it is not cached and must be resolved
+every time.</p></li>
+<li><p>media.padletcdn.com resolves that domain. It points to an external IP
+address.</p></li>
+<li><p>The attacker changes malicio.us IP address to 127.0.0.1 (for example)</p></li>
+<li><p>media.padletcdn.com retrieves the content to make a preview image. Due to
+the short TTL it is forced to resolve the domain again and that resolves to
+127.0.0.1 which is internal.</p></li>
+<li><p>The attacker gets a preview of the internal IP address.</p></li>
+</ul>
+<p>To avoid that I recommended Padlet to ensure that media.padletcdn.com uses a
+local DNS which has a minimum TTL of at least 1 minute. That way the domain
+will never be resolved twice for the same request. Did they do it? I don't
+know. I quickly checked the URLs shown above and the issue seems fixed,
+that's all I know.</p>
+</div>
+<div class="section" id="timeline">
+<h2>Timeline</h2>
+<ul class="simple">
+<li><p>SSRF found on 2020-03-28</p></li>
+<li><p>SSRF reported on 2020-03-28</p></li>
+<li><p>SSRF fixed during the following month</p></li>
+</ul>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Whenever the web application is the one doing a web request there is a
+potential for SSRF and this was a cool example of how such SSRF can be
+exploited in the special case of Google's cloud. I hope it was entertaining!</p>
+<hr class="docutils" />
+<div class="section" id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.deviantart.com/davidsfire/art/Octavia-Rocking-out-vector-561038579">https://www.deviantart.com/davidsfire/art/Octavia-Rocking-out-vector-561038579</a></p></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>
