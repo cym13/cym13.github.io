@@ -3,15 +3,23 @@ Welcome!
 ========
 
 This blog is about software security, cryptography, software engineering,
-ponies and whatever lies in between.
+ponies and whatever lies in between. If you're unsure what to read, start
+with the starred articles!
 
 Recent articles
 ===============
 
+May 2022
+--------
+
+`Dusty File: Padlet Server-Side Request Forgery <article/df_padlet_ssrf.html>`_
+    First installment of the Dusty Files series, we look at the discovery and
+    exploitation of a SSRF in Padlet.
+
 August 2020
 -----------
 
-`Cracking Phobos UUID <article/cracking_phobos_uuid.html>`_
+`★ Cracking Phobos UUID <article/cracking_phobos_uuid.html>`_
     The standard D library provides a random UUID implementation that relies
     on regular pseudo-number generation and is not cryptographically secure.
     We show how this can be exploited in practice to predict future UUIDs.
@@ -31,7 +39,7 @@ June 2020
 December 2019
 -------------
 
-`HPLIP Privilege Escalation <article/hplip_privesc.html>`_
+`★ HPLIP Privilege Escalation <article/hplip_privesc.html>`_
     Study of a file-based privilege escalation in HPLIP. Writable directories
     are still a liability!
 
@@ -58,7 +66,7 @@ March 2019
 June 2018
 ---------
 
-`Breaking dependencies with Github account takeover <article/github_account_takeover.html>`_
+`★ Breaking dependencies with Github account takeover <article/github_account_takeover.html>`_
     Let's raise Github projects back from the dead to take control of
     hundreds of Dub, Go and AUR packages!
 
@@ -113,12 +121,12 @@ May 2017
 April 2017
 ----------
 
-`Why we need authenticated cryptography <article/demo_bank.html>`_
+`★ Why we need authenticated cryptography <article/demo_bank.html>`_
     Simple demonstration of how an attacker could tamper with an encrypted
     message to his benefit without ever decrypting it in the absence of
     message authentication.
 
-`Weaponizing Excel Webservice <article/excel_webservice.html>`_
+`★ Weaponizing Excel Webservice <article/excel_webservice.html>`_
     Excel formula injections are common in programs generating XLS files, but
     often considered harmless. This discusses a new technique that greatly
     improve the Red Team situation.
