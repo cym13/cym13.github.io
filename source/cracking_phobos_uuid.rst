@@ -29,6 +29,10 @@ tl;dr for busy people
   to be secret. Otherwise change for a token built from cryptographically
   secure randomness.
 
+- **I since learned that this is a port of Boost's UUID implementation and it
+  seems that anything explained in this article will be applicable there as
+  well.**
+
 Context
 =======
 

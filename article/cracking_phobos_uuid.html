@@ -70,6 +70,9 @@ provide it in a standard way.</p></li>
 <li><p>If your project uses <strong>randomUUID()</strong>, make sure its value isn't supposed
 to be secret. Otherwise change for a token built from cryptographically
 secure randomness.</p></li>
+<li><p><strong>I since learned that this is a port of Boost's UUID implementation and it
+seems that anything explained in this article will be applicable there as
+well.</strong></p></li>
 </ul>
 </div>
 <div class="section" id="context">
@@ -168,36 +171,36 @@ randomness is used.</p>
 <h3>Phobos implementation</h3>
 <p>Phobos' <strong>randomUUID()</strong> follows these lines perfectly, using non-secure
 randomness.</p>
-<pre class="code java literal-block"><code><span class="n">UUID</span> <span class="nf">randomUUID</span><span class="p">(</span><span class="n">RNG</span><span class="p">)(</span><span class="n">ref</span> <span class="n">RNG</span> <span class="n">randomGen</span><span class="p">)</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">isInputRange</span><span class="o">!</span><span class="n">RNG</span> <span class="o">&amp;&amp;</span> <span class="n">isIntegral</span><span class="o">!</span><span class="p">(</span><span class="n">ElementType</span><span class="o">!</span><span class="n">RNG</span><span class="p">))</span>
-<span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.random</span> <span class="p">:</span> <span class="n">isUniformRNG</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="nf">assert</span><span class="p">(</span><span class="n">isUniformRNG</span><span class="o">!</span><span class="n">RNG</span><span class="p">,</span> <span class="s">&quot;randomGen must be a uniform RNG&quot;</span><span class="p">);</span>
+<pre class="code java literal-block"><code><span class="n">UUID</span><span class="w"> </span><span class="nf">randomUUID</span><span class="p">(</span><span class="n">RNG</span><span class="p">)(</span><span class="n">ref</span><span class="w"> </span><span class="n">RNG</span><span class="w"> </span><span class="n">randomGen</span><span class="p">)</span><span class="w">
+</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isInputRange</span><span class="o">!</span><span class="n">RNG</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isIntegral</span><span class="o">!</span><span class="p">(</span><span class="n">ElementType</span><span class="o">!</span><span class="n">RNG</span><span class="p">))</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">isUniformRNG</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="nf">assert</span><span class="p">(</span><span class="n">isUniformRNG</span><span class="o">!</span><span class="n">RNG</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;randomGen must be a uniform RNG&quot;</span><span class="p">);</span><span class="w">
 
-    <span class="n">alias</span> <span class="n">E</span> <span class="o">=</span> <span class="n">ElementEncodingType</span><span class="o">!</span><span class="n">RNG</span><span class="p">;</span>
-    <span class="kd">enum</span> <span class="n">size_t</span> <span class="n">elemSize</span> <span class="o">=</span> <span class="n">E</span><span class="p">.</span><span class="na">sizeof</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="nf">assert</span><span class="p">(</span><span class="n">elemSize</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">);</span>
-    <span class="kd">static</span> <span class="nf">assert</span><span class="p">(</span><span class="mi">16</span> <span class="o">%</span> <span class="n">elemSize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+    </span><span class="n">alias</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ElementEncodingType</span><span class="o">!</span><span class="n">RNG</span><span class="p">;</span><span class="w">
+    </span><span class="kd">enum</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">elemSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">.</span><span class="na">sizeof</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="nf">assert</span><span class="p">(</span><span class="n">elemSize</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="nf">assert</span><span class="p">(</span><span class="mi">16</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">elemSize</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">
 
-    <span class="n">UUID</span> <span class="n">u</span><span class="p">;</span>
-    <span class="n">foreach</span> <span class="p">(</span><span class="n">ref</span> <span class="n">E</span> <span class="n">e</span> <span class="p">;</span> <span class="n">u</span><span class="p">.</span><span class="na">asArrayOf</span><span class="o">!</span><span class="n">E</span><span class="p">())</span>
-    <span class="p">{</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">randomGen</span><span class="p">.</span><span class="na">front</span><span class="p">;</span>
-        <span class="n">randomGen</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span>
-    <span class="p">}</span>
+    </span><span class="n">UUID</span><span class="w"> </span><span class="n">u</span><span class="p">;</span><span class="w">
+    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">ref</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="na">asArrayOf</span><span class="o">!</span><span class="n">E</span><span class="p">())</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randomGen</span><span class="p">.</span><span class="na">front</span><span class="p">;</span><span class="w">
+        </span><span class="n">randomGen</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="c1">//set variant
-</span>    <span class="c1">//must be 0b10xxxxxx
-</span>    <span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span> <span class="o">&amp;=</span> <span class="mb">0b10111111</span><span class="p">;</span>
-    <span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span> <span class="o">|=</span> <span class="mb">0b10000000</span><span class="p">;</span>
+    </span><span class="c1">//set variant</span><span class="w">
+    </span><span class="c1">//must be 0b10xxxxxx</span><span class="w">
+    </span><span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mb">0b10111111</span><span class="p">;</span><span class="w">
+    </span><span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b10000000</span><span class="p">;</span><span class="w">
 
-    <span class="c1">//set version
-</span>    <span class="c1">//must be 0b0100xxxx
-</span>    <span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span> <span class="o">&amp;=</span> <span class="mb">0b01001111</span><span class="p">;</span>
-    <span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span> <span class="o">|=</span> <span class="mb">0b01000000</span><span class="p">;</span>
+    </span><span class="c1">//set version</span><span class="w">
+    </span><span class="c1">//must be 0b0100xxxx</span><span class="w">
+    </span><span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mb">0b01001111</span><span class="p">;</span><span class="w">
+    </span><span class="n">u</span><span class="p">.</span><span class="na">data</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b01000000</span><span class="p">;</span><span class="w">
 
-    <span class="k">return</span> <span class="n">u</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>It generates 4 32-bit uint values using the default random number generator
 of std.random: MT19937. If that PRNG's state is too small, it falls back on
 Xorshift192 (<a class="reference external" href="https://github.com/dlang/phobos/blob/v2.093.0/std/uuid.d#L1200">code here</a>).</p>
@@ -265,44 +268,44 @@ corresponding state value. And if we're able to do it once, we can do it for
 we never need to worry about the updating (orange) process in that scenario.</p>
 <img alt="../image/mt19937_2.png" src="../image/mt19937_2.png" style="width: 70%;" />
 <p>In code, this gives:</p>
-<pre class="code java literal-block"><code><span class="n">uint</span> <span class="nf">scramble</span><span class="p">(</span><span class="n">uint</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">immutable</span> <span class="n">b</span> <span class="o">=</span> <span class="mh">0x9d2c5680</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0xefc60000</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="n">uint</span><span class="w"> </span><span class="nf">scramble</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x9d2c5680</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xefc60000</span><span class="p">;</span><span class="w">
 
-    <span class="n">z</span> <span class="o">^=</span>  <span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">;</span>
-    <span class="n">z</span> <span class="o">^=</span> <span class="p">(</span><span class="n">z</span> <span class="o">&lt;&lt;</span>  <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">b</span><span class="p">;</span>
-    <span class="n">z</span> <span class="o">^=</span> <span class="p">(</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">c</span><span class="p">;</span>
-    <span class="n">z</span> <span class="o">^=</span> <span class="p">(</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">z</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w">  </span><span class="n">z</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">11</span><span class="p">;</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w">  </span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">z</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Sliding things left and right... Let's just slide the other way around (with
 a twist to account for overlaps).</p>
-<pre class="code java literal-block"><code><span class="n">uint</span> <span class="nf">unscramble</span><span class="p">(</span><span class="n">uint</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">immutable</span> <span class="n">b</span> <span class="o">=</span> <span class="mh">0x9d2c5680</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0xefc60000</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="n">uint</span><span class="w"> </span><span class="nf">unscramble</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x9d2c5680</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xefc60000</span><span class="p">;</span><span class="w">
 
-    <span class="n">z</span> <span class="o">^=</span> <span class="p">(</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">);</span>
-    <span class="n">z</span> <span class="o">^=</span> <span class="p">(</span><span class="n">z</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">c</span><span class="p">;</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">undoLshiftXorMask</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span> <span class="c1">// The twist
-</span>    <span class="n">z</span> <span class="o">^=</span> <span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">;</span>
-    <span class="n">z</span> <span class="o">^=</span> <span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">22</span><span class="p">;</span>
-    <span class="k">return</span> <span class="n">z</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">undoLshiftXorMask</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"> </span><span class="c1">// The twist</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">11</span><span class="p">;</span><span class="w">
+    </span><span class="n">z</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">22</span><span class="p">;</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">z</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="n">uint</span> <span class="nf">undoLshiftXorMask</span><span class="p">(</span><span class="n">uint</span> <span class="n">v</span><span class="p">,</span> <span class="n">uint</span> <span class="n">shift</span><span class="p">,</span> <span class="n">uint</span> <span class="n">mask</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">uint</span> <span class="nf">bits</span><span class="p">(</span><span class="n">uint</span> <span class="n">v</span><span class="p">,</span> <span class="n">uint</span> <span class="n">start</span><span class="p">,</span> <span class="n">uint</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">v</span> <span class="o">&gt;&gt;</span> <span class="n">start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">size</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
+</span><span class="n">uint</span><span class="w"> </span><span class="nf">undoLshiftXorMask</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">shift</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">mask</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">uint</span><span class="w"> </span><span class="nf">bits</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">((</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">foreach</span> <span class="p">(</span><span class="n">i</span> <span class="p">;</span> <span class="n">iota</span><span class="p">(</span><span class="n">shift</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">shift</span><span class="p">))</span>
-        <span class="n">v</span> <span class="o">^=</span> <span class="p">(</span><span class="n">bits</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="n">shift</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">bits</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">shift</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">;</span>
-    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">iota</span><span class="p">(</span><span class="n">shift</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="n">shift</span><span class="p">))</span><span class="w">
+        </span><span class="n">v</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="n">bits</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="o">-</span><span class="n">shift</span><span class="p">,</span><span class="w"> </span><span class="n">shift</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bits</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">shift</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">v</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="n">unittest</span> <span class="p">{</span>
-    <span class="n">uint</span> <span class="n">z</span> <span class="o">=</span> <span class="mh">0x12345678</span><span class="p">;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="n">unscramble</span><span class="p">(</span><span class="n">scramble</span><span class="p">(</span><span class="n">z</span><span class="p">)));</span>
-<span class="p">}</span></code></pre>
+</span><span class="n">unittest</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x12345678</span><span class="p">;</span><span class="w">
+    </span><span class="k">assert</span><span class="p">(</span><span class="n">z</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">unscramble</span><span class="p">(</span><span class="n">scramble</span><span class="p">(</span><span class="n">z</span><span class="p">)));</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>And just like that, the first hurdle is behind us. Easy. All we need to do to
 predict all future numbers is to collect 624 consecutive numbers, unscramble
 them and use them to seed our own MersenneTwisterEngine. But that is not our
@@ -324,47 +327,47 @@ so if we know the right 3 state values we can predict one next state.</p>
 <p>That part is not actually difficult since we just need to follow exactly what
 the algorithm normally does. We just need to unscramble/rescramble our raw
 output value.</p>
-<pre class="code java literal-block"><code><span class="n">uint</span> <span class="nf">predictNumber</span><span class="p">(</span><span class="n">uint</span> <span class="n">index</span><span class="p">,</span> <span class="n">uint</span> <span class="n">next</span><span class="p">,</span> <span class="n">uint</span> <span class="n">conj</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">immutable</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">624</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">397</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">a</span> <span class="o">=</span> <span class="mh">0x9908b0df</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="n">uint</span><span class="w"> </span><span class="nf">predictNumber</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="n">conj</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">624</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">397</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x9908b0df</span><span class="p">;</span><span class="w">
 
-    <span class="n">uint</span> <span class="n">lowerMask</span> <span class="o">=</span> <span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="mi">1</span><span class="n">u</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// All bits but the MSB
-</span>    <span class="n">uint</span> <span class="n">upperMask</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">lowerMask</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">uint</span><span class="p">.</span><span class="na">max</span><span class="p">;</span>   <span class="c1">// Most Significant Bit
-</span>
-    <span class="n">uint</span> <span class="n">q</span> <span class="o">=</span> <span class="n">unscramble</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">upperMask</span><span class="p">;</span>
-    <span class="n">uint</span> <span class="n">p</span> <span class="o">=</span> <span class="n">unscramble</span><span class="p">(</span><span class="n">next</span><span class="p">)</span>  <span class="o">&amp;</span> <span class="n">lowerMask</span><span class="p">;</span>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">lowerMask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="mi">1</span><span class="n">u</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">31</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="c1">// All bits but the MSB</span><span class="w">
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">upperMask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">lowerMask</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">uint</span><span class="p">.</span><span class="na">max</span><span class="p">;</span><span class="w">   </span><span class="c1">// Most Significant Bit</span><span class="w">
 
-    <span class="n">uint</span> <span class="n">y</span> <span class="o">=</span> <span class="n">q</span> <span class="o">|</span> <span class="n">p</span><span class="p">;</span>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unscramble</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">upperMask</span><span class="p">;</span><span class="w">
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unscramble</span><span class="p">(</span><span class="n">next</span><span class="p">)</span><span class="w">  </span><span class="o">&amp;</span><span class="w"> </span><span class="n">lowerMask</span><span class="p">;</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">y</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">^=</span> <span class="n">a</span><span class="p">;</span>
-    <span class="n">x</span> <span class="o">^=</span> <span class="n">unscramble</span><span class="p">(</span><span class="n">conj</span><span class="p">);</span>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w">
 
-    <span class="k">return</span> <span class="n">scramble</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
-<span class="p">}</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">
+        </span><span class="n">x</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w">
+    </span><span class="n">x</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">unscramble</span><span class="p">(</span><span class="n">conj</span><span class="p">);</span><span class="w">
 
-<span class="n">unittest</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">;</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">scramble</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">prng</span> <span class="o">=</span> <span class="n">Mt19937</span><span class="p">(</span><span class="n">unpredictableSeed</span><span class="p">());</span>
+</span><span class="n">unittest</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">;</span><span class="w">
 
-    <span class="n">immutable</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">624</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">397</span><span class="p">;</span>
-    <span class="n">immutable</span> <span class="n">a</span> <span class="o">=</span> <span class="mh">0x9908b0df</span><span class="p">;</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">prng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mt19937</span><span class="p">(</span><span class="n">unpredictableSeed</span><span class="p">());</span><span class="w">
 
-    <span class="n">uint</span><span class="o">[]</span> <span class="n">rawOutput</span> <span class="o">=</span> <span class="n">prng</span><span class="p">.</span><span class="na">take</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="na">array</span><span class="p">;</span>
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">624</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">397</span><span class="p">;</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x9908b0df</span><span class="p">;</span><span class="w">
 
-    <span class="n">uint</span> <span class="n">index</span>  <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-    <span class="n">uint</span> <span class="n">target</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span>
+    </span><span class="n">uint</span><span class="o">[]</span><span class="w"> </span><span class="n">rawOutput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prng</span><span class="p">.</span><span class="na">take</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="na">array</span><span class="p">;</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">prediction</span> <span class="o">=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">,</span>      <span class="c1">// index
-</span>                                    <span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span>    <span class="c1">// next
-</span>                                    <span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span> <span class="c1">// conjugate
-</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">rawOutput</span><span class="o">[</span><span class="n">target</span><span class="o">]</span> <span class="o">==</span> <span class="n">prediction</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">index</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">prediction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">,</span><span class="w">      </span><span class="c1">// index</span><span class="w">
+                                    </span><span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w">    </span><span class="c1">// next</span><span class="w">
+                                    </span><span class="n">rawOutput</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span><span class="w"> </span><span class="c1">// conjugate</span><span class="w">
+
+    </span><span class="k">assert</span><span class="p">(</span><span class="n">rawOutput</span><span class="o">[</span><span class="n">target</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">prediction</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Alright, so we can read only 3 values which allows us to predict the next
 value &quot;index&quot; will have, so 624 outputs later. Now, let's move to the meat of
 the challenge: can we still do this efficiently when we start removing bits
@@ -416,78 +419,78 @@ course visualizing data as bits is also a good idea.</em></p>
 </blockquote>
 <p>And so finally here is the code allowing us to predict UUIDs from a list of
 UUID outputs.</p>
-<pre class="code java literal-block"><code><span class="n">auto</span> <span class="nf">predictUuid</span><span class="p">(</span><span class="n">UUID</span><span class="o">[]</span> <span class="n">uuidLst</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">uuidIndex</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">uint</span><span class="o">[]</span> <span class="n">data</span> <span class="o">=</span> <span class="n">uuidLst</span><span class="p">.</span><span class="na">map</span><span class="o">!</span><span class="n">uuidToUints</span><span class="p">.</span><span class="na">join</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="n">auto</span><span class="w"> </span><span class="nf">predictUuid</span><span class="p">(</span><span class="n">UUID</span><span class="o">[]</span><span class="w"> </span><span class="n">uuidLst</span><span class="p">,</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">uuidIndex</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">uint</span><span class="o">[]</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uuidLst</span><span class="p">.</span><span class="na">map</span><span class="o">!</span><span class="n">uuidToUints</span><span class="p">.</span><span class="na">join</span><span class="p">;</span><span class="w">
 
-    <span class="n">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="n">uuidIndex</span> <span class="o">*</span> <span class="mi">8</span><span class="p">;</span>
+    </span><span class="n">size_t</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uuidIndex</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w">
 
-    <span class="n">uint</span><span class="o">[]</span> <span class="n">part0</span><span class="p">;</span>
-    <span class="n">foreach</span> <span class="p">(</span><span class="n">mask1</span> <span class="p">;</span> <span class="mf">0..16</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">c</span> <span class="o">=</span> <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">;</span>
+    </span><span class="n">uint</span><span class="o">[]</span><span class="w"> </span><span class="n">part0</span><span class="p">;</span><span class="w">
+    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">mask1</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="mf">0..16</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">;</span><span class="w">
 
-        <span class="n">c</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="mi">15</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">);</span>
-        <span class="n">c</span> <span class="o">|=</span> <span class="n">mask1</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">;</span>
+        </span><span class="n">c</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">15</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">);</span><span class="w">
+        </span><span class="n">c</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">mask1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">;</span><span class="w">
 
-        <span class="n">foreach</span> <span class="p">(</span><span class="n">mask2</span> <span class="p">;</span> <span class="mf">0..16</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">uint</span> <span class="n">n</span>  <span class="o">=</span> <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+        </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">mask2</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="mf">0..16</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">uint</span><span class="w"> </span><span class="n">n</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span><span class="w">
 
-            <span class="n">n</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="mi">15</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">);</span>
-            <span class="n">n</span> <span class="o">|=</span> <span class="n">mask2</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">;</span>
+            </span><span class="n">n</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">15</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">);</span><span class="w">
+            </span><span class="n">n</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">mask2</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="mi">12</span><span class="p">;</span><span class="w">
 
-            <span class="n">part0</span> <span class="o">~=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+            </span><span class="n">part0</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">);</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">uint</span><span class="o">[]</span> <span class="n">part1</span><span class="p">;</span>
-    <span class="n">foreach</span> <span class="p">(</span><span class="n">mask1</span> <span class="p">;</span> <span class="mf">0..4</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">n</span> <span class="o">=</span> <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
+    </span><span class="n">uint</span><span class="o">[]</span><span class="w"> </span><span class="n">part1</span><span class="p">;</span><span class="w">
+    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">mask1</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="mf">0..4</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span><span class="w">
 
-        <span class="n">n</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">);</span>
-        <span class="n">n</span> <span class="o">|=</span> <span class="n">mask1</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">;</span>
+        </span><span class="n">n</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w">
+        </span><span class="n">n</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">mask1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w">
 
-        <span class="n">foreach</span> <span class="p">(</span><span class="n">mask2</span> <span class="p">;</span> <span class="mf">0..4</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">uint</span> <span class="n">c</span> <span class="o">=</span> <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">;</span>
+        </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">mask2</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="mf">0..4</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">uint</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">;</span><span class="w">
 
-            <span class="n">c</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">);</span>
-            <span class="n">c</span> <span class="o">|=</span> <span class="n">mask2</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">;</span>
+            </span><span class="n">c</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w">
+            </span><span class="n">c</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">mask2</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w">
 
-            <span class="n">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
-            <span class="n">part1</span> <span class="o">~=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+            </span><span class="n">uint</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span><span class="w">
+            </span><span class="n">part1</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">);</span><span class="w">
 
-            <span class="n">i</span> <span class="o">^=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">;</span>
-            <span class="n">part1</span> <span class="o">~=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+            </span><span class="n">i</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">31</span><span class="p">;</span><span class="w">
+            </span><span class="n">part1</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">);</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">uint</span> <span class="n">part2</span> <span class="o">=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">]</span><span class="p">,</span>
-                               <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span>
-                               <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">part2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">]</span><span class="p">,</span><span class="w">
+                               </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w">
+                               </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">2</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span><span class="w">
 
-    <span class="n">uint</span> <span class="n">part3</span> <span class="o">=</span> <span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">]</span><span class="p">,</span>
-                               <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span>
-                               <span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span>
+    </span><span class="n">uint</span><span class="w"> </span><span class="n">part3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">predictNumber</span><span class="p">(</span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">]</span><span class="p">,</span><span class="w">
+                               </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span><span class="p">,</span><span class="w">
+                               </span><span class="n">data</span><span class="o">[</span><span class="n">index</span><span class="o">+</span><span class="mi">3</span><span class="o">+</span><span class="mi">397</span><span class="o">]</span><span class="p">);</span><span class="w">
 
-    <span class="n">UUID</span><span class="o">[]</span> <span class="n">candidates</span><span class="p">;</span>
-    <span class="n">foreach</span> <span class="p">(</span><span class="n">p0</span> <span class="p">;</span> <span class="n">part0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">foreach</span> <span class="p">(</span><span class="n">p1</span> <span class="p">;</span> <span class="n">part1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">ubyte</span><span class="o">[</span><span class="mi">16</span><span class="o">]</span> <span class="n">candidate</span><span class="p">;</span>
-            <span class="n">candidate</span><span class="o">[</span> <span class="mi">0</span> <span class="p">..</span>  <span class="mi">4</span><span class="o">]</span> <span class="o">=</span> <span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">p0</span><span class="p">);</span>
-            <span class="n">candidate</span><span class="o">[</span> <span class="mi">4</span> <span class="p">..</span>  <span class="mi">8</span><span class="o">]</span> <span class="o">=</span> <span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">p1</span><span class="p">);</span>
-            <span class="n">candidate</span><span class="o">[</span> <span class="mi">8</span> <span class="p">..</span> <span class="mi">12</span><span class="o">]</span> <span class="o">=</span> <span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">part2</span><span class="p">);</span>
-            <span class="n">candidate</span><span class="o">[</span><span class="mi">12</span> <span class="p">..</span> <span class="mi">16</span><span class="o">]</span> <span class="o">=</span> <span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">part3</span><span class="p">);</span>
+    </span><span class="n">UUID</span><span class="o">[]</span><span class="w"> </span><span class="n">candidates</span><span class="p">;</span><span class="w">
+    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">p0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">part0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">part1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">ubyte</span><span class="o">[</span><span class="mi">16</span><span class="o">]</span><span class="w"> </span><span class="n">candidate</span><span class="p">;</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">..</span><span class="w">  </span><span class="mi">4</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">p0</span><span class="p">);</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="p">..</span><span class="w">  </span><span class="mi">8</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">p1</span><span class="p">);</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="mi">12</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">part2</span><span class="p">);</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="mi">12</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="mi">16</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nativeToLittleEndian</span><span class="p">(</span><span class="n">part3</span><span class="p">);</span><span class="w">
 
-            <span class="n">candidate</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span> <span class="o">&amp;=</span> <span class="mb">0b10111111</span><span class="p">;</span>
-            <span class="n">candidate</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span> <span class="o">|=</span> <span class="mb">0b10000000</span><span class="p">;</span>
+            </span><span class="n">candidate</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mb">0b10111111</span><span class="p">;</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="mi">8</span><span class="o">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b10000000</span><span class="p">;</span><span class="w">
 
-            <span class="n">candidate</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span> <span class="o">&amp;=</span> <span class="mb">0b01001111</span><span class="p">;</span>
-            <span class="n">candidate</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span> <span class="o">|=</span> <span class="mb">0b01000000</span><span class="p">;</span>
+            </span><span class="n">candidate</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mb">0b01001111</span><span class="p">;</span><span class="w">
+            </span><span class="n">candidate</span><span class="o">[</span><span class="mi">6</span><span class="o">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b01000000</span><span class="p">;</span><span class="w">
 
-            <span class="n">candidates</span> <span class="o">~=</span> <span class="n">UUID</span><span class="p">(</span><span class="n">candidate</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+            </span><span class="n">candidates</span><span class="w"> </span><span class="o">~=</span><span class="w"> </span><span class="n">UUID</span><span class="p">(</span><span class="n">candidate</span><span class="p">);</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">candidates</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">candidates</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>I considered demonstrating this on a real project, finding one is easy
 enough, but that would be a disservice to that project. I do not wish to draw
 attention and possibly malicious actors to any particular project. However I
