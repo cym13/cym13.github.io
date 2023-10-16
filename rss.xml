@@ -4,9 +4,17 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://breakpoint.purrfect.fr</link>
-  <lastBuildDate>Tue, 31 May 2022 22:46:55 +0200</lastBuildDate>
-  <pubDate>Tue, 31 May 2022 22:46:55 +0200</pubDate>
+  <lastBuildDate>Mon, 16 Oct 2023 23:50:19 +0200</lastBuildDate>
+  <pubDate>Mon, 16 Oct 2023 23:50:19 +0200</pubDate>
   <ttl>7200</ttl>
+
+
+  <item>
+    <title>Breaking Grandpa: A look at RFC 1004</title>
+    <description>Where we find a novel attack against a very very old authentication protocol with the help of Verifpal.</description>
+    <link>https://breakpoint.purrfect.fr/article/breaking_grandpa.html</link>
+    <pubDate>Mon, 16 Oct 2023 23:50:04 +0200</pubDate>
+  </item>
 
 
   <item>
