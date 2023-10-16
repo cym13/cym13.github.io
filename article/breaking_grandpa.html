@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Breakpoint: Breaking grandpa: A look at RFC 1004</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
+
+    <link rel="icon" href="../image/favicon.ico" type="image/x-icon"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+    <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+
+        <ul>
+          <li>
+              <a href="../index.html">Index</a>
+              <a href="../rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a>
+              <a href="../soc_rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="breaking-grandpa-a-look-at-rfc-1004">
+<h2>Breaking grandpa: A look at RFC 1004</h2>
+<section id="rfc-1004">
+<h3>RFC 1004</h3>
+<p>I recently decided to take some time exploring old RFCs in search of little
+known protocols. <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc1004">RFC 1004</a>
+describes an old protocol that is absolutely little known and little used and
+for good reasons. It is a distributed authentication protocol from 1987 that
+explicitely aims at protecting the authenticity of the exchange only (&quot;Is
+that message really from who I think it is, unmodified?&quot;) and doesn't care
+about its confidentiality.</p>
+<p>By modern standards I can think of no reason to ever consider using this
+protocol. It relies heavily on pre-shared keys between participants and a
+trusted &quot;Cookie Jar&quot; as well as on decryption of hashes as proof of
+authenticity. As we'll see, this turns out to be a big mistake.</p>
+<p>In this article we'll show a non-trivial attack against this protocol found
+using Verifpal.</p>
+</section>
+<section id="verifpal">
+<h3>Verifpal</h3>
+<p><a class="reference external" href="https://verifpal.com/">Verifypal</a> is a cryptographic protocol formal
+analyzer designed to be more user-friendly than similar tools. Its goal is to
+bring formal verification to regular developpers and engineers in order to
+quickly test and discard prototype ideas. If there's one thing I hope people
+get out of that article it's that Verifpal is very much worth trying if
+you're developing any kind of secure data exchange and aren't a
+cryptographer.</p>
+<p>The way Verifpal works is by creating a model of the protocol. There are 4
+kinds of statements:</p>
+<ul class="simple">
+<li><p><strong>attacker</strong>: which can be passive (just listens) or active (actively
+intercepts, replays or modifies messages, possibly over several sessions).</p></li>
+<li><p><strong>principal</strong>: an actor in the protocol, and its actions.</p></li>
+<li><p><strong>messages</strong>: what is sent, from whom, to who, symbolized by an arrow.</p></li>
+<li><p><strong>queries</strong> the questions we want to ask about the protocol we just
+described.</p></li>
+</ul>
+<p>One thing that is important to note is that Verifpal analyzes the protocol,
+not the implementation. So it doesn't care what specific encryption function
+you use: if you want symmetric encryption without authentication that is
+modeled with the function ENC which describes a perfect encryption with these
+characteristics.</p>
+<p>Another thing you'll note if you compare the RFC description with the
+Verifpal model is that we send less things than specified in the protocol.
+That's because Verifpal doesn't like principals receiving already known
+values: if it's a public value and hasn't been hashed or encrypted or
+modified in any way then it's useless to send it as it is already known.
+Obviously the implementation might disagree with that, but from a protocol
+analyzer which cares mainly about what information you can get access to,
+this is not important.</p>
+<p>And without further suspense, here is the model for RFC 1004:</p>
+<pre class="code javascript literal-block"><code><span class="c1">// Filename: rfc1004.vp</span><span class="w">
+
+</span><span class="nx">attacker</span><span class="p">[</span><span class="nx">active</span><span class="p">]</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Alice</span><span class="p">[</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">public</span><span class="w">  </span><span class="nx">A_alice</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">private</span><span class="w"> </span><span class="nx">K_alice</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Bob</span><span class="p">[</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">public</span><span class="w">  </span><span class="nx">A_bob</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">private</span><span class="w"> </span><span class="nx">K_bob</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Jar</span><span class="p">[</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">public</span><span class="w">  </span><span class="nx">A_jar</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">private</span><span class="w"> </span><span class="nx">K_alice</span><span class="w">
+    </span><span class="nx">knows</span><span class="w"> </span><span class="kr">private</span><span class="w"> </span><span class="nx">K_bob</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Alice</span><span class="p">[</span><span class="w">
+    </span><span class="nx">generates</span><span class="w"> </span><span class="nx">m1_id</span><span class="w">
+    </span><span class="nx">m1_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_jar</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">A_bob</span><span class="p">)</span><span class="w">
+    </span><span class="nx">m1_hash_enc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_hash</span><span class="p">)</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="c1">// M1: Association request</span><span class="w">
+</span><span class="nx">Alice</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">Jar</span><span class="o">:</span><span class="w"> </span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_hash_enc</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Jar</span><span class="p">[</span><span class="w">
+    </span><span class="nx">m1_hash_dec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DEC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_hash_enc</span><span class="p">)</span><span class="w">
+    </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ASSERT</span><span class="p">(</span><span class="nx">m1_hash_dec</span><span class="p">,</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_jar</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">A_bob</span><span class="p">))</span><span class="o">?</span><span class="w">
+
+    </span><span class="c1">// Kab will be the session key between Alice and Bob</span><span class="w">
+    </span><span class="nx">generates</span><span class="w"> </span><span class="nx">Kab</span><span class="w">
+
+    </span><span class="nx">m2_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_jar</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab</span><span class="p">)</span><span class="w">
+    </span><span class="nx">m2_hash_enc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">CONCAT</span><span class="p">(</span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">m2_hash</span><span class="p">))</span><span class="w">
+    </span><span class="nx">cookie_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab</span><span class="p">)</span><span class="w">
+    </span><span class="nx">cookie_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="nx">ENC</span><span class="p">(</span><span class="nx">K_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab</span><span class="p">))</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="c1">// M2: Response with cookies</span><span class="w">
+</span><span class="c1">//     Cookie_A is the session key encrypted with Alice's key</span><span class="w">
+</span><span class="c1">//     Cookie_B is the session key encrypted with Bob's key then Alice's</span><span class="w">
+</span><span class="nx">Jar</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">Alice</span><span class="o">:</span><span class="w"> </span><span class="nx">m2_hash_enc</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_a</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_b</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Alice</span><span class="p">[</span><span class="w">
+    </span><span class="nx">m2_id</span><span class="p">,</span><span class="w"> </span><span class="nx">m2_hash_dec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">SPLIT</span><span class="p">(</span><span class="nx">DEC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">m2_hash_enc</span><span class="p">))</span><span class="w">
+    </span><span class="nx">Kab_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DEC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_a</span><span class="p">)</span><span class="w">
+    </span><span class="nx">cookie_b_dec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DEC</span><span class="p">(</span><span class="nx">K_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_b</span><span class="p">)</span><span class="w">
+
+    </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ASSERT</span><span class="p">(</span><span class="nx">m2_hash_dec</span><span class="p">,</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_jar</span><span class="p">,</span><span class="w"> </span><span class="nx">m1_id</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab_a</span><span class="p">))</span><span class="o">?</span><span class="w">
+
+    </span><span class="nx">generates</span><span class="w"> </span><span class="nx">x</span><span class="w">
+    </span><span class="nx">generates</span><span class="w"> </span><span class="nx">m3_id</span><span class="w">
+
+    </span><span class="nx">m3_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">m3_id</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab_a</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">)</span><span class="w">
+    </span><span class="nx">m3_hash_enc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">Kab_a</span><span class="p">,</span><span class="w"> </span><span class="nx">CONCAT</span><span class="p">(</span><span class="nx">m3_id</span><span class="p">,</span><span class="w"> </span><span class="nx">m3_hash</span><span class="p">))</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="c1">// M3: Alice has Kab, sends the version encrypted with Bob's key to Bob</span><span class="w">
+</span><span class="nx">Alice</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">Bob</span><span class="o">:</span><span class="w"> </span><span class="nx">m3_hash_enc</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_b_dec</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Bob</span><span class="p">[</span><span class="w">
+    </span><span class="nx">Kab_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">DEC</span><span class="p">(</span><span class="nx">K_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">cookie_b_dec</span><span class="p">)</span><span class="w">
+    </span><span class="nx">m3_id_</span><span class="p">,</span><span class="w"> </span><span class="nx">m3_hash_dec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">SPLIT</span><span class="p">(</span><span class="nx">DEC</span><span class="p">(</span><span class="nx">Kab_b</span><span class="p">,</span><span class="w"> </span><span class="nx">m3_hash_enc</span><span class="p">))</span><span class="w">
+
+    </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ASSERT</span><span class="p">(</span><span class="nx">m3_hash_dec</span><span class="p">,</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">A_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">m3_id_</span><span class="p">,</span><span class="w"> </span><span class="nx">Kab_b</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">))</span><span class="o">?</span><span class="w">
+
+    </span><span class="nx">generates</span><span class="w"> </span><span class="nx">m4_id</span><span class="w">
+
+    </span><span class="nx">m4_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">m4_id</span><span class="p">)</span><span class="w">
+    </span><span class="nx">m4_hash_enc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ENC</span><span class="p">(</span><span class="nx">Kab_b</span><span class="p">,</span><span class="w"> </span><span class="nx">CONCAT</span><span class="p">(</span><span class="nx">m4_id</span><span class="p">,</span><span class="w"> </span><span class="nx">m4_hash</span><span class="p">))</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="c1">// M4: Bob acknowledges the key exchange, Alice and Bob can now talk</span><span class="w">
+</span><span class="nx">Bob</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">Alice</span><span class="o">:</span><span class="w"> </span><span class="nx">m4_hash_enc</span><span class="w">
+
+</span><span class="nx">principal</span><span class="w"> </span><span class="nx">Alice</span><span class="p">[</span><span class="w">
+    </span><span class="nx">m4_id_</span><span class="p">,</span><span class="w"> </span><span class="nx">m4_hash_dec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">SPLIT</span><span class="p">(</span><span class="nx">DEC</span><span class="p">(</span><span class="nx">Kab_a</span><span class="p">,</span><span class="w"> </span><span class="nx">m4_hash_enc</span><span class="p">))</span><span class="w">
+
+    </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ASSERT</span><span class="p">(</span><span class="nx">m4_hash_dec</span><span class="p">,</span><span class="w"> </span><span class="nx">HASH</span><span class="p">(</span><span class="nx">A_bob</span><span class="p">,</span><span class="w"> </span><span class="nx">A_alice</span><span class="p">,</span><span class="w"> </span><span class="nx">m4_id_</span><span class="p">))</span><span class="o">?</span><span class="w">
+</span><span class="p">]</span><span class="w">
+
+</span><span class="nx">queries</span><span class="p">[</span><span class="w">
+    </span><span class="c1">// Can we recover m4_hash_dec? If so this means we found a way to</span><span class="w">
+    </span><span class="c1">// recover the session key Kab in use for the ongoing communication.</span><span class="w">
+
+    </span><span class="nx">confidentiality</span><span class="o">?</span><span class="w"> </span><span class="nx">m4_hash_dec</span><span class="w">
+</span><span class="p">]</span></code></pre>
+<p>Is it hard to follow? Don't hesitate to read the RFC alongside it to make
+sure you understand everything. A colored version as well as graph version is
+<a class="reference external" href="https://verifhub.verifpal.com/b277e80e0a669fcebf0b2b820c7d556a">available on Verifhub</a>. When we're
+done writing, we simply run</p>
+<pre class="literal-block">$ verifpal verify rfc1004.vp</pre>
+<p>and wait a few seconds.</p>
+<img alt="../image/yuuna_thinking.png" src="../image/yuuna_thinking.png" />
+</section>
+<section id="an-interesting-attack">
+<h3>An interesting attack</h3>
+<p>Verifpal finds a very interesting and non-trivial attack here; one that I did
+not consider when reading the protocol. Here is the output describing the
+attack:</p>
+<pre class="code text literal-block"><code>Result • confidentiality? m4_hash_dec — When:
+
+m1_hash_enc → ENC(k_alice, HASH(a_alice, a_jar, m1_id, a_bob))
+m1_hash_dec → HASH(a_alice, a_jar, m1_id, a_bob)
+unnamed_0 → ASSERT(HASH(a_alice, a_jar, m1_id, a_bob), HASH(a_alice, a_jar, m1_id, a_bob))?
+m2_hash_enc → ENC(k_alice, CONCAT(m1_id, HASH(a_alice, a_jar, m1_id, kab)))
+
+cookie_b → ENC(k_alice, kab) ← mutated by Attacker (originally ENC(k_alice, ENC(k_bob, kab)))
+
+m2_id → m1_id
+m2_hash_dec → HASH(a_alice, a_jar, m1_id, kab)
+kab_a → kab
+cookie_b_dec → kab
+unnamed_1 → ASSERT(HASH(a_alice, a_jar, m1_id, kab), HASH(a_alice, a_jar, m1_id, kab))?
+
+m3_hash → HASH(a_alice, a_bob, m3_id, kab, x) ← obtained by Attacker
+
+m3_hash_enc → ENC(kab, CONCAT(m3_id, HASH(a_alice, a_bob, m3_id, kab, x)))
+kab_b → DEC(k_bob, kab)
+m3_id_ → SPLIT(DEC(DEC(k_bob, kab), ENC(kab, CONCAT(m3_id, HASH(a_alice, a_bob, m3_id, kab, x)))))
+m3_hash_dec → SPLIT(DEC(DEC(k_bob, kab), ENC(kab, CONCAT(m3_id, HASH(a_alice, a_bob, m3_id, kab, x)))))
+unnamed_2 → ASSERT(SPLIT(DEC(DEC(k_bob, kab), ENC(kab, CONCAT(m3_id, HASH(a_alice, a_bob, m3_id, kab, x))))), HASH(a_alice, a_bob, SPLIT(DEC(DEC(k_bob, kab), ENC(kab, CONCAT(m3_id, HASH(a_alice, a_bob, m3_id, kab, x))))), DEC(k_bob, kab), x))?
+
+m4_hash_enc → a_alice ← mutated by Attacker (originally ENC(kab_b, CONCAT(m4_id, m4_hash)))
+
+m4_id_ → SPLIT(DEC(kab, a_alice))
+m4_hash_dec → SPLIT(DEC(kab, a_alice))
+unnamed_3 → ASSERT(SPLIT(DEC(kab, a_alice)), HASH(a_bob, a_alice, SPLIT(DEC(kab, a_alice))))?
+
+m4_hash_dec (HASH(a_alice, a_bob, m3_id, kab, x)) is obtained by Attacker.</code></pre>
+<p>Ok, this is a mouthful. The original output had colors, I added spacing
+arround the most important messages. But let's just focus on this line, the
+key to everything:</p>
+<pre class="code text literal-block"><code>cookie_b → ENC(k_alice, kab) ← mutated by Attacker (originally ENC(k_alice, ENC(k_bob, kab)))</code></pre>
+<p>Here we see that the attacker changes <strong>Cookie_B</strong> from its initial value of
+<strong>ENC(K_Alice, ENC(K_Bob, Kab))</strong> to <strong>ENC(K_Alice, Kab)</strong> which is none
+other than Cookie_A. This happens in M2 from Jar to Alice.</p>
+<p>What happens then? Alice first decrypts and verifies the hash of the message
+to ensure it wasn't modified. However the hash was computed <em>before</em> the
+session key was encrypted into cookie_a and cookie_b. Since the initial
+component of both is the same, it fails to distinguish between a cookie
+encrypted once and a cookie encrypted twice. Therefore replacing Cookie_B
+with Cookie_A is left unnoticed.</p>
+<p>Alice then enjoys her session key Kab_a, decrypts what she thinks is Bob's
+encrypted copy of the session key and sends that to Bob. But what she
+decrypted was actually her own cookie, and what she sent was therefore the
+session key in plain text. The attacker can just pick it up.</p>
+<p>Now, this is interesting but there's an issue. If we let this message through
+Bob is never going to get the correct session key and the trick will
+eventually be discovered, and we don't have <strong>ENC(K_Bob, Kab)</strong> since Alice
+decrypted Kab instead.</p>
+<p>One thing we can do is impersonate Bob: we never let Bob receive any of these
+messages and we just respond to Alice directly. After all, as far as Alice is
+concerned, possession of the session key means we're authenticated. That's a
+strong attack in its own right.</p>
+<p>This is what's described with this step:</p>
+<pre class="code text literal-block"><code>m4_hash_enc → a_alice ← mutated by Attacker (originally ENC(kab_b, CONCAT(m4_id, m4_hash)))</code></pre>
+<p>Here we show that we can control the response from Bob to Alice and therefore
+impersonate him properly. Since Bob is never notified of the communication,
+he never expects to receive anythig.</p>
+<p>But is there any way to pass as Alice to Bob? If we have the right to talk to
+Bob we can initiate a connection. In this session we'll be taking the
+position of Alice in the protocol (let's call that Eve) and we'll get our own
+session key (let's call it <strong>Kab_2</strong>). When the time comes to talk to Bob we
+just replace our address with Alice's (<strong>A_Alice</strong>). That's right, no trick
+is necessary, as long as you know someone's address you can impersonate them
+as the initiator of any connection. Yes, this is bad, and no fancy tool is
+necessary to find that.</p>
+<p>Since we are able to impersonate both sides, we can perfom both
+impersonations at the same time to let Alice talk to Bob while modifying
+messages on the fly. Simply relay the messages while adjusting what session
+key and verification hash is used for each.</p>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
+<p>We found that it's possible to impersonate both sides of a communication
+using RFC 1004's distributed authentication protocol, completely breaking it.
+Furthermore this is a protocol vulnerability, not as easily dealt with as a
+simple implementation bug or obsolete cipher. But of course nobody uses this
+protocol (or so I hope) so the security impact is essentially absent of this
+research.</p>
+<p>However it shows the kind of problem you can quickly run into when trying to
+use the ability to decrypt something as a proof of authentication. There's a
+reason why we have dedicated tools such as signatures and Message
+Authentication Codes (MAC), and why we require them to use separate keys.
+<a class="reference external" href="http://breakpoint.purrfect.fr/article/demo_bank.html">Proper authentication is important</a>.</p>
+<p>And yet the main takeaway, I think, should be that Verifpal is a nice tool to
+have in your arsenal. The modeling stage forces you to express the protocol
+in cryptographic terms and it's very possible that this alone be enough to
+identify issues. Then the tool is good at what it does. The attack trace can
+be a bit difficult to follow at first, but that's something you get used to
+and the knowledge that there is an issue is often enough to find it on your
+own.</p>
+<p>Furthermore the tool is great at exploring the protocol we modeled. &quot;This
+relies on the client checking the server's message authentication. What if
+they don't? What if that value leaks at that point of the protocol? What if
+that password is weak and easily guessable?&quot;. Removing checks in a program
+and checking what attack opportunities open up can be a great way to
+understand how critical each part is or to find novel attacks on protocols
+that are difficult to implement well.</p>
+</section>
+<hr class="docutils" />
+<section id="image-sources">
+<h3>Image sources</h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.emojipng.com/preview/354130">https://www.emojipng.com/preview/354130</a></p></li>
+</ul>
+</section>
+</section>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>

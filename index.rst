@@ -9,6 +9,13 @@ with the starred articles!
 Recent articles
 ===============
 
+October 2023
+------------
+
+`Breaking Grandpa: A look at RFC 1004 <article/breaking_grandpa.html>`_
+    Where we find a novel attack against a very very old authentication
+    protocol with the help of Verifpal.
+
 May 2022
 --------
 
