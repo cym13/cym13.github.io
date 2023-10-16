@@ -69,8 +69,8 @@ And without further suspense, here is the model for RFC 1004:
     attacker[active]
 
     principal Alice[
-        knows public  A_alice
-        knows private K_alice
+        knows public  A_alice // Alices's address
+        knows private K_alice // Alices's secret key shared with Jar
     ]
 
     principal Bob[
