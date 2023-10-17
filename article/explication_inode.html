@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Les inodes, mais qu'est-ce que c'est ? Introduction  aux systèmes de fichier</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,14 +46,14 @@
     </header>
 
     <div class="content">
-      <div class="section" id="les-inodes-mais-qu-est-ce-que-c-est-introduction-aux-systemes-de-fichier">
-<h1>Les inodes, mais qu'est-ce que c'est ? Introduction  aux systèmes de fichier</h1>
-<div class="section" id="les-chemins">
-<h2>Les chemins</h2>
+      <section id="les-inodes-mais-qu-est-ce-que-c-est-introduction-aux-systemes-de-fichier">
+<h2>Les inodes, mais qu'est-ce que c'est ? Introduction  aux systèmes de fichier</h2>
+<section id="les-chemins">
+<h3>Les chemins</h3>
 <p>Un chemin vers un fichier c'est cool, ça permet de le désigner:</p>
 <pre class="code sh literal-block"><code>/tmp/chat.png</code></pre>
 <p>ou de le manipuler:</p>
-<pre class="code sh literal-block"><code>mv /tmp/chat.png /tmp/chaton.png</code></pre>
+<pre class="code sh literal-block"><code>mv<span class="w"> </span>/tmp/chat.png<span class="w"> </span>/tmp/chaton.png</code></pre>
 <p>et ça à la manière d'un pointeur (le chemin n'est pas la donnée, il dit juste
 où la trouver).</p>
 <p>Mais quand on fait ce genre de trucs, on a pas envie de bouger le fichier
@@ -77,16 +77,16 @@ sur plusieurs emplacements et je ne parle même pas des liens...</p>
 c'est bien mais que si on veut pouvoir travailler il faut d'autres
 informations comme la taille, le type etc...</p>
 <p>Bref c'est la merde.</p>
-</div>
-<div class="section" id="les-inodes">
-<h2>Les inodes</h2>
+</section>
+<section id="les-inodes">
+<h3>Les inodes</h3>
 <p>Le truc, c'est qu'un chemin c'est un identifiant humain pour un fichier mais
 on a besoin d'un identifiant système.</p>
 <p>Cet identifiant c'est l'inode.</p>
 <p>En gros, le système de fichier entretiens une grosse table de correspondance
 avec toutes les informations sur les fichiers. Sur des systèmes GNU/Linux on
 peut les voir ces informations en faisant:</p>
-<pre class="code sh literal-block"><code>stat /tmp/chat.png</code></pre>
+<pre class="code sh literal-block"><code>stat<span class="w"> </span>/tmp/chat.png</code></pre>
 <p>Bon, c'est un petit abus de language de dire que l'inode c'est l'identifiant.
 Dans la table de correspondance, on a des nœuds d'informations (information
 node -&gt; inode).  L'inode est donc le conteneur de l'ensemble des informations
@@ -111,12 +111,12 @@ fichier.</p>
 |  Espace Disque            | |   |    Image sur disque     |
 +---------------------------+ |   +-------------------------+
                               |</pre>
-</div>
-<div class="section" id="les-liens-physiques">
-<h2>Les liens physiques</h2>
+</section>
+<section id="les-liens-physiques">
+<h3>Les liens physiques</h3>
 <p>L'utilisateur n'a conscience que du lien n°1. Un lien chemin/inode est appelé
 un lien physique. Il y en a au moins un par fichier. On les crée avec ln:</p>
-<pre class="code sh literal-block"><code>ln /tmp/chat.png /tmp/chat_1.png</code></pre>
+<pre class="code sh literal-block"><code>ln<span class="w"> </span>/tmp/chat.png<span class="w"> </span>/tmp/chat_1.png</code></pre>
 <pre class="literal-block">+----------------------+       +-------------------------+
 |  /tmp/chat.png       |       |    /tmp/chat_1.png      |
 +----------------------+       +-------------------------+
@@ -137,11 +137,11 @@ est supprimé. Le lien inode/disque n'est supprimé que lorsque tout les liens
 physiques ont été supprimé. L'image sur disque n'est jamais vraiment supprimée,
 l'espace disque correspondant est juste marqué comme pouvant acceuillir de
 nouveaux fichiers qui viendront écraser les données existantes.</p>
-</div>
-<div class="section" id="les-liens-symboliques">
-<h2>Les liens symboliques</h2>
+</section>
+<section id="les-liens-symboliques">
+<h3>Les liens symboliques</h3>
 <p>Il existe un autre type de lien plus souple : les liens symboliques.</p>
-<pre class="code sh literal-block"><code>ln -s /tmp/chat.png /tmp/chat_1.png</code></pre>
+<pre class="code sh literal-block"><code>ln<span class="w"> </span>-s<span class="w"> </span>/tmp/chat.png<span class="w"> </span>/tmp/chat_1.png</code></pre>
 <pre class="literal-block">+----------------------+       +-------------------------+
 |  /tmp/chat.png       |------&gt;|    /tmp/chat_1.png      |
 +----------------------+       +-------------------------+
@@ -167,8 +167,8 @@ symbolique est cassé et l'image sur le disque est marquée comme à supprimer.<
 être dans une situation dans laquelle on a <em>besoin</em> de faire un lien physique,
 c'est que l'on sait déjà très bien ce que l'on fait car ce sont des
 situations rares et souvent un peu délicates.</p>
-</div>
-</div>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

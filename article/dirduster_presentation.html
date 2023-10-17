@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Dirduster: short presentation</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,16 +46,16 @@
     </header>
 
     <div class="content">
-      <div class="section" id="dirduster-short-presentation">
-<h1>Dirduster: short presentation</h1>
-<div class="section" id="tl-dr">
-<h2>tl;dr</h2>
+      <section id="dirduster-short-presentation">
+<h2>Dirduster: short presentation</h2>
+<section id="tl-dr">
+<h3>tl;dr</h3>
 <p><a class="reference external" href="https://github.com/cym13/dirduster">Dirduster</a> is a fast, command-line web
 directory bruteforcing tool written in D and used professionally for years
 with much satisfaction.</p>
-</div>
-<div class="section" id="what-is-dirduster">
-<h2>What is dirduster?</h2>
+</section>
+<section id="what-is-dirduster">
+<h3>What is dirduster?</h3>
 <p>When assessing the security of a website it is important to map all entry
 points. One common strategy for that is called “spidering”: start from the
 home page and recursively follow all links.</p>
@@ -77,16 +77,16 @@ able to perform fast dirbusting. It also has lots of configuration options
 to adapt to any situation you may encounter. And if you're wondering about
 the name, it's because it's similar to dirbuster but written in the <a class="reference external" href="https://dlang.org/">D
 programming language</a>.</p>
-</div>
-<div class="section" id="why-not-dirb-dirbuster-gobuster">
-<h2>Why not dirb, dirbuster, gobuster...?</h2>
+</section>
+<section id="why-not-dirb-dirbuster-gobuster">
+<h3>Why not dirb, dirbuster, gobuster...?</h3>
 <p>There are lots of reasons but the basic idea is that I didn't find a tool
 that worked as well as I wanted it to.</p>
-<div class="figure">
+<figure>
 <img alt="../image/rd_shrug.png" src="../image/rd_shrug.png" style="width: 40%;" />
-</div>
-<div class="section" id="dirbuster">
-<h3>Dirbuster</h3>
+</figure>
+<section id="dirbuster">
+<h4>Dirbuster</h4>
 <p>This is by far the most popular tool to do dirbusting and I really don't like
 it.</p>
 <p>It's graphical which means that I can't easily run it via SSH on a
@@ -102,9 +102,9 @@ needs to be able to separate the wheat from the chaff. Dirbuster allows you
 to customize what error codes should be ignored, to exclude pages matching a
 given regex and its text interface is well suited to grep away any page
 matching a given size for example.</p>
-</div>
-<div class="section" id="dirb">
-<h3>Dirb</h3>
+</section>
+<section id="dirb">
+<h4>Dirb</h4>
 <p>Dirb is another common tool since it is installed by default on Kali Linux.
 It's not a bad tool: it's more customizable than dirbuster and rather easy to
 grep. But it has its issues.</p>
@@ -120,16 +120,16 @@ before the URL doesn't work, it must be placed after (which is exactly the
 opposite of any UNIX tool), etc. It's just clunky.</p>
 <p>Also it only supports one URL at a time. Launching dirb many times is
 possible of course, but it's nice to be able to test many URLs at once.</p>
-</div>
-<div class="section" id="other-tools">
-<h3>Other tools</h3>
+</section>
+<section id="other-tools">
+<h4>Other tools</h4>
 <p>I did it a few years ago and certainly didn't take the time to try them all.
 If you find that some other tool works better for you, go for it (but give
 dirduster a try first)!</p>
-</div>
-</div>
-<div class="section" id="how-do-you-use-it">
-<h2>How do you use it?</h2>
+</section>
+</section>
+<section id="how-do-you-use-it">
+<h3>How do you use it?</h3>
 <p>First of all I must admit that even though dirduster comes with some
 dictionaries (the dirbuster ones) I much prefer the raft lists from <a class="reference external" href="https://github.com/danielmiessler/SecLists">SecLists</a>. They are very effective for
 me.</p>
@@ -153,23 +153,23 @@ slash) is sometimes useful but often not worth investing any time.</p>
 new feature so I have yet to determine just how useful it is in practice.</p>
 <p>And that's about it. Pipe to tee, maybe grepping to remove some duds and
 you're good to go.</p>
-</div>
-<div class="section" id="what-next">
-<h2>What next?</h2>
+</section>
+<section id="what-next">
+<h3>What next?</h3>
 <p>Nothing. I will continue supporting dirduster of course, it's one of my main
 tools at work and I use it weekly, but I feel like it has the features it
 needs. I don't plan on adding more unless someone comes with a pull request
 or a very well thought argument.</p>
 <p>I hope it fits your toolbox as well as mine:
 <a class="reference external" href="https://github.com/cym13/dirduster">https://github.com/cym13/dirduster</a></p>
-<div class="section" id="image-source">
-<h3>Image source</h3>
+<section id="image-source">
+<h4>Image source</h4>
 <ul class="simple">
 <li><p>Unknown</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

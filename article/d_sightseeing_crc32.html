@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: D sightseeing: crc32</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="d-sightseeing-crc32">
-<h1>D sightseeing: crc32</h1>
-<div class="section" id="sightseeing">
-<h2>Sightseeing?</h2>
+      <section id="d-sightseeing-crc32">
+<h2>D sightseeing: crc32</h2>
+<section id="sightseeing">
+<h3>Sightseeing?</h3>
 <p>Yeah... I like D but there is just so much to tell about it that it's hard to
 convey my enthusiasm to my friends. So instead of a 3 day conference let's
 analyse a very simple script that serves an actual purpose: a replacement for
@@ -62,26 +62,26 @@ efforts of my html generator, you will sometimes find three dots at the very
 beginning of a line. You may safely ignore them.</p>
 <p>Let's see the beast!</p>
 <img alt="../image/girl_glancing.png" src="../image/girl_glancing.png" style="width: 40%;" />
-</div>
-<div class="section" id="prelude-to-the-program">
-<h2>Prelude to the program</h2>
+</section>
+<section id="prelude-to-the-program">
+<h3>Prelude to the program</h3>
 <p>D accepts shebangs, rdmd is a program that's used to launch programs
 &quot;script-style&quot; by compiling on the fly (and avoiding recompiling if
 possible). It can also be used to run little command lines as D doesn't have
 a REPL (Read-Eval-Print Loop). Very handy.</p>
 <pre class="literal-block">rdmd --eval='[1, 2, 3].map!(x =&gt; x*2-1).writeln'</pre>
 <p>Below are some imports from the standard library.</p>
-<pre class="code d literal-block"><code><span class="err">#</span><span class="p">!/</span><span class="n">usr</span><span class="p">/</span><span class="n">bin</span><span class="p">/</span><span class="n">env</span> <span class="n">rdmd</span>
+<pre class="code d literal-block"><code><span class="err">#</span><span class="p">!/</span><span class="n">usr</span><span class="p">/</span><span class="n">bin</span><span class="p">/</span><span class="n">env</span><span class="w"> </span><span class="n">rdmd</span><span class="w">
 
-<span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">file</span><span class="p">;</span>
-<span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">stdio</span><span class="p">;</span>
-<span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">algorithm</span><span class="p">;</span></code></pre>
+</span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">file</span><span class="p">;</span><span class="w">
+</span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">stdio</span><span class="p">;</span><span class="w">
+</span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">algorithm</span><span class="p">;</span></code></pre>
 <p>As in C there are types and there are storage classes. <cite>enum</cite> is a storage
 class for compile-time constants.</p>
-<pre class="code d literal-block"><code><span class="k">enum</span> <span class="n">vernum</span> <span class="p">=</span> <span class="s">&quot;2.0.0&quot;</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="k">enum</span><span class="w"> </span><span class="n">vernum</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><s>&quot;2.0.0&quot;</s><span class="p">;</span></code></pre>
 <p>Here we demonstrate a multi-line string. There are other ways but it's a good
 example of the versatility of strings in D.</p>
-<pre class="code d literal-block"><code><span class="k">enum</span> <span class="n">help</span> <span class="p">=</span> <span class="n">q</span><span class="s">&quot;EOF
+<pre class="code d literal-block"><code><span class="k">enum</span><span class="w"> </span><span class="n">help</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">q</span><s>&quot;EOF
 Compute CRC32 checksum of streams and files
 
 Usage: crc32 [options] [FILE...]
@@ -95,43 +95,43 @@ Options:
     -h, --help      Print this help and exit
     -v, --version   Print version and exit
     -r, --recursive Traverse subdirectories recursively
-EOF&quot;</span><span class="p">;</span></code></pre>
-</div>
-<div class="section" id="our-first-function">
-<h2>Our first function</h2>
+EOF&quot;</s><span class="p">;</span></code></pre>
+</section>
+<section id="our-first-function">
+<h3>Our first function</h3>
 <p>As in python you can import things anywhere. Contrary to python it is
 considered good practice to import as locally as possible. This is because
 templates are common, and are compiled only if instanciated, so you don't
 import (and compile) what you don't use that way.</p>
 <pre class="code d literal-block"><code><span class="cm">/**
  * Computes the crc32 checksum of a file and returns it as a string
- */</span>
-<span class="nb">string</span> <span class="n">crc32</span><span class="p">(</span><span class="n">File</span> <span class="n">chunks</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">uni</span><span class="p">;</span>
-    <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">digest</span><span class="p">.</span><span class="n">crc</span><span class="p">;</span></code></pre>
+ */</span><span class="w">
+</span><span class="nb">string</span><span class="w"> </span><span class="n">crc32</span><span class="p">(</span><span class="n">File</span><span class="w"> </span><span class="n">chunks</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">uni</span><span class="p">;</span><span class="w">
+    </span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">digest</span><span class="p">.</span><span class="n">crc</span><span class="p">;</span></code></pre>
 <p>Use of UFCS (Uniform Function Call Syntax) and optional parentheses as
 explained below. Read the file by chunks, compute the crc32 which returns a
 byte array, reverse the byte order, and build a string from that. I think
 it's pretty self-explanatory.</p>
-<pre class="code d literal-block"><code>    <span class="k">return</span> <span class="n">chunks</span><span class="p">.</span><span class="n">byChunk</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
-                 <span class="p">.</span><span class="n">crc32Of</span><span class="p">[]</span>
-                 <span class="p">.</span><span class="n">retro</span>
-                 <span class="p">.</span><span class="n">array</span>
-                 <span class="p">.</span><span class="n">toHexString</span>
-                 <span class="p">.</span><span class="n">toLower</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
-<div class="section" id="a-word-on-ufcs">
-<h3>A word on UFCS</h3>
+<pre class="code d literal-block"><code><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">chunks</span><span class="p">.</span><span class="n">byChunk</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span><span class="w">
+                 </span><span class="p">.</span><span class="n">crc32Of</span><span class="p">[]</span><span class="w">
+                 </span><span class="p">.</span><span class="n">retro</span><span class="w">
+                 </span><span class="p">.</span><span class="n">array</span><span class="w">
+                 </span><span class="p">.</span><span class="n">toHexString</span><span class="w">
+                 </span><span class="p">.</span><span class="n">toLower</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
+<section id="a-word-on-ufcs">
+<h4>A word on UFCS</h4>
 <p>I talked about UFCS but didn't explain what it was on the spot not to cut the
 flow of the code too much. It is a very easy concept; it just states that the
 first argument of a function can be moved before it using a dot.</p>
 <p>The following calls are all perfectly equivalent (and useless):</p>
-<pre class="code d literal-block"><code><span class="n">writeln</span><span class="p">(</span><span class="n">toLower</span><span class="p">(</span><span class="s">&quot;TEST&quot;</span><span class="p">),</span> <span class="s">&quot;.txt&quot;</span><span class="p">);</span>
-<span class="n">toLower</span><span class="p">(</span><span class="s">&quot;TEST&quot;</span><span class="p">).</span><span class="n">writeln</span><span class="p">(</span><span class="s">&quot;.txt&quot;</span><span class="p">);</span>
-<span class="s">&quot;TEST&quot;</span><span class="p">.</span><span class="n">toLower</span><span class="p">().</span><span class="n">writeln</span><span class="p">(</span><span class="s">&quot;.txt&quot;</span><span class="p">);</span></code></pre>
+<pre class="code d literal-block"><code><span class="n">writeln</span><span class="p">(</span><span class="n">toLower</span><span class="p">(</span><s>&quot;TEST&quot;</s><span class="p">),</span><span class="w"> </span><s>&quot;.txt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="n">toLower</span><span class="p">(</span><s>&quot;TEST&quot;</s><span class="p">).</span><span class="n">writeln</span><span class="p">(</span><s>&quot;.txt&quot;</s><span class="p">);</span><span class="w">
+</span><s>&quot;TEST&quot;</s><span class="p">.</span><span class="n">toLower</span><span class="p">().</span><span class="n">writeln</span><span class="p">(</span><s>&quot;.txt&quot;</s><span class="p">);</span></code></pre>
 <p>To that we must add that empty parentheses are always optional, so we can
 also write:</p>
-<pre class="code d literal-block"><code><span class="s">&quot;TEST&quot;</span><span class="p">.</span><span class="n">toLower</span><span class="p">.</span><span class="n">writeln</span><span class="p">(</span><span class="s">&quot;.txt&quot;</span><span class="p">);</span></code></pre>
+<pre class="code d literal-block"><code><s>&quot;TEST&quot;</s><span class="p">.</span><span class="n">toLower</span><span class="p">.</span><span class="n">writeln</span><span class="p">(</span><s>&quot;.txt&quot;</s><span class="p">);</span></code></pre>
 <p>This serves two purposes.</p>
 <p>First of all it looks nice: it gives a feeling of pipeline programming that
 fits well processes such as our <em>crc32</em> function where the code flows from
@@ -143,10 +143,10 @@ that manages that type and can take any of the classes we want and use UFCS
 to make it look like a method call.</p>
 <p>There are of course limits to that approach so it's not what I'd recommend in
 that situation, but it can definitely come in handy sometimes.</p>
-</div>
-</div>
-<div class="section" id="the-main">
-<h2>The main</h2>
+</section>
+</section>
+<section id="the-main">
+<h3>The main</h3>
 <p>Note the arguments: simple.</p>
 <p>I didn't have to return an int, I could have returned void. Had I done that,
 the return value would have been 0 if no exception was thrown, 1 otherwise
@@ -155,18 +155,18 @@ the return value would have been 0 if no exception was thrown, 1 otherwise
 common parts of the standard C libraries are exposed directly through this
 part of the D standard library. After all, D interacts very well with C, so
 why not use its functions where useful?</p>
-<pre class="code d literal-block"><code><span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">getopt</span><span class="p">:</span>       <span class="n">getopt</span><span class="p">;</span>
-    <span class="k">import</span> <span class="n">std</span><span class="p">.</span><span class="n">array</span><span class="p">:</span>        <span class="n">array</span><span class="p">;</span>
-    <span class="k">import</span> <span class="n">core</span><span class="p">.</span><span class="n">stdc</span><span class="p">.</span><span class="n">stdlib</span><span class="p">:</span> <span class="n">exit</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="nb">string</span><span class="p">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">getopt</span><span class="p">:</span><span class="w">       </span><span class="n">getopt</span><span class="p">;</span><span class="w">
+    </span><span class="k">import</span><span class="w"> </span><span class="n">std</span><span class="p">.</span><span class="n">array</span><span class="p">:</span><span class="w">        </span><span class="n">array</span><span class="p">;</span><span class="w">
+    </span><span class="k">import</span><span class="w"> </span><span class="n">core</span><span class="p">.</span><span class="n">stdc</span><span class="p">.</span><span class="n">stdlib</span><span class="p">:</span><span class="w"> </span><span class="n">exit</span><span class="p">;</span></code></pre>
 <p>Type deduction. Works about everywhere except as function argument
 (can be the function return value though). If the compiler knows the
 type, why write it? Makes for simpler code, especially since sometimes
 the type cannot be known (eg: type defined in a function then returned,
 it's called a voldemort type and is sometimes used for encapsulation).</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="k">auto</span> <span class="n">spanmode</span> <span class="p">=</span> <span class="n">SpanMode</span><span class="p">.</span><span class="n">shallow</span><span class="p">;</span></code></pre>
-<div class="section" id="managing-arguments">
-<h3>Managing arguments</h3>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="k">auto</span><span class="w"> </span><span class="n">spanmode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SpanMode</span><span class="p">.</span><span class="n">shallow</span><span class="p">;</span></code></pre>
+<section id="managing-arguments">
+<h4>Managing arguments</h4>
 <p>Side note but I like getopt in D.</p>
 <p>There are different ways to define lambda functions in D. One way is <cite>(x =&gt;
 x*2;)</cite>. This is equivalent to: <cite>(auto x) { return x*2; }</cite>. But what if the
@@ -174,23 +174,23 @@ function takes no argument? Then you get empty parentheses. And empty
 parentheses are optional. So below, half the arguments are actually lambda
 functions.  Those can be hard to spot at first admitedly, so prefer the other
 forms.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="n">getopt</span><span class="p">(</span><span class="n">args</span><span class="p">,</span>
-        <span class="s">&quot;recursive|r&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="n">spanmode</span> <span class="p">=</span> <span class="n">SpanMode</span><span class="p">.</span><span class="n">depth</span><span class="p">;</span> <span class="p">},</span>
-        <span class="s">&quot;version|v&quot;</span><span class="p">,</span>   <span class="p">{</span> <span class="n">writeln</span><span class="p">(</span><span class="s">&quot;crc32 v&quot;</span><span class="p">,</span> <span class="n">vernum</span><span class="p">);</span> <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="p">},</span>
-        <span class="s">&quot;help|h&quot;</span><span class="p">,</span>      <span class="p">{</span> <span class="n">write</span><span class="p">(</span><span class="n">help</span><span class="p">);</span> <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="p">},</span>
-    <span class="p">);</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="n">getopt</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w">
+        </span><s>&quot;recursive|r&quot;</s><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">spanmode</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SpanMode</span><span class="p">.</span><span class="n">depth</span><span class="p">;</span><span class="w"> </span><span class="p">},</span><span class="w">
+        </span><s>&quot;version|v&quot;</s><span class="p">,</span><span class="w">   </span><span class="p">{</span><span class="w"> </span><span class="n">writeln</span><span class="p">(</span><s>&quot;crc32 v&quot;</s><span class="p">,</span><span class="w"> </span><span class="n">vernum</span><span class="p">);</span><span class="w"> </span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w">
+        </span><s>&quot;help|h&quot;</s><span class="p">,</span><span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="n">write</span><span class="p">(</span><span class="n">help</span><span class="p">);</span><span class="w"> </span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">);</span></code></pre>
 <p>The langage has what's called &quot;slices&quot;. It is what we call &quot;a range&quot; in
 python: for example here <cite>args[1..$]</cite> is equivalent to the python <cite>args[1:]</cite>.
 One interesting thing is that they do not copy data, it's simply a pointer's
 game. They are therefore very interesting when making parsers etc.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="c1">// Without arguments, use stdin
-</span>    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">length</span> <span class="p">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">writeln</span><span class="p">(</span><span class="n">stdin</span><span class="p">.</span><span class="n">crc32</span><span class="p">);</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span></code></pre>
-</div>
-<div class="section" id="templates">
-<h3>Templates</h3>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="c1">// Without arguments, use stdin</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">length</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">writeln</span><span class="p">(</span><span class="n">stdin</span><span class="p">.</span><span class="n">crc32</span><span class="p">);</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span></code></pre>
+</section>
+<section id="templates">
+<h4>Templates</h4>
 <p>Our first use of a template. isFile is a function that takes a file and
 returns a boolean. Filter is a template (as are most things that we
 manipulate here actually, but it's the first one that we will use as a
@@ -209,8 +209,8 @@ empty parens):</p>
 and as we want to reuse it we will turn it into an array which is the last
 call of the section (equivalent to <cite>list()</cite> in python. This array is
 GC-allocated, we could have filled a malloced-buffer though.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="c1">// Make list of inputs
-</span>    <span class="nb">string</span><span class="p">[]</span> <span class="n">fileList</span> <span class="p">=</span> <span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">filter</span><span class="p">!</span><span class="n">isFile</span><span class="p">.</span><span class="n">array</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="c1">// Make list of inputs</span><span class="w">
+    </span><span class="nb">string</span><span class="p">[]</span><span class="w"> </span><span class="n">fileList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">filter</span><span class="p">!</span><span class="n">isFile</span><span class="p">.</span><span class="n">array</span><span class="p">;</span></code></pre>
 <p>Ok, now that the basics are understood, we do the same thing but bigger, and
 with more functions!</p>
 <p>We introduce map that also takes a function or lambda as compile-time
@@ -221,51 +221,51 @@ doesn't bring anything, it exists solely because it fits well with UFCS. The
 body of the foreach is passed as a lambda which uses more of what we saw.</p>
 <p>There is a last subtlety though: the ~= operator. It's like += in python, but
 D decided to separate addition (+) and concatenation (~).</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="c1">// Add inputs from directory arguments
-</span>    <span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">filter</span><span class="p">!</span><span class="n">isDir</span>
-              <span class="p">.</span><span class="n">map</span><span class="p">!(</span><span class="n">d</span> <span class="p">=&gt;</span> <span class="n">dirEntries</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">spanmode</span><span class="p">))</span>
-              <span class="p">.</span><span class="n">each</span><span class="p">!((</span><span class="n">dir</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">fileList</span> <span class="p">~=</span> <span class="n">dir</span><span class="p">.</span><span class="n">map</span><span class="p">!(</span><span class="n">e</span> <span class="p">=&gt;</span> <span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
-                                             <span class="p">.</span><span class="n">filter</span><span class="p">!</span><span class="n">isFile</span>
-                                             <span class="p">.</span><span class="n">array</span><span class="p">);</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="c1">// Add inputs from directory arguments</span><span class="w">
+    </span><span class="n">args</span><span class="p">[</span><span class="mf">1.</span><span class="p">.$].</span><span class="n">filter</span><span class="p">!</span><span class="n">isDir</span><span class="w">
+              </span><span class="p">.</span><span class="n">map</span><span class="p">!(</span><span class="n">d</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="n">dirEntries</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">spanmode</span><span class="p">))</span><span class="w">
+              </span><span class="p">.</span><span class="n">each</span><span class="p">!((</span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="n">fileList</span><span class="w"> </span><span class="p">~=</span><span class="w"> </span><span class="n">dir</span><span class="p">.</span><span class="n">map</span><span class="p">!(</span><span class="n">e</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="p">)</span><span class="w">
+                                             </span><span class="p">.</span><span class="n">filter</span><span class="p">!</span><span class="n">isFile</span><span class="w">
+                                             </span><span class="p">.</span><span class="n">array</span><span class="p">);</span></code></pre>
 <p>Not much to say next...</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="c1">// Remove duplicates
-</span>    <span class="n">sort</span><span class="p">(</span><span class="n">fileList</span><span class="p">);</span>
-    <span class="n">fileList</span> <span class="p">=</span> <span class="n">fileList</span><span class="p">.</span><span class="n">uniq</span><span class="p">.</span><span class="n">array</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="c1">// Remove duplicates</span><span class="w">
+    </span><span class="n">sort</span><span class="p">(</span><span class="n">fileList</span><span class="p">);</span><span class="w">
+    </span><span class="n">fileList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fileList</span><span class="p">.</span><span class="n">uniq</span><span class="p">.</span><span class="n">array</span><span class="p">;</span></code></pre>
 <p>A real foreach. We didn't specify the type of f so it's infered.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>   <span class="k">foreach</span> <span class="p">(</span><span class="n">f</span> <span class="p">;</span> <span class="n">fileList</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">File</span> <span class="n">file</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">   </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">f</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">fileList</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="p">;</span></code></pre>
 <p>This is interesting. We don't have context managers like python.  However we
 have scope managers. The following line ensures that when quitting the scope
 defined by the enclosing {} we will close the file.</p>
 <p>There are also scope(success) and scope(error), and they can be used multiple
 times in a same scope: they just stack nicely at the end.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>       <span class="k">scope</span><span class="p">(</span><span class="n">exit</span><span class="p">)</span> <span class="n">file</span><span class="p">.</span><span class="n">close</span><span class="p">;</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">       </span><span class="k">scope</span><span class="p">(</span><span class="n">exit</span><span class="p">)</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">close</span><span class="p">;</span></code></pre>
 <p>Exceptions, very classic. One note though: D has two kinds of Throwables:
 Exceptions and Errors. The former are meant to be caught, the later signal an
 unrecoverable error. They are not to be caught. This distinction doesn't mean
 much but shows well the fact that D is meant to build programs that work
 <em>correctly</em>.</p>
-<pre class="code d literal-block"><code><span class="err">…</span>       <span class="k">try</span> <span class="p">{</span>
-            <span class="n">file</span> <span class="p">=</span> <span class="n">File</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">);</span>
-        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">FileException</span> <span class="n">ex</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">stderr</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">msg</span><span class="p">);</span>
-            <span class="k">continue</span><span class="p">;</span>
-        <span class="p">}</span></code></pre>
+<pre class="code d literal-block"><code><span class="err">…</span><span class="w">       </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">file</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><s>&quot;rb&quot;</s><span class="p">);</span><span class="w">
+        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="n">FileException</span><span class="w"> </span><span class="n">ex</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">stderr</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">ex</span><span class="p">.</span><span class="n">msg</span><span class="p">);</span><span class="w">
+            </span><span class="k">continue</span><span class="p">;</span><span class="w">
+        </span><span class="p">}</span></code></pre>
 <p>This first line is actually a function call, optionnal parens etc...
 I like optional parentheses, maybe to the point of abuse. I don't know. It's
 my style and not D's recommended style though, so if you don't like it just
 write it differently.</p>
-<pre class="code d literal-block"><code>        <span class="k">auto</span> <span class="n">crc</span> <span class="p">=</span> <span class="n">file</span><span class="p">.</span><span class="n">crc32</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">crc</span><span class="p">)</span>
-            <span class="n">writefln</span><span class="p">(</span><span class="s">&quot;%s\t%s&quot;</span><span class="p">,</span> <span class="n">crc</span><span class="p">,</span> <span class="n">f</span><span class="p">);</span>
-    <span class="p">}</span>
+<pre class="code d literal-block"><code><span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">crc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">crc32</span><span class="p">;</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">crc</span><span class="p">)</span><span class="w">
+            </span><span class="n">writefln</span><span class="p">(</span><s>&quot;%s\t%s&quot;</s><span class="p">,</span><span class="w"> </span><span class="n">crc</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</section>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>Ok, so we saw many things in such a small program. Maybe too much. One thing
 is certain though: I wrote this program a long time ago to fill a real need
 and it was not meant as a demonstration example. It uses so many D features
@@ -273,14 +273,14 @@ because they are actually enjoyable and easy to use in real life even in such
 short scripts.</p>
 <p>There is much more to say so I hope I'll have the occasion to go sightseeing
 with you again in the future.</p>
-<div class="section" id="image-source">
-<h3>Image source</h3>
+<section id="image-source">
+<h4>Image source</h4>
 <ul class="simple">
 <li><p>Unknown</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

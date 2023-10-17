@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint</title>
     <link rel="stylesheet" type="text/css" href="style/base.css"/>
     <link rel="stylesheet" type="text/css" href="style/pygments.css"/>
@@ -45,8 +45,8 @@
     </header>
 
     <div class="content">
-      <div class="section" id="stream-of-consciousness">
-<h1>Stream of Consciousness</h1>
+      <section id="stream-of-consciousness">
+<h2>Stream of Consciousness</h2>
 <p><em>Random ramble at the edge of reason.</em></p>
 <hr class="docutils" />
 <p><strong>Tue May 31 10:38:46 PM CEST 2022</strong></p>
@@ -443,56 +443,56 @@ country.</p>
 <p>Just had a nice thought... Is there a real x such that x^x=i ?</p>
 <p>Suppose by contradiction</p>
 <div class="formula">
-<i>x</i> ∈ ℝ, <i>x</i><sup><i>x</i></sup> = <i>i</i>
+<i>x</i> ∈ ℝ, <i>x</i><sup><i>x</i></sup> = <i>i</i>
 </div>
 <p>Then,</p>
 <div class="formula">
-ln(<i>x</i><sup><i>x</i></sup>) = ln(<i>i</i>)
+ln(<i>x</i><sup><i>x</i></sup>) = ln(<i>i</i>)
 </div>
 <div class="formula">
-<i>x</i>ln(<i>x</i>) = ln(<i>i</i>) = ln(<i>e</i><sup><i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span></sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
+<i>x</i>ln(<i>x</i>) = ln(<i>i</i>) = ln(<i>e</i><sup><i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span></sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <div class="formula">
-  ⇒  <i>x</i>ln(<i>x</i>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
+ ⟹ <i>x</i>ln(<i>x</i>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <p>But</p>
 <div class="formula">
-<i>x</i><sup><i>x</i></sup> = <i>i</i>  ⇒  <i>x</i>ln(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span><i>x</i><sup><i>x</i></sup>
+<i>x</i><sup><i>x</i></sup> = <i>i</i> ⟹ <i>x</i>ln(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span><i>x</i><sup><i>x</i></sup>
 </div>
 <p>Then, by taking the derivative on both sides</p>
 <div class="formula">
-<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>(1 + ln(<i>x</i>)) = <i>x</i><sup><i>x</i></sup>⋅(1 + ln(<i>x</i>))
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>(1 + ln(<i>x</i>)) = <i>x</i><sup><i>x</i></sup>⋅(1 + ln(<i>x</i>))
 </div>
 <p>We can't simplify if 1+ln(x)=0 which happens for x=e^-1, so let's consider
 that case first.</p>
 <div class="formula">
-<i>x</i> = <i>e</i><sup> − 1</sup>  ⇒  <i>e</i><sup> − 1</sup>⋅ln(<i>e</i><sup> − 1</sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
+<i>x</i> = <i>e</i><sup> − 1</sup> ⟹ <i>e</i><sup> − 1</sup>⋅ln(<i>e</i><sup> − 1</sup>) = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <div class="formula">
-  ⇒   − <i>e</i><sup> − 1</sup> = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
+ ⟹  − <i>e</i><sup> − 1</sup> = <i>i</i><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span>
 </div>
 <p>which is false. So e^-1 can't be solution of our equation. Let's continue
 with x≠e^-1 by simplifying left and right the (1+ln(x)) term:</p>
 <div class="formula">
-<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <i>x</i><sup><i>x</i></sup>
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <i>x</i><sup><i>x</i></sup>
 </div>
 <div class="formula">
-<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span><i>x</i>ln(<i>x</i>)
+<span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span><i>x</i>ln(<i>x</i>)
 </div>
 <div class="formula">
-1 = <i>x</i>ln(<i>x</i>)
+1 = <i>x</i>ln(<i>x</i>)
 </div>
 <div class="formula">
-<i>e</i> = <i>x</i><sup><i>x</i></sup>
+<i>e</i> = <i>x</i><sup><i>x</i></sup>
 </div>
 <p>But as previously established</p>
 <div class="formula">
-<i>x</i><sup><i>x</i></sup> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>  ⇒  <i>e</i> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>
+<i>x</i><sup><i>x</i></sup> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span> ⟹ <i>e</i> = <span class="fraction"><span class="ignored">(</span><span class="numerator">2</span><span class="ignored">)/(</span><span class="denominator"><i>π</i></span><span class="ignored">)</span></span>
 </div>
 <p>Which is false. Therefore since supposing the existence of a solution leads
 only to contradiction we proved that no real number is solution.</p>
 <div class="formula">
-∄<i>x</i> ∈ ℝ, <i>x</i><sup><i>x</i></sup> = <i>i</i>
+∄<i>x</i> ∈ ℝ, <i>x</i><sup><i>x</i></sup> = <i>i</i>
 </div>
 <p>Nothing groundbreaking, just a thought. It's funny how all my proofs end up
 being proofs by contradiction one way or another even though it is frowned
@@ -522,7 +522,7 @@ worth it and these cans are too big for a single meal so I'm stuck with it
 for the next day at least. I would much rather have more kind of fish cans
 and complete dishes such as canned raviolis in case I really start craving
 meat. Still, this was a nice experience overall.</p>
-</div>
+</section>
     </div>
   </body>
 </html>

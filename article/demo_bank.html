@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Why we need authenticated cryptography</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="why-we-need-authenticated-cryptography">
-<h1>Why we need authenticated cryptography</h1>
-<div class="section" id="genesis">
-<h2>Genesis</h2>
+      <section id="why-we-need-authenticated-cryptography">
+<h2>Why we need authenticated cryptography</h2>
+<section id="genesis">
+<h3>Genesis</h3>
 <p>I was asked the question &quot;Can someone modify an encrypted document without
 ever decrypting it?&quot;. The answer is yes, although it is quite counter
 intuitive.</p>
@@ -63,31 +63,31 @@ messages to detect tampering.</p>
 cipher when you have more than a block (generally 16 bytes) of data. It
 is generally written next to the cipher name. For example AES-256-GCM is
 using the AES cipher with a 256 bits key and the GCM mode.</pre>
-</div>
-<div class="section" id="the-simulation">
-<h2>The simulation</h2>
+</section>
+<section id="the-simulation">
+<h3>The simulation</h3>
 <p>In order to demonstrate how an attacker could modify an encrypted message I
 wrote a little bank simulation in python. You can find the full code <a class="reference external" href="../file/demo_nomac_tamper.py">here</a>.</p>
 <p><em>If you know python you may find some design choices weird. My primary goal
 was to produce a code that even a beginner can understand and modify to
 experiment other scenarios.</em></p>
 <p>Let's launch it to see how it goes. To halt it use Ctl+C.</p>
-<pre class="code bash literal-block"><code>$ python demo_nomac_tamper.py
-<span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$6230</span> from Alice to Bob
-5844c2b7c2a31ec2bf47641e23c295c28fc28f54c38dc29e
-<span class="o">[</span><span class="m">0</span><span class="o">]</span> Transfered <span class="nv">$6230</span> from Alice to Bob
+<pre class="code bash literal-block"><code>$<span class="w"> </span>python<span class="w"> </span>demo_nomac_tamper.py<span class="w">
+</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>Requesting<span class="w"> </span>a<span class="w"> </span>transfer<span class="w"> </span>of<span class="w"> </span><span class="nv">$6230</span><span class="w"> </span>from<span class="w"> </span>Alice<span class="w"> </span>to<span class="w"> </span>Bob<span class="w">
+</span>5844c2b7c2a31ec2bf47641e23c295c28fc28f54c38dc29e<span class="w">
+</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>Transfered<span class="w"> </span><span class="nv">$6230</span><span class="w"> </span>from<span class="w"> </span>Alice<span class="w"> </span>to<span class="w"> </span>Bob<span class="w">
 
-<span class="o">[</span><span class="m">1</span><span class="o">]</span> Requesting a transfer of <span class="nv">$4731</span> from Denis to Alice
-5b47c2bcc2bc3ac2af6a621536c390c381c28853c282c29fc3bf0f
-<span class="o">[</span><span class="m">1</span><span class="o">]</span> Transfered <span class="nv">$4731</span> from Denis to Alice
+</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>Requesting<span class="w"> </span>a<span class="w"> </span>transfer<span class="w"> </span>of<span class="w"> </span><span class="nv">$4731</span><span class="w"> </span>from<span class="w"> </span>Denis<span class="w"> </span>to<span class="w"> </span>Alice<span class="w">
+</span>5b47c2bcc2bc3ac2af6a621536c390c381c28853c282c29fc3bf0f<span class="w">
+</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>Transfered<span class="w"> </span><span class="nv">$4731</span><span class="w"> </span>from<span class="w"> </span>Denis<span class="w"> </span>to<span class="w"> </span>Alice<span class="w">
 
-^C
------------
-Alice   <span class="nv">$8501</span>
-Bob     <span class="nv">$16230</span>
-Charles <span class="nv">$10000</span>
-Denis   <span class="nv">$5269</span>
-Eve     <span class="nv">$0</span></code></pre>
+</span>^C<span class="w">
+</span>-----------<span class="w">
+</span>Alice<span class="w">   </span><span class="nv">$8501</span><span class="w">
+</span>Bob<span class="w">     </span><span class="nv">$16230</span><span class="w">
+</span>Charles<span class="w"> </span><span class="nv">$10000</span><span class="w">
+</span>Denis<span class="w">   </span><span class="nv">$5269</span><span class="w">
+</span>Eve<span class="w">     </span><span class="nv">$0</span></code></pre>
 <p>We can see some money transfer requests between different persons. The
 hexadecimal string in-between the request and confirmation is the encrypted
 message as seen by someone eavesdropping on the network. That person is Eve,
@@ -95,23 +95,23 @@ the malicious user that would very much like stealing that money as she has
 nothing left on her account.</p>
 <p>For now she is only looking at the packets, but let's turn the BE_EVIL flag
 at the top of the file and relaunch the demo:</p>
-<pre class="code bash literal-block"><code>$ python demo_nomac_tamper.py
-<span class="o">[</span><span class="m">0</span><span class="o">]</span> Requesting a transfer of <span class="nv">$3115</span> from Alice to Bob
-5844c2b7c2a31ec2bf47641e23c290c28cc28d51c38dc29e
-<span class="o">[</span><span class="m">0</span><span class="o">]</span> Transfered <span class="nv">$3115</span> from Alice to Eve
-HACKED!
+<pre class="code bash literal-block"><code>$<span class="w"> </span>python<span class="w"> </span>demo_nomac_tamper.py<span class="w">
+</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>Requesting<span class="w"> </span>a<span class="w"> </span>transfer<span class="w"> </span>of<span class="w"> </span><span class="nv">$3115</span><span class="w"> </span>from<span class="w"> </span>Alice<span class="w"> </span>to<span class="w"> </span>Bob<span class="w">
+</span>5844c2b7c2a31ec2bf47641e23c290c28cc28d51c38dc29e<span class="w">
+</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>Transfered<span class="w"> </span><span class="nv">$3115</span><span class="w"> </span>from<span class="w"> </span>Alice<span class="w"> </span>to<span class="w"> </span>Eve<span class="w">
+</span>HACKED!<span class="w">
 
-<span class="o">[</span><span class="m">1</span><span class="o">]</span> Requesting a transfer of <span class="nv">$1734</span> from Bob to Charles
-5943c2b4c2ad33c2b65d7b3930c381c381c28d53c282c29ac3bf0f
-<span class="o">[</span><span class="m">1</span><span class="o">]</span> User not found Dqfrles
+</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>Requesting<span class="w"> </span>a<span class="w"> </span>transfer<span class="w"> </span>of<span class="w"> </span><span class="nv">$1734</span><span class="w"> </span>from<span class="w"> </span>Bob<span class="w"> </span>to<span class="w"> </span>Charles<span class="w">
+</span>5943c2b4c2ad33c2b65d7b3930c381c381c28d53c282c29ac3bf0f<span class="w">
+</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>User<span class="w"> </span>not<span class="w"> </span>found<span class="w"> </span>Dqfrles<span class="w">
 
-^C
------------
-Alice   <span class="nv">$6885</span>
-Bob     <span class="nv">$10000</span>
-Charles <span class="nv">$10000</span>
-Denis   <span class="nv">$10000</span>
-Eve     <span class="nv">$3115</span></code></pre>
+</span>^C<span class="w">
+</span>-----------<span class="w">
+</span>Alice<span class="w">   </span><span class="nv">$6885</span><span class="w">
+</span>Bob<span class="w">     </span><span class="nv">$10000</span><span class="w">
+</span>Charles<span class="w"> </span><span class="nv">$10000</span><span class="w">
+</span>Denis<span class="w">   </span><span class="nv">$10000</span><span class="w">
+</span>Eve<span class="w">     </span><span class="nv">$3115</span></code></pre>
 <p>We halted the program at two messages but you can continue. We see that a
 transfer request from Alice to Bob was confirmed as being a request from
 Alice to Eve! And we also see that a transfer from Bob to Charles gave a
@@ -121,9 +121,9 @@ for Bob, so that &quot;Bob&quot; actually decrypts to &quot;Eve&quot;. As all me
 Bob the others don't decrypt well now, but as the bank will just ignore them
 that's no concern for us. So we aren't taking Bob's money but we hijack any
 transfer to his account (and block any other transfer in this simple case).</p>
-</div>
-<div class="section" id="why-was-it-possible">
-<h2>Why was it possible?</h2>
+</section>
+<section id="why-was-it-possible">
+<h3>Why was it possible?</h3>
 <img alt="../image/kigurumi_wondering.png" src="../image/kigurumi_wondering.png" style="width: 20%;" />
 <p>There are lots of useful comments in the code to explain what we did and how
 we did it. I'll focus here on the more mathematical part.</p>
@@ -131,7 +131,7 @@ we did it. I'll focus here on the more mathematical part.</p>
 encrypt data a block at a time: for each plaintext byte <em>P</em> I will compute a
 pseudo-random byte <em>R</em> and XOR the two giving me an ciphered byte <em>C</em>.</p>
 <div class="formula">
-<i>C</i> = <i>P</i>⊕<i>R</i>
+<i>C</i> = <i>P</i>⊕<i>R</i>
 </div>
 <p>Of course the random byte isn't really random, it is part of a random-looking
 sequence generated by the key so that it can be deciphered. But we aren't
@@ -141,56 +141,56 @@ first byte of the ciphertext will be the first byte of the plaintext.</p>
 order. That's how the cipher works, to decipher the message just generate the
 same random bytes and XOR them with the ciphertext:</p>
 <div class="formula">
-<i>C</i>⊕<i>R</i> = <i>P</i>⊕<i>R</i>⊕<i>R</i> = <i>P</i>
+<i>C</i>⊕<i>R</i> = <i>P</i>⊕<i>R</i>⊕<i>R</i> = <i>P</i>
 </div>
 <p>This also means that if we XOR some other <em>M</em> byte with the ciphertext it will
 be reflected in the plaintext:</p>
 <div class="formula">
-<i>C</i>’ = <i>C</i>⊕<i>M</i>
+<i>C</i>’ = <i>C</i>⊕<i>M</i>
 </div>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = <i>P</i>⊕<i>R</i>⊕<i>M</i>⊕<i>R</i> = <i>P</i>⊕<i>M</i>
+<i>C</i>’⊕<i>R</i> = <i>P</i>⊕<i>R</i>⊕<i>M</i>⊕<i>R</i> = <i>P</i>⊕<i>M</i>
 </div>
 <p>We can use this to our advantage. Let's suppose that the plaintext byte is a
 <em>b</em>, then we can do the following.</p>
 <div class="formula">
-<i>C</i>’ = <i>C</i>⊕<i>b</i>
+<i>C</i>’ = <i>C</i>⊕<i>b</i>
 </div>
 <p>If <em>P</em> is indeed a <em>b</em> this will simplify into:</p>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = (<i>C</i>⊕<i>b</i>)⊕<i>R</i>)
+<i>C</i>’⊕<i>R</i> = (<i>C</i>⊕<i>b</i>)⊕<i>R</i>)
 </div>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = ((<i>P</i>⊕<i>R</i>)⊕<i>b</i>)⊕<i>R</i>)
+<i>C</i>’⊕<i>R</i> = ((<i>P</i>⊕<i>R</i>)⊕<i>b</i>)⊕<i>R</i>)
 </div>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = (<i>b</i>⊕<i>b</i>⊕<i>R</i>⊕<i>R</i>)
+<i>C</i>’⊕<i>R</i> = (<i>b</i>⊕<i>b</i>⊕<i>R</i>⊕<i>R</i>)
 </div>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = 0
+<i>C</i>’⊕<i>R</i> = 0
 </div>
 <p>We will have changed our <em>b</em> into 0! But that only works if we know what
 byte to change and what value we expect it to be. All that's left to do is to
 also XOR the letter we want instead, so an <em>e</em> in our case:</p>
 <div class="formula">
-<i>C</i>’ = <i>C</i>⊕<i>b</i>⊕<i>e</i>
+<i>C</i>’ = <i>C</i>⊕<i>b</i>⊕<i>e</i>
 </div>
 <div class="formula">
-<i>C</i>’⊕<i>R</i> = <i>e</i>
+<i>C</i>’⊕<i>R</i> = <i>e</i>
 </div>
 <p>And that's how we were able to change three bytes. Of course when the
 original bytes aren't what we expected them to be it won't decrypt to
 anything useful. But as most communications use very structured formats,
 emails for example, it is often possible to find something to modify to our
 advantage without ever decrypting the message.</p>
-<div class="section" id="image-source">
-<h3>Image source</h3>
+<section id="image-source">
+<h4>Image source</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://catbox.moe/">https://catbox.moe/</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

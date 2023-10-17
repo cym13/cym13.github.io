@@ -29,17 +29,17 @@ li {
     text-align: justify;
 }
 
-.content h1 {
+.content h1,h2 {
     text-align: center;
     font-size: 40px;
 }
 
-.content h2 {
+.content h3 {
     margin-top: 50px;
     font-size: 30px;
 }
 
-.content h3 {
+.content h4 {
     margin-top: 40px;
 }
 
@@ -102,6 +102,7 @@ li {
     font-style: italic;
     margin-top: 0px;
     margin-bottom: 0px;
+    font-size: 30px;
 }
 
 

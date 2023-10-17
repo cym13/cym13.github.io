@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Hacking the simplest database</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,37 +46,37 @@
     </header>
 
     <div class="content">
-      <div class="section" id="hacking-the-simplest-database">
-<h1>Hacking the simplest database</h1>
-<div class="section" id="a-database-case-study">
-<h2>A database case study</h2>
+      <section id="hacking-the-simplest-database">
+<h2>Hacking the simplest database</h2>
+<section id="a-database-case-study">
+<h3>A database case study</h3>
 <p>In here blog post <a class="reference external" href="https://jvns.ca/blog/2017/06/11/log-structured-storage/">Log-structured storage</a> Julia Evans mentions what she
 calls the &quot;Simplest database&quot;. Behold the entirety of its code:</p>
 <pre class="code bash literal-block"><code><span class="ch">#!/bin/bash
-</span>
-db_set<span class="o">()</span> <span class="o">{</span>
-    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">,</span><span class="nv">$2</span><span class="s2">&quot;</span> &gt;&gt; database
-<span class="o">}</span>
+</span><span class="w">
+</span>db_set<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w">
+    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">,</span><span class="nv">$2</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>database<span class="w">
+</span><span class="o">}</span><span class="w">
 
-db_get<span class="o">()</span> <span class="o">{</span>
-    grep <span class="s2">&quot;^</span><span class="nv">$1</span><span class="s2">,&quot;</span> database <span class="p">|</span> sed -e <span class="s2">&quot;s/^</span><span class="nv">$1</span><span class="s2">,//&quot;</span> <span class="p">|</span> tail -n <span class="m">1</span>
-<span class="o">}</span></code></pre>
+</span>db_get<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w">
+    </span>grep<span class="w"> </span><span class="s2">&quot;^</span><span class="nv">$1</span><span class="s2">,&quot;</span><span class="w"> </span>database<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s/^</span><span class="nv">$1</span><span class="s2">,//&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="o">}</span></code></pre>
 <p>This isn't of course meant to be a practical database, mainly a minimalism
 case study. But still it is interesting in some ways. Julia Evans used it as
 a minimalist database, we'll use it for a minimalist security code review.</p>
 <p>So let's break thing!</p>
 <img alt="../image/rainbowdash_caught_worse.jpg" src="../image/rainbowdash_caught_worse.jpg" />
-</div>
-<div class="section" id="privilege-escalation">
-<h2>Privilege escalation</h2>
+</section>
+<section id="privilege-escalation">
+<h3>Privilege escalation</h3>
 <p>We're essentially reading from and writing to a file. How can this be
 exploited? As we already <a class="reference external" href="scr_privesc.html">saw</a> file operations are often
 a vector of privilege escalations.</p>
 <p>We will assume that the user using that database is root. It could be another
 user but the point is that he's someone worth grabbing the access.</p>
 <p>The file is written in the current directory so we face different cases:</p>
-<div class="section" id="the-current-directory-is-world-readable">
-<h3>The current directory is world-readable</h3>
+<section id="the-current-directory-is-world-readable">
+<h4>The current directory is world-readable</h4>
 <p>No specific set of permissions is set on the file which means it will be
 created with the user's umask permissions. In practice this means on most
 systems the file will be readable by any user, but writable only by the
@@ -84,19 +84,19 @@ owner.</p>
 <p>This wouldn't be an issue if the file was kept in a protected directory, but
 if in a world-readable one then anyone can just read the content of the
 database. Better not store passwords in there.</p>
-</div>
-<div class="section" id="the-current-directory-is-world-writable">
-<h3>The current directory is world-writable</h3>
+</section>
+<section id="the-current-directory-is-world-writable">
+<h4>The current directory is world-writable</h4>
 <p>The file could also be written to a world-writable directory such as /tmp or
 /dev/shm.</p>
 <p>In that case the exploitation is straight forward: create a symbolic link to
 another file, say /etc/shadow. When root tries using the database he will
 overwrite or read from that file instead. If we get some control on its data,
 all the better. We can get a shell from that.</p>
-</div>
-</div>
-<div class="section" id="data-injection">
-<h2>Data injection</h2>
+</section>
+</section>
+<section id="data-injection">
+<h3>Data injection</h3>
 <p>Privilege escalation is good but it requires to have a foot on the system.
 What if we only have an access to its data, such as through a web interface?</p>
 <p>The easiest thing to do is to perform data injection. Of course in the
@@ -104,82 +104,82 @@ current setup it's not very interesting: there is no security mechanism
 preventing us to overwrite another data. But what if there was? What if some
 keys were off-limit?</p>
 <p>Here we can do two types of data injection: comma-based and line-based.</p>
-<div class="section" id="comma-based-injection">
-<h3>Comma-based injection</h3>
+<section id="comma-based-injection">
+<h4>Comma-based injection</h4>
 <p>Fields are limited by commas, but nothing is preventing us to insert commas
 in our data. Putting a comma in the value isn't terribly useful because it
 would be transparent: only the first comma has a meaning.</p>
 <p>On the other hand putting a comma in the key would allow us to redefine
 another field.</p>
-<pre class="code bash literal-block"><code>$ db_set password YouCantTouchMe
+<pre class="code bash literal-block"><code>$<span class="w"> </span>db_set<span class="w"> </span>password<span class="w"> </span>YouCantTouchMe<span class="w">
 
-$ db_set password, YesICan
+</span>$<span class="w"> </span>db_set<span class="w"> </span>password,<span class="w"> </span>YesICan<span class="w">
 
-$ db_get password
-,YesICan</code></pre>
+</span>$<span class="w"> </span>db_get<span class="w"> </span>password<span class="w">
+</span>,YesICan</code></pre>
 <p>Fun thing, the second entry is actually still perfectly functionnal:</p>
-<pre class="code bash literal-block"><code>$ db_get password,
-YesICan</code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>db_get<span class="w"> </span>password,<span class="w">
+</span>YesICan</code></pre>
 <p>So, should we strip commas off user inputs? Of course not, stripping is very
 rarely a good idea. Here we should either escape them by encoding them in
 some form, or refuse them altogether.</p>
-<pre class="code bash literal-block"><code>$ db_set password YouCantTouchMe
+<pre class="code bash literal-block"><code>$<span class="w"> </span>db_set<span class="w"> </span>password<span class="w"> </span>YouCantTouchMe<span class="w">
 
-$ db_set pass,word YesICan
+</span>$<span class="w"> </span>db_set<span class="w"> </span>pass,word<span class="w"> </span>YesICan<span class="w">
 
-$ db_get password
-YesICan</code></pre>
-</div>
-<div class="section" id="line-based-injection">
-<h3>Line-based injection</h3>
+</span>$<span class="w"> </span>db_get<span class="w"> </span>password<span class="w">
+</span>YesICan</code></pre>
+</section>
+<section id="line-based-injection">
+<h4>Line-based injection</h4>
 <p>If commas are unusable we can rely on line injections to get a similar
 effect:</p>
-<pre class="code bash literal-block"><code>$ db_set password YouCantTouchMe
+<pre class="code bash literal-block"><code>$<span class="w"> </span>db_set<span class="w"> </span>password<span class="w"> </span>YouCantTouchMe<span class="w">
 
-$ db_set legit <span class="s2">&quot;AAAA\npassword,YesICan&quot;</span>
+</span>$<span class="w"> </span>db_set<span class="w"> </span>legit<span class="w"> </span><span class="s2">&quot;AAAA\npassword,YesICan&quot;</span><span class="w">
 
-$ db_get legit
-AAAA
+</span>$<span class="w"> </span>db_get<span class="w"> </span>legit<span class="w">
+</span>AAAA<span class="w">
 
-$ db_get password
-YesICan</code></pre>
+</span>$<span class="w"> </span>db_get<span class="w"> </span>password<span class="w">
+</span>YesICan</code></pre>
 <p>Of course the solution is similar to that of the comma example.</p>
-</div>
-</div>
-<div class="section" id="sed-injection">
-<h2>Sed injection</h2>
+</section>
+</section>
+<section id="sed-injection">
+<h3>Sed injection</h3>
 <p>I love sed injections because you almost never find one, but when you do it's
 practically guaranteed to give you full access.</p>
 <p>It's not well-known but sed can execute shell commands, so let's just pop a
 shell:</p>
-<pre class="code bash literal-block"><code>$ db_get legit <span class="s2">&quot;We need the database to be not-empty&quot;</span>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>db_get<span class="w"> </span>legit<span class="w"> </span><span class="s2">&quot;We need the database to be not-empty&quot;</span><span class="w">
 
-$ db_get <span class="s2">&quot;//;e sh #&quot;</span> whatever</code></pre>
+</span>$<span class="w"> </span>db_get<span class="w"> </span><span class="s2">&quot;//;e sh #&quot;</span><span class="w"> </span>whatever</code></pre>
 <p>That injections forms the following sed command which calls /bin/sh using <em>e</em>
 and ignores the rest of the line:</p>
-<pre class="code bash literal-block"><code>$ sed <span class="s2">&quot;s/^//;e /bin/sh #,//&quot;</span> whatever</code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>sed<span class="w"> </span><span class="s2">&quot;s/^//;e /bin/sh #,//&quot;</span><span class="w"> </span>whatever</code></pre>
 <p>Of course if we were remote we would be using a reverse shell or something
 similar. Stopping <em>e</em> isn't enough, sed also has commands to write to files
 and read from them. This can also lead to remote command execution, for
 example by changing the content of an executable file or getting SSH access
 by changing ~/.ssh/authorized_keys.</p>
 <p>Sed rocks ;)</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>What is interesting isn't showing how insecure such a simple example is: it
 was never meant to be secure in the first place.</p>
 <p>No, what's really interesting is that those vulnerabilities are very <em>very</em>
 common, even in commercial solutions. 5 ways to exploit 6 lines of code is a
 nice ratio though ;)</p>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="http://rainbows-dashing.deviantart.com/art/ive-seen-worse-325266232">http://rainbows-dashing.deviantart.com/art/ive-seen-worse-325266232</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

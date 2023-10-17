@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Puppy writeup</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,17 +46,17 @@
     </header>
 
     <div class="content">
-      <div class="section" id="puppy-writeup">
-<h1>Puppy writeup</h1>
-<div class="section" id="introduction">
-<h2>Introduction</h2>
+      <section id="puppy-writeup">
+<h2>Puppy writeup</h2>
+<section id="introduction">
+<h3>Introduction</h3>
 <p>Quelqu'un sur irc hier a proposé un <a class="reference external" href="http://imgur.com/pb2jkGn">petit challenge de steganographie</a> pas méchant. La victime du jour ? Un chiot qui
 renferme, nous dit-on, des secrets.</p>
 <p><strong>puppy.png</strong></p>
 <img alt="../image/puppy.png" src="../image/puppy.png" />
-</div>
-<div class="section" id="a-la-recherche-d-un-texte-cache">
-<h2>À la recherche d'un texte caché</h2>
+</section>
+<section id="a-la-recherche-d-un-texte-cache">
+<h3>À la recherche d'un texte caché</h3>
 <p>Les deux formes les plus courantes d'information cachées dans une image sont:</p>
 <ul class="simple">
 <li><p>Du texte sous forme de commentaire ou autre</p></li>
@@ -66,57 +66,57 @@ renferme, nous dit-on, des secrets.</p>
 chaines de caractère présentes dans un binaire. La plupart sont le fruit de
 coïncidences mais s'il y a du texte légitime non chiffré on devrait pouvoir
 le retrouver.</p>
-<pre class="code bash literal-block"><code>$ strings puppy.png
+<pre class="code bash literal-block"><code>$<span class="w"> </span>strings<span class="w"> </span>puppy.png<span class="w">
 
-IHDR
-sRGB
+</span>IHDR<span class="w">
+</span>sRGB<span class="w">
 
-...
+</span>...<span class="w">
 
-<span class="o">)</span>2DE2b
-__MACOSX/UX
-__MACOSX/Secret/UX
-__MACOSX/Secret/._skull.jpgUX
-cg<span class="sb">`</span>b<span class="sb">`</span>
-<span class="m">100</span>.
-20h<span class="p">&amp;</span>
-QRR<span class="sb">`</span>
-L_7?
-KMS<span class="se">\
-</span>Secret/Untitled.rtfUX
-__MACOSX/Secret/._Untitled.rtfUX
-cg<span class="sb">`</span>b<span class="sb">`</span>
-<span class="m">2</span>+0tA
-Secret/UX
-Secret/skull.jpgUX
-__MACOSX/UX
-__MACOSX/Secret/UX
-__MACOSX/Secret/._skull.jpgUX
-Secret/Untitled.rtfUX
-__MACOSX/Secret/._Untitled.rtfUX</code></pre>
+</span><span class="o">)</span>2DE2b<span class="w">
+</span>__MACOSX/UX<span class="w">
+</span>__MACOSX/Secret/UX<span class="w">
+</span>__MACOSX/Secret/._skull.jpgUX<span class="w">
+</span>cg<span class="sb">`</span>b<span class="sb">`</span><span class="w">
+</span><span class="m">100</span>.<span class="w">
+</span>20h<span class="p">&amp;</span><span class="w">
+</span>QRR<span class="sb">`</span><span class="w">
+</span>L_7?<span class="w">
+</span>KMS<span class="se">\
+</span>Secret/Untitled.rtfUX<span class="w">
+</span>__MACOSX/Secret/._Untitled.rtfUX<span class="w">
+</span>cg<span class="sb">`</span>b<span class="sb">`</span><span class="w">
+</span><span class="m">2</span>+0tA<span class="w">
+</span>Secret/UX<span class="w">
+</span>Secret/skull.jpgUX<span class="w">
+</span>__MACOSX/UX<span class="w">
+</span>__MACOSX/Secret/UX<span class="w">
+</span>__MACOSX/Secret/._skull.jpgUX<span class="w">
+</span>Secret/Untitled.rtfUX<span class="w">
+</span>__MACOSX/Secret/._Untitled.rtfUX</code></pre>
 <p>Visiblement ça n'a pas été inutile, on voit clairement des chemins de
 fichiers présents dans l'image, et il semble que celle-ci ai été faite avec
 un mac. On dirait que tout les chemins finissent par UX... Cela s'expliquera
 sans doute par la suite. Avant cela, récupéront une liste plus propre:</p>
-<pre class="code bash literal-block"><code>$ strings puppy.png <span class="p">|</span> grep -e Secret -e MACOS
+<pre class="code bash literal-block"><code>$<span class="w"> </span>strings<span class="w"> </span>puppy.png<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span>Secret<span class="w"> </span>-e<span class="w"> </span>MACOS<span class="w">
 
-Secret/UX
-Secret/skull.jpgUX
-__MACOSX/UX
-__MACOSX/Secret/UX
-__MACOSX/Secret/._skull.jpgUX
-Secret/Untitled.rtfUX
-__MACOSX/Secret/._Untitled.rtfUX
-Secret/UX
-Secret/skull.jpgUX
-__MACOSX/UX
-__MACOSX/Secret/UX
-__MACOSX/Secret/._skull.jpgUX
-Secret/Untitled.rtfUX
-__MACOSX/Secret/._Untitled.rtfUX</code></pre>
-</div>
-<div class="section" id="a-la-recherche-d-un-fichier-cache">
-<h2>À la recherche d'un fichier caché</h2>
+</span>Secret/UX<span class="w">
+</span>Secret/skull.jpgUX<span class="w">
+</span>__MACOSX/UX<span class="w">
+</span>__MACOSX/Secret/UX<span class="w">
+</span>__MACOSX/Secret/._skull.jpgUX<span class="w">
+</span>Secret/Untitled.rtfUX<span class="w">
+</span>__MACOSX/Secret/._Untitled.rtfUX<span class="w">
+</span>Secret/UX<span class="w">
+</span>Secret/skull.jpgUX<span class="w">
+</span>__MACOSX/UX<span class="w">
+</span>__MACOSX/Secret/UX<span class="w">
+</span>__MACOSX/Secret/._skull.jpgUX<span class="w">
+</span>Secret/Untitled.rtfUX<span class="w">
+</span>__MACOSX/Secret/._Untitled.rtfUX</code></pre>
+</section>
+<section id="a-la-recherche-d-un-fichier-cache">
+<h3>À la recherche d'un fichier caché</h3>
 <p>Regardons la liste de fichier que l'on a trouvé (moins les <span class="docutils literal">UX</span> qui ne
 semblent pas en faire partie au regard des extensions que l'on identifie).</p>
 <pre class="literal-block">__MACOSX/
@@ -147,9 +147,9 @@ est compressé. Ça pourrait être une archive compressée dans un système de
 fichier, mais dans ce cas le nom de l'archive serait visible parmi les
 fichiers trouvé et ce n'est pas le cas.</p>
 <p>On est donc à la recherche d'une archive contenant une image et un texte.</p>
-</div>
-<div class="section" id="a-la-recherche-de-l-archive-cachee">
-<h2>À la recherche de l'archive cachée</h2>
+</section>
+<section id="a-la-recherche-de-l-archive-cachee">
+<h3>À la recherche de l'archive cachée</h3>
 <p>Nous devons identifier l'archive parmi les informations binaires de l'image
 et l'en séparer. Le soucis est que l'on ne sait pas où elle se trouve ni de
 quel type d'archive il s'agit (tar.gz, zip, tar.bz2, ax, xz, 7z...).</p>
@@ -161,37 +161,37 @@ des outils spécifiques.</p>
 <p>Si l'on reprend le résultat original de <span class="docutils literal">strings</span> on voit que le premier
 nom de fichier était <span class="docutils literal">Secret/</span>. Cherchons où il se trouve. <span class="docutils literal">strings</span> peut
 donner les offsets des résultats avec <span class="docutils literal"><span class="pre">--radix=x</span></span>.</p>
-<pre class="code bash literal-block"><code>$ strings --radix<span class="o">=</span>x puppy.png <span class="p">|</span> grep Secret/ <span class="p">|</span> head -1
+<pre class="code bash literal-block"><code>$<span class="w"> </span>strings<span class="w"> </span>--radix<span class="o">=</span>x<span class="w"> </span>puppy.png<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Secret/<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="w">
 
-  3d04d Secret/UX</code></pre>
+  </span>3d04d<span class="w"> </span>Secret/UX</code></pre>
 <p>Allons voir ce qui se trouve du côté de l'offset 0x3d04d du coup :</p>
 <p>On peut utiliser hexdump ou xxd (qui vient avec vim) pour obtenir une
 représentation mi-hexadécimale, mi-ascii du contenu du fichier. Je vais
 utiliser xxd ici.</p>
-<pre class="code bash literal-block"><code>$ xxd puppy.png <span class="p">|</span> head
+<pre class="code bash literal-block"><code>$<span class="w"> </span>xxd<span class="w"> </span>puppy.png<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w">
 
-<span class="m">00000000</span>: <span class="m">8950</span> 4e47 0d0a 1a0a <span class="m">0000</span> 000d <span class="m">4948</span> <span class="m">4452</span>  .PNG........IHDR
-<span class="m">00000010</span>: <span class="m">0000</span> <span class="m">0215</span> <span class="m">0000</span> <span class="m">0190</span> <span class="m">0802</span> <span class="m">0000</span> <span class="m">0096</span> <span class="m">1305</span>  ................
-<span class="m">00000020</span>: df00 <span class="m">0000</span> <span class="m">0173</span> <span class="m">5247</span> <span class="m">4200</span> aece 1ce9 <span class="m">0000</span>  .....sRGB.......
-<span class="m">00000030</span>: <span class="m">0009</span> <span class="m">7048</span> <span class="m">5973</span> <span class="m">0000</span> 0b13 <span class="m">0000</span> 0b13 <span class="m">0100</span>  ..pHYs..........
-<span class="m">00000040</span>: 9a9c <span class="m">1800</span> <span class="m">0040</span> <span class="m">0049</span> <span class="m">4441</span> <span class="m">5478</span> 018c bd09  .....&#64;.IDATx....
-<span class="m">00000050</span>: <span class="m">9264</span> 3b92 5de9 <span class="m">5344</span> fe4c <span class="m">9242</span> 11ee ba17  .d<span class="p">;</span>.<span class="o">]</span>.SD.L.B....
-<span class="m">00000060</span>: d04b e8d5 b548 8b90 95ac fae1 639f 7b0f  .K...H......c.<span class="o">{</span>.
-<span class="m">00000070</span>: a00f 661e 3f8b 1a1e <span class="m">3085</span> 8e17 0a3c bcc1  ..f.?...0....&lt;..
-<span class="m">00000080</span>: ccdc 1fff afff fbff 797e 7e7e <span class="m">7878</span> f80c  ........y~~~xx..
-<span class="m">00000090</span>: bdc3 3c3e 3e7e 7d7d 3d7e 7e3d 3d3d d185  ..&lt;&gt;&gt;~<span class="o">}}=</span>~~<span class="o">===</span>..</code></pre>
+</span><span class="m">00000000</span>:<span class="w"> </span><span class="m">8950</span><span class="w"> </span>4e47<span class="w"> </span>0d0a<span class="w"> </span>1a0a<span class="w"> </span><span class="m">0000</span><span class="w"> </span>000d<span class="w"> </span><span class="m">4948</span><span class="w"> </span><span class="m">4452</span><span class="w">  </span>.PNG........IHDR<span class="w">
+</span><span class="m">00000010</span>:<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0215</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0190</span><span class="w"> </span><span class="m">0802</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0096</span><span class="w"> </span><span class="m">1305</span><span class="w">  </span>................<span class="w">
+</span><span class="m">00000020</span>:<span class="w"> </span>df00<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0173</span><span class="w"> </span><span class="m">5247</span><span class="w"> </span><span class="m">4200</span><span class="w"> </span>aece<span class="w"> </span>1ce9<span class="w"> </span><span class="m">0000</span><span class="w">  </span>.....sRGB.......<span class="w">
+</span><span class="m">00000030</span>:<span class="w"> </span><span class="m">0009</span><span class="w"> </span><span class="m">7048</span><span class="w"> </span><span class="m">5973</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span>0b13<span class="w"> </span><span class="m">0000</span><span class="w"> </span>0b13<span class="w"> </span><span class="m">0100</span><span class="w">  </span>..pHYs..........<span class="w">
+</span><span class="m">00000040</span>:<span class="w"> </span>9a9c<span class="w"> </span><span class="m">1800</span><span class="w"> </span><span class="m">0040</span><span class="w"> </span><span class="m">0049</span><span class="w"> </span><span class="m">4441</span><span class="w"> </span><span class="m">5478</span><span class="w"> </span>018c<span class="w"> </span>bd09<span class="w">  </span>.....&#64;.IDATx....<span class="w">
+</span><span class="m">00000050</span>:<span class="w"> </span><span class="m">9264</span><span class="w"> </span>3b92<span class="w"> </span>5de9<span class="w"> </span><span class="m">5344</span><span class="w"> </span>fe4c<span class="w"> </span><span class="m">9242</span><span class="w"> </span>11ee<span class="w"> </span>ba17<span class="w">  </span>.d<span class="p">;</span>.<span class="o">]</span>.SD.L.B....<span class="w">
+</span><span class="m">00000060</span>:<span class="w"> </span>d04b<span class="w"> </span>e8d5<span class="w"> </span>b548<span class="w"> </span>8b90<span class="w"> </span>95ac<span class="w"> </span>fae1<span class="w"> </span>639f<span class="w"> </span>7b0f<span class="w">  </span>.K...H......c.<span class="o">{</span>.<span class="w">
+</span><span class="m">00000070</span>:<span class="w"> </span>a00f<span class="w"> </span>661e<span class="w"> </span>3f8b<span class="w"> </span>1a1e<span class="w"> </span><span class="m">3085</span><span class="w"> </span>8e17<span class="w"> </span>0a3c<span class="w"> </span>bcc1<span class="w">  </span>..f.?...0....&lt;..<span class="w">
+</span><span class="m">00000080</span>:<span class="w"> </span>ccdc<span class="w"> </span>1fff<span class="w"> </span>afff<span class="w"> </span>fbff<span class="w"> </span>797e<span class="w"> </span>7e7e<span class="w"> </span><span class="m">7878</span><span class="w"> </span>f80c<span class="w">  </span>........y~~~xx..<span class="w">
+</span><span class="m">00000090</span>:<span class="w"> </span>bdc3<span class="w"> </span>3c3e<span class="w"> </span>3e7e<span class="w"> </span>7d7d<span class="w"> </span>3d7e<span class="w"> </span>7e3d<span class="w"> </span>3d3d<span class="w"> </span>d185<span class="w">  </span>..&lt;&gt;&gt;~<span class="o">}}=</span>~~<span class="o">===</span>..</code></pre>
 <p>On veut les lignes autour de notre offset, en sachant que ces derniers sont
 alignés sur 16 octets (donc finissent par un 0). On veut donc la ligne
 commençant par l'offset 0003d040.</p>
 <pre class="code bash literal-block"><code><span class="c1"># -B2 et -A2 pour avoir 2 lignes avant et après le résultat
-</span>
-$ xxd puppy.png <span class="p">|</span> grep -B2 -A2 <span class="s2">&quot;3d040:&quot;</span>
+</span><span class="w">
+</span>$<span class="w"> </span>xxd<span class="w"> </span>puppy.png<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-B2<span class="w"> </span>-A2<span class="w"> </span><span class="s2">&quot;3d040:&quot;</span><span class="w">
 
-0003d020: <span class="m">3040</span> <span class="m">5060</span> <span class="m">7080</span> <span class="m">8887</span> <span class="m">8685</span> <span class="m">8483</span> <span class="m">8281</span> ff50  <span class="m">0</span>&#64;P<span class="sb">`</span>p..........P
-0003d030: 4b03 040a <span class="m">0000</span> <span class="m">0000</span> 00fb 081c <span class="m">4700</span> <span class="m">0000</span>  K...........G...
-0003d040: <span class="m">0000</span> <span class="m">0000</span> <span class="m">0000</span> <span class="m">0000</span> <span class="m">0007</span> <span class="m">0010</span> <span class="m">0053</span> <span class="m">6563</span>  .............Sec
-0003d050: <span class="m">7265</span> 742f <span class="m">5558</span> 0c00 378a df55 3a8a df55  ret/UX..7..U:..U
-0003d060: f501 <span class="m">1400</span> 504b <span class="m">0304</span> <span class="m">1400</span> <span class="m">0800</span> <span class="m">0800</span> 9b92  ....PK..........</code></pre>
+</span>0003d020:<span class="w"> </span><span class="m">3040</span><span class="w"> </span><span class="m">5060</span><span class="w"> </span><span class="m">7080</span><span class="w"> </span><span class="m">8887</span><span class="w"> </span><span class="m">8685</span><span class="w"> </span><span class="m">8483</span><span class="w"> </span><span class="m">8281</span><span class="w"> </span>ff50<span class="w">  </span><span class="m">0</span>&#64;P<span class="sb">`</span>p..........P<span class="w">
+</span>0003d030:<span class="w"> </span>4b03<span class="w"> </span>040a<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span>00fb<span class="w"> </span>081c<span class="w"> </span><span class="m">4700</span><span class="w"> </span><span class="m">0000</span><span class="w">  </span>K...........G...<span class="w">
+</span>0003d040:<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0007</span><span class="w"> </span><span class="m">0010</span><span class="w"> </span><span class="m">0053</span><span class="w"> </span><span class="m">6563</span><span class="w">  </span>.............Sec<span class="w">
+</span>0003d050:<span class="w"> </span><span class="m">7265</span><span class="w"> </span>742f<span class="w"> </span><span class="m">5558</span><span class="w"> </span>0c00<span class="w"> </span>378a<span class="w"> </span>df55<span class="w"> </span>3a8a<span class="w"> </span>df55<span class="w">  </span>ret/UX..7..U:..U<span class="w">
+</span>0003d060:<span class="w"> </span>f501<span class="w"> </span><span class="m">1400</span><span class="w"> </span>504b<span class="w"> </span><span class="m">0304</span><span class="w"> </span><span class="m">1400</span><span class="w"> </span><span class="m">0800</span><span class="w"> </span><span class="m">0800</span><span class="w"> </span>9b92<span class="w">  </span>....PK..........</code></pre>
 <p>Si on a pas un peu l'habitude de regarder des fichiers binaires, on peut
 passer à côté du caractère assez spécifique de ces quelques lignes. Il est
 rare en effet de trouver autant d'octets nuls côte à côte au beau milieu d'un
@@ -215,51 +215,51 @@ text editor the first two bytes of the file are usually &quot;PK&quot;.</pre>
 <p>Voilà qui est intéressant ! À l'offset 0x3d02f on voit effectivement PK ! Ce
 serait donc le début d'une archive zip ? On va la séparer du fichier pour
 voir.</p>
-</div>
-<div class="section" id="a-la-recherche-du-fichier-zip">
-<h2>À la recherche du fichier zip</h2>
+</section>
+<section id="a-la-recherche-du-fichier-zip">
+<h3>À la recherche du fichier zip</h3>
 <p>On sait où le ficher commence mais pas où il termine. On va déjà enlever le
 début. Pour cela, on va utiliser <span class="docutils literal">dd</span>. Cet utilitaire permet de faire des
 copie binaires. On va lui dire d'écrire la fin du fichier <strong>puppy.png</strong> dans
 le fichier <strong>out.zip</strong> en sautant 0x3d02f=249903 blocs de 1 octet.</p>
-<pre class="code bash literal-block"><code>$ dd <span class="k">if</span><span class="o">=</span>puppy.png <span class="nv">skip</span><span class="o">=</span><span class="m">249903</span> <span class="nv">bs</span><span class="o">=</span><span class="m">1</span> <span class="nv">of</span><span class="o">=</span>out.zip
+<pre class="code bash literal-block"><code>$<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>puppy.png<span class="w"> </span><span class="nv">skip</span><span class="o">=</span><span class="m">249903</span><span class="w"> </span><span class="nv">bs</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">of</span><span class="o">=</span>out.zip<span class="w">
 
-<span class="m">154934</span>+0 records <span class="k">in</span>
-<span class="m">154934</span>+0 records out
-<span class="m">154934</span> bytes <span class="o">(</span><span class="m">155</span> kB<span class="o">)</span> copied, <span class="m">0</span>.157568 s, <span class="m">983</span> kB/s
+</span><span class="m">154934</span>+0<span class="w"> </span>records<span class="w"> </span><span class="k">in</span><span class="w">
+</span><span class="m">154934</span>+0<span class="w"> </span>records<span class="w"> </span>out<span class="w">
+</span><span class="m">154934</span><span class="w"> </span>bytes<span class="w"> </span><span class="o">(</span><span class="m">155</span><span class="w"> </span>kB<span class="o">)</span><span class="w"> </span>copied,<span class="w"> </span><span class="m">0</span>.157568<span class="w"> </span>s,<span class="w"> </span><span class="m">983</span><span class="w"> </span>kB/s<span class="w">
 
-$ file out.zip
+</span>$<span class="w"> </span>file<span class="w"> </span>out.zip<span class="w">
 
-out.zip: Zip archive data, at least v1.0 to extract</code></pre>
+</span>out.zip:<span class="w"> </span>Zip<span class="w"> </span>archive<span class="w"> </span>data,<span class="w"> </span>at<span class="w"> </span>least<span class="w"> </span>v1.0<span class="w"> </span>to<span class="w"> </span>extract</code></pre>
 <p>Testons ?</p>
-<pre class="code bash literal-block"><code>$ unzip out.zip
+<pre class="code bash literal-block"><code>$<span class="w"> </span>unzip<span class="w"> </span>out.zip<span class="w">
 
-Archive:  out.zip
-   creating: Secret/
-  inflating: Secret/skull.jpg
-   creating: __MACOSX/
-   creating: __MACOSX/Secret/
-  inflating: __MACOSX/Secret/._skull.jpg
-  inflating: Secret/Untitled.rtf
-  inflating: __MACOSX/Secret/._Untitled.rtf</code></pre>
+</span>Archive:<span class="w">  </span>out.zip<span class="w">
+   </span>creating:<span class="w"> </span>Secret/<span class="w">
+  </span>inflating:<span class="w"> </span>Secret/skull.jpg<span class="w">
+   </span>creating:<span class="w"> </span>__MACOSX/<span class="w">
+   </span>creating:<span class="w"> </span>__MACOSX/Secret/<span class="w">
+  </span>inflating:<span class="w"> </span>__MACOSX/Secret/._skull.jpg<span class="w">
+  </span>inflating:<span class="w"> </span>Secret/Untitled.rtf<span class="w">
+  </span>inflating:<span class="w"> </span>__MACOSX/Secret/._Untitled.rtf</code></pre>
 <p>On dirait que ça a marché :) Si on regarde dans l'archive on trouve bien une
 image (qui ne contient rien d'autre... à moins que ? :p ) et un fichier rtf:</p>
 <p><strong>Secret/Untitled.rtf</strong></p>
-<pre class="code postscript literal-block"><code><span class="p">{</span><span class="nf">\rtf1\ansi\ansicpg1252\cocoartf1389</span>
-<span class="p">{</span><span class="nf">\fonttbl\f0\fswiss\fcharset0</span> <span class="nf">Helvetica;</span><span class="p">}</span>
-<span class="p">{</span><span class="nf">\colortbl;\red255\green255\blue255;</span><span class="p">}</span>
-<span class="nf">\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0</span>
-<span class="nf">\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669</span> <span class="nf">\</span>
-<span class="nf">\tx6236\tx6803\pardirnatural\partightenfactor0</span>
+<pre class="code postscript literal-block"><code><span class="p">{</span><span class="nf">\rtf1\ansi\ansicpg1252\cocoartf1389</span><span class="w">
+</span><span class="p">{</span><span class="nf">\fonttbl\f0\fswiss\fcharset0</span><span class="w"> </span><span class="nf">Helvetica;</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nf">\colortbl;\red255\green255\blue255;</span><span class="p">}</span><span class="w">
+</span><span class="nf">\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0</span><span class="w">
+</span><span class="nf">\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669</span><span class="w"> </span><span class="nf">\</span><span class="w">
+</span><span class="nf">\tx6236\tx6803\pardirnatural\partightenfactor0</span><span class="w">
 
-<span class="nf">\f0\fs24</span> <span class="nf">\cf0</span> <span class="nf">The</span> <span class="nf">Codeword</span> <span class="nf">is:\</span>
-<span class="nf">\</span>
-<span class="nf">hunter2</span><span class="p">}</span></code></pre>
+</span><span class="nf">\f0\fs24</span><span class="w"> </span><span class="nf">\cf0</span><span class="w"> </span><span class="nf">The</span><span class="w"> </span><span class="nf">Codeword</span><span class="w"> </span><span class="nf">is:\</span><span class="w">
+</span><span class="nf">\</span><span class="w">
+</span><span class="nf">hunter2</span><span class="p">}</span></code></pre>
 <p>Et voici le flag ! <strong>hunter2</strong></p>
 <img alt="../image/secret_skull.jpg" src="../image/secret_skull.jpg" style="width: 50%;" />
-</div>
-<div class="section" id="a-la-recherche-de-la-methode-employee">
-<h2>À la recherche de la méthode employée</h2>
+</section>
+<section id="a-la-recherche-de-la-methode-employee">
+<h3>À la recherche de la méthode employée</h3>
 <p>Comment est-il possible de mettre une archive ZIP dans un PNG sans endommager
 ce dernier ? Comme souvent, la solution se trouve sur wikipedia, dans la
 <a class="reference external" href="https://en.wikipedia.org/wiki/PNG_(file_format)">spécification du format PNG</a></p>
@@ -275,14 +275,14 @@ du fichier. Pour savoir où se trouve la fin, le format PNG utilise une
 section spéciale dont l'identificateur est <span class="docutils literal">IEND</span>, tout ce qui est après
 est ignoré. Où se trouve cette balise ?</p>
 <pre class="code bash literal-block"><code><span class="c1"># -B2 et -A2 pour avoir 2 lignes avant et après le résultat
-</span>
-$ xxd puppy.png <span class="p">|</span> grep -B2 -A2 <span class="s2">&quot;IEND&quot;</span>
+</span><span class="w">
+</span>$<span class="w"> </span>xxd<span class="w"> </span>puppy.png<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-B2<span class="w"> </span>-A2<span class="w"> </span><span class="s2">&quot;IEND&quot;</span><span class="w">
 
-0003cff0: <span class="m">4226</span> 8e55 656c 13c5 8e0c <span class="m">6383</span> dc06 49f4  B<span class="p">&amp;</span>.Uel....c...I.
-0003d000: 0d4a 0b89 0c31 e0ff <span class="m">0112</span> a1e6 4b9d 14ec  .J...1......K...
-0003d010: f000 <span class="m">0000</span> <span class="m">0049</span> 454e 44ae <span class="m">4260</span> <span class="m">8200</span> <span class="m">1020</span>  .....IEND.B<span class="sb">`</span>...
-0003d020: <span class="m">3040</span> <span class="m">5060</span> <span class="m">7080</span> <span class="m">8887</span> <span class="m">8685</span> <span class="m">8483</span> <span class="m">8281</span> ff50  <span class="m">0</span>&#64;P<span class="sb">`</span>p..........P
-0003d030: 4b03 040a <span class="m">0000</span> <span class="m">0000</span> 00fb 081c <span class="m">4700</span> <span class="m">0000</span>  K...........G...</code></pre>
+</span>0003cff0:<span class="w"> </span><span class="m">4226</span><span class="w"> </span>8e55<span class="w"> </span>656c<span class="w"> </span>13c5<span class="w"> </span>8e0c<span class="w"> </span><span class="m">6383</span><span class="w"> </span>dc06<span class="w"> </span>49f4<span class="w">  </span>B<span class="p">&amp;</span>.Uel....c...I.<span class="w">
+</span>0003d000:<span class="w"> </span>0d4a<span class="w"> </span>0b89<span class="w"> </span>0c31<span class="w"> </span>e0ff<span class="w"> </span><span class="m">0112</span><span class="w"> </span>a1e6<span class="w"> </span>4b9d<span class="w"> </span>14ec<span class="w">  </span>.J...1......K...<span class="w">
+</span>0003d010:<span class="w"> </span>f000<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0049</span><span class="w"> </span>454e<span class="w"> </span>44ae<span class="w"> </span><span class="m">4260</span><span class="w"> </span><span class="m">8200</span><span class="w"> </span><span class="m">1020</span><span class="w">  </span>.....IEND.B<span class="sb">`</span>...<span class="w">
+</span>0003d020:<span class="w"> </span><span class="m">3040</span><span class="w"> </span><span class="m">5060</span><span class="w"> </span><span class="m">7080</span><span class="w"> </span><span class="m">8887</span><span class="w"> </span><span class="m">8685</span><span class="w"> </span><span class="m">8483</span><span class="w"> </span><span class="m">8281</span><span class="w"> </span>ff50<span class="w">  </span><span class="m">0</span>&#64;P<span class="sb">`</span>p..........P<span class="w">
+</span>0003d030:<span class="w"> </span>4b03<span class="w"> </span>040a<span class="w"> </span><span class="m">0000</span><span class="w"> </span><span class="m">0000</span><span class="w"> </span>00fb<span class="w"> </span>081c<span class="w"> </span><span class="m">4700</span><span class="w"> </span><span class="m">0000</span><span class="w">  </span>K...........G...</code></pre>
 <p>On voit qu'il y a environ 20 octets entre le <span class="docutils literal">IEND</span> et l'offset 0x3d02f où
 commence notre fichier ZIP avec <span class="docutils literal">PK</span>. Ces octets ne semblent pas avoir de
 raison d'être ici, c'est sans doute du bruit placé là pour séparer les deux
@@ -295,24 +295,24 @@ trouve après une balise <span class="docutils literal">IEND</span> pour, tout s
 supplémentaire (en laissant un peu d'espace, sans doute pour faciliter la
 manipulation).</p>
 <p>On peut reproduire la manipulation avec un simple cat:</p>
-<pre class="code bash literal-block"><code>$ cat image_normale.png fichier.zip &gt; image_truquée.png</code></pre>
-</div>
-<div class="section" id="aurait-on-pu-aller-plus-vite">
-<h2>Aurait-on pu aller plus vite ?</h2>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>cat<span class="w"> </span>image_normale.png<span class="w"> </span>fichier.zip<span class="w"> </span>&gt;<span class="w"> </span>image_truquée.png</code></pre>
+</section>
+<section id="aurait-on-pu-aller-plus-vite">
+<h3>Aurait-on pu aller plus vite ?</h3>
 <p>Oui. Dès que l'on a eu l'idée que le fichier caché puisse être un fichier ZIP
 nous aurions pu lancer sans plus de civilités :</p>
-<pre class="code bash literal-block"><code>$ unzip puppy.png
+<pre class="code bash literal-block"><code>$<span class="w"> </span>unzip<span class="w"> </span>puppy.png<span class="w">
 
-Archive:  puppy.png
-warning <span class="o">[</span>puppy.png<span class="o">]</span>:  <span class="m">249903</span> extra bytes at beginning or within zipfile
-  <span class="o">(</span>attempting to process anyway<span class="o">)</span>
-   creating: Secret/
-  inflating: Secret/skull.jpg
-   creating: __MACOSX/
-   creating: __MACOSX/Secret/
-  inflating: __MACOSX/Secret/._skull.jpg
-  inflating: Secret/Untitled.rtf
-  inflating: __MACOSX/Secret/._Untitled.rtf</code></pre>
+</span>Archive:<span class="w">  </span>puppy.png<span class="w">
+</span>warning<span class="w"> </span><span class="o">[</span>puppy.png<span class="o">]</span>:<span class="w">  </span><span class="m">249903</span><span class="w"> </span>extra<span class="w"> </span>bytes<span class="w"> </span>at<span class="w"> </span>beginning<span class="w"> </span>or<span class="w"> </span>within<span class="w"> </span>zipfile<span class="w">
+  </span><span class="o">(</span>attempting<span class="w"> </span>to<span class="w"> </span>process<span class="w"> </span>anyway<span class="o">)</span><span class="w">
+   </span>creating:<span class="w"> </span>Secret/<span class="w">
+  </span>inflating:<span class="w"> </span>Secret/skull.jpg<span class="w">
+   </span>creating:<span class="w"> </span>__MACOSX/<span class="w">
+   </span>creating:<span class="w"> </span>__MACOSX/Secret/<span class="w">
+  </span>inflating:<span class="w"> </span>__MACOSX/Secret/._skull.jpg<span class="w">
+  </span>inflating:<span class="w"> </span>Secret/Untitled.rtf<span class="w">
+  </span>inflating:<span class="w"> </span>__MACOSX/Secret/._Untitled.rtf</code></pre>
 <p>Comment cela est-il possible ? De la même manière que le format PNG indique
 son commencement par la séquence d'octets <span class="docutils literal">8950 4e47 0d0a</span> soit <span class="docutils literal">.PNG..</span>
 le format ZIP commence par la séquence <span class="docutils literal">504b 0304</span>. Dans le cas où cette
@@ -322,8 +322,8 @@ Comme (c'est un hasard) cette séquence n'apparait pas dans l'image, lancer
 unzip sur l'image directement suffit à décompresser les fichiers.</p>
 <p>Voilà qui conclue cette étude d'un challenge qui sans être particulièrement
 difficile permet de mettre en évidence des techniques intéressantes.</p>
-</div>
-</div>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

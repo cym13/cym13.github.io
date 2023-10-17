@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: SSL/TLS configuration recommendations</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="ssl-tls-configuration-recommendations">
-<h1>SSL/TLS configuration recommendations</h1>
-<div class="section" id="introduction">
-<h2>Introduction</h2>
+      <section id="ssl-tls-configuration-recommendations">
+<h2>SSL/TLS configuration recommendations</h2>
+<section id="introduction">
+<h3>Introduction</h3>
 <p>So you want to deploy SSL/TLS on your service. That's a very good decision.
 Services without encryption are not only jeopardizing the provider who may
 loose its data and reputation. It may also endanger the users as the
@@ -57,27 +57,27 @@ confidentiality and the integrity of the communication is at stake.</p>
 <p>But deploying SSL/TLS is easy to mess up so here is a procedure that you may use
 to ensure that the result is conveniently secure. This will not correspond to
 all situations but it provides a safe basis.</p>
-</div>
-<div class="section" id="choosing-the-configuration">
-<h2>Choosing the configuration</h2>
-<div class="section" id="you-should-not-write-your-configuration-yourself">
-<h3>You should not write your configuration yourself</h3>
+</section>
+<section id="choosing-the-configuration">
+<h3>Choosing the configuration</h3>
+<section id="you-should-not-write-your-configuration-yourself">
+<h4>You should not write your configuration yourself</h4>
 <p>Unless you're aware of all the possibilities of your webserver and
 all cryptographic results that make such algorithm safer than such other one you
 won't get it right.</p>
 <p>If, on the other hand, you are aware of all the different protocols, encryption
 schemes and attacks, then you also know that making a mistake is very probable.
 You should therefore not trust yourself.</p>
-</div>
-<div class="section" id="you-should-not-use-the-default-configuration">
-<h3>You should not use the default configuration</h3>
+</section>
+<section id="you-should-not-use-the-default-configuration">
+<h4>You should not use the default configuration</h4>
 <p>The default configuration of most web servers (when they provide one) is not
 secure. It is meant to provide something that works without fuss so that you can
 proceed with your development. It is not meant to stop an attacker.</p>
 <img alt="../image/kagami-hiiragi-nope-nope.png" src="../image/kagami-hiiragi-nope-nope.png" style="width: 50%;" />
-</div>
-<div class="section" id="you-should-use-a-configuration-generator">
-<h3>You should use a configuration generator</h3>
+</section>
+<section id="you-should-use-a-configuration-generator">
+<h4>You should use a configuration generator</h4>
 <p>I strongly recommend using the Mozilla SSL/TLS configuration generator which is
 kept up-to-date with the latest security recommendations to make your server
 secure.</p>
@@ -92,21 +92,21 @@ ECDHE-ECDSA-CHACHA20-POLY1305.</p>
 <p>If you write this list by hand and do not include those algorithms it means that
 even if the client is able to deal with such a high security level the server
 won't let it.</p>
-</div>
-<div class="section" id="a-word-of-caution-on-hsts">
-<h3>A word of caution on HSTS</h3>
+</section>
+<section id="a-word-of-caution-on-hsts">
+<h4>A word of caution on HSTS</h4>
 <p>By default HSTS is enabled in the configuration generator. This may be an issue
 if done by mistake because once a website has been loaded with HSTS it is not
 possible to load it in HTTP for many month.</p>
 <p>HSTS is a very good thing that I recommend using. It is meant to solve the issue
 of websites that want to enforce HTTPS and is much safer than setting up a
 redirection on the HTTP version to the HTTPS version.</p>
-</div>
-</div>
-<div class="section" id="the-verification">
-<h2>The verification</h2>
-<div class="section" id="the-tools">
-<h3>The tools</h3>
+</section>
+</section>
+<section id="the-verification">
+<h3>The verification</h3>
+<section id="the-tools">
+<h4>The tools</h4>
 <p>You wrote your configuration and want to check that it is indeed what your
 expect it to be. How can you do?</p>
 <p>Mozilla recommends the tool <a class="reference external" href="https://github.com/mozilla/cipherscan">cipherscan</a> which lists the available cipher
@@ -119,9 +119,9 @@ connections to determine what cipher suite would be used if you were using what
 web client.</p>
 <p>None of these tools require installation. However keep in mind that while they
 may provide good indications they will not supplant a security expert.</p>
-</div>
-<div class="section" id="the-expert">
-<h3>The expert</h3>
+</section>
+<section id="the-expert">
+<h4>The expert</h4>
 <p>What information will an expert provide that such a tool will not?</p>
 <p>These tools are static: they consider the service in complete isolation of the
 world and do not try to take in account the context at all. The job of an expert
@@ -142,9 +142,9 @@ its configuration validated by a security expert. You may consider my opinion to
 be slightly biased in the matter as that is my job, but at least the bias is
 publicly known.</p>
 <img alt="../image/mayoi-hachikuji-yeees.png" src="../image/mayoi-hachikuji-yeees.png" style="width: 50%;" />
-</div>
-<div class="section" id="the-tools-again">
-<h3>The tools again</h3>
+</section>
+<section id="the-tools-again">
+<h4>The tools again</h4>
 <p>Security moves fast. A year from now you may be wanting to check that your
 server is still as secure as it can be. Security consultants aren't cheap and
 you may not want to hire one repeatedly (not that I mind of course).</p>
@@ -153,10 +153,10 @@ server configurations against current attacks. Of course I have no guarantees
 that testssl.sh will get updated appropriately and new attacks without
 remediations are always possible so keep an open mind and practice defense in
 depth.</p>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>In conclusion the protocol I propose is simple and should correspond to most
 applications:</p>
 <ul class="simple">
@@ -169,22 +169,22 @@ no vulnerability is present. Modify if necessary.</p></li>
 <li><p>When possible get an expert to look at your configuration.</p></li>
 <li><p>Regularly recheck the configuration using up-to-date verification tools.</p></li>
 </ul>
-<div class="section" id="what-so-no-practical-advice-on-what-cipher-is-better-etc">
-<h3>What? So no practical advice on what cipher is better etc?</h3>
+<section id="what-so-no-practical-advice-on-what-cipher-is-better-etc">
+<h4>What? So no practical advice on what cipher is better etc?</h4>
 <p>No. Those things change, and they should not be left to the choice of
 developpers anyway. Let's face it, most developpers are not competent to make
 cryptographic choices: it just isn't their job. Let professionals do those
 choices for you and spend your time doing what you really like: building
 stuff that matters.</p>
-</div>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+</section>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.4chan.org/">https://www.4chan.org/</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

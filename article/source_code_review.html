@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Fast security source code review</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,11 +46,11 @@
     </header>
 
     <div class="content">
-      <div class="section" id="fast-security-source-code-review">
-<h1>Fast security source code review</h1>
+      <section id="fast-security-source-code-review">
+<h2>Fast security source code review</h2>
 <img alt="../image/twilight_reading_hard.png" src="../image/twilight_reading_hard.png" style="width: 60%;" />
-<div class="section" id="the-need-for-fsscr">
-<h2>The need for FSSCR</h2>
+<section id="the-need-for-fsscr">
+<h3>The need for FSSCR</h3>
 <p>There are many situations in which one finds himself wanting to assess the
 security of a program or library:</p>
 <ul class="simple">
@@ -66,9 +66,9 @@ decided to write my own. It will span over a few blog posts of which I'll
 incorporate the links here.</p>
 <p>Also I want to focus on <strong>finding</strong> bugs. To exploit them please refer to
 other documents.</p>
-</div>
-<div class="section" id="what-you-ll-find">
-<h2>What you'll find</h2>
+</section>
+<section id="what-you-ll-find">
+<h3>What you'll find</h3>
 <p>There are three kinds of bugs: structural ones, generic ones, and specific
 ones.</p>
 <p>To enlight better the kind of bugs we're talking about we'll take as example
@@ -87,8 +87,8 @@ vulnerabilities:</p>
 <li><p>Using components with known vulnerabilities</p></li>
 <li><p>Unvalidated redirects and forwards</p></li>
 </ol>
-<div class="section" id="structural-bugs">
-<h3>Structural bugs</h3>
+<section id="structural-bugs">
+<h4>Structural bugs</h4>
 <p>They are bugs of design, where the programmer just didn't think of putting
 any security in place.</p>
 <p>The easiest bugs to find are part of this category because they are quite
@@ -120,9 +120,9 @@ group.</p>
 <p>Some exceptions are the use of vulnerable components, bad cryptography which
 can lead to a number of the aforementioned cases and security
 misconfiguration. Those are typically easier to see in the code.</p>
-</div>
-<div class="section" id="generic-bugs">
-<h3>Generic bugs</h3>
+</section>
+<section id="generic-bugs">
+<h4>Generic bugs</h4>
 <p>Those are mistakes that are common amongst most languages while still being
 programming ones. They are the bugs we are primarily looking for when
 performing a source code analysis.</p>
@@ -132,9 +132,9 @@ contains the three top elements.</p>
 <p>These bugs are programming ones. They are the ones for which FSSCR really
 shines because they are specific enough for many tools to miss them but
 generic enough that we can devise a method to find them.</p>
-</div>
-<div class="section" id="specific-bugs">
-<h3>Specific bugs</h3>
+</section>
+<section id="specific-bugs">
+<h4>Specific bugs</h4>
 <p>Those are the bugs that make the news.</p>
 <p>Subtle off-by-one errors like the <a class="reference external" href="http://www.cryptofails.com/page/23">Cryptocat case</a>, slight indentation mistakes like
 <a class="reference external" href="https://www.imperialviolet.org/2014/02/22/applebug.html">Goto fail</a>,
@@ -149,13 +149,13 @@ and I might talk about them someday but none of them fits a <em>fast</em> code
 review so we won't focus too much on them.</p>
 <p>If you would like more information though I strongly recommend the book “A
 Bug Hunter's Diary” which is too awesome to be left out.</p>
-</div>
-</div>
-<div class="section" id="the-tools">
-<h2>The tools</h2>
+</section>
+</section>
+<section id="the-tools">
+<h3>The tools</h3>
 <p>I use two kinds of tools mainly: discovery and exploration ones.</p>
-<div class="section" id="discovery-tools">
-<h3>Discovery tools</h3>
+<section id="discovery-tools">
+<h4>Discovery tools</h4>
 <p>They are all the security related automated source code scanner you can find.
 I don't know of any being really generic so you'll have to find one that's
 made for the language you study if any. For this reason I don't have much
@@ -166,9 +166,9 @@ and they aren't likely to find most real security problems.</p>
 <p>Special mention for <a class="reference external" href="https://github.com/openstack/bandit">bandit</a> in python which is the best tool I've found all
 languages considered. It is quite fasts, precise, security-oriented and very
 easy to use. It should be part of any project's automated testing stack.</p>
-</div>
-<div class="section" id="exploration-tools">
-<h3>Exploration tools</h3>
+</section>
+<section id="exploration-tools">
+<h4>Exploration tools</h4>
 <p>Those are the screwdrivers of our toolbox: rough but deadly efficient.</p>
 <p>I spend 90% of my time using the following GNU/Linux tools:</p>
 <ul class="simple">
@@ -177,29 +177,29 @@ easy to use. It should be part of any project's automated testing stack.</p>
 <li><p><a class="reference external" href="http://ranger.nongnu.org/">ranger</a> (an excellent file manager that I love for its preview mode)</p></li>
 <li><p><a class="reference external" href="https://github.com/cym13/gg">gg</a> (a recursive grep on steroid in pure bash that I wrote)</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="know-thy-enemy">
-<h2>Know thy enemy</h2>
+</section>
+</section>
+<section id="know-thy-enemy">
+<h3>Know thy enemy</h3>
 <p>As always the exploration phase is the most import part. Getting familiar
 with the code base is what will make you efficient in the next steps of the
 analysis.</p>
-<div class="section" id="see-it-live">
-<h3>See it live</h3>
+<section id="see-it-live">
+<h4>See it live</h4>
 <p>If you have access to the live tool (eg: a website) visit it. Identify the
 points of interest (Is there authentication? What is the website trying to
 protect? What are the interaction points?).</p>
-</div>
-<div class="section" id="get-a-feel-of-the-vocabulary">
-<h3>Get a feel of the vocabulary</h3>
+</section>
+<section id="get-a-feel-of-the-vocabulary">
+<h4>Get a feel of the vocabulary</h4>
 <p>Many companies like defining their own world, calling customers &quot;rabbiters&quot;
 and items &quot;carrots&quot; for example. Get yourself in their world. For example,
 when studying a video game there is no point in searching &quot;user_cart&quot; if they
 call it a &quot;player_booty&quot;. Are they talking about passwords, keys, tokens or
 secrets?</p>
-</div>
-<div class="section" id="identify-what-you-can-ignore">
-<h3>Identify what you can ignore</h3>
+</section>
+<section id="identify-what-you-can-ignore">
+<h4>Identify what you can ignore</h4>
 <p>There is generally a lot you can ignore. I usually maintain two copies of the
 source code for big missions: one is the original, the other is the work
 version where I systematically delete any file that I don't think I need
@@ -208,10 +208,10 @@ aren't likely to present any more vulnerability.</p>
 <p>This is all about reducing the cognitive load: getting less grep hits, less
 garbage to filter out, less files to think about. The secret to being fast is
 avoiding any unnecessary work.</p>
-</div>
-</div>
-<div class="section" id="start-with-the-lowest-fruits">
-<h2>Start with the lowest fruits</h2>
+</section>
+</section>
+<section id="start-with-the-lowest-fruits">
+<h3>Start with the lowest fruits</h3>
 <img alt="../image/after_a_hard_day_of_applebucking.png" src="../image/after_a_hard_day_of_applebucking.png" style="width: 50%;" />
 <p>There is no need to build a boat where there is a bridge. The key here is to
 focus on what is directly available.</p>
@@ -232,9 +232,9 @@ needs to be credentials somewhere readily available.</p>
 where they might make use of a hard-coded secret: use of an external service,
 development services which usually have weak passwords, etc. Try to adapt
 your vocabulary. Leverage your exploration phase fully.</p>
-</div>
-<div class="section" id="cryptography-the-great-forgotten">
-<h2>Cryptography, the great forgotten</h2>
+</section>
+<section id="cryptography-the-great-forgotten">
+<h3>Cryptography, the great forgotten</h3>
 <p>The last low fruit is cryptography. Cryptography has a reputation of being
 impossible to grasp although identifying flaws is often quite easy in
 practice. It is easy to screw up, even security professionals generally shy
@@ -263,9 +263,9 @@ result in vulnerabilities.</p></li>
 <pre class="literal-block">Keywords: crypt cipher rand hash time secret obfuscate</pre>
 <p>There are much more that could be said of course, but those four points will
 keep you running. Such flaws really are incredibly common.</p>
-</div>
-<div class="section" id="the-error-lies-in-the-interface">
-<h2>The error lies in the interface</h2>
+</section>
+<section id="the-error-lies-in-the-interface">
+<h3>The error lies in the interface</h3>
 <p>Most bugs don't happen where the code is well managed with its internal
 logic, it happens at the interface, at the boundary of two worlds where the
 logic shifts from a rule set to another.</p>
@@ -293,9 +293,9 @@ sure when interpreting something that what is data remains data and what is
 code remains code. Shell injections through file names, XSS through link
 URLs... If it's data it should be escaped without thinking twice about it.</p>
 <pre class="literal-block">Keywords: exec system process query open load send read</pre>
-</div>
-<div class="section" id="privilege-escalations">
-<h2>Privilege escalations</h2>
+</section>
+<section id="privilege-escalations">
+<h3>Privilege escalations</h3>
 <p>There are other kinds of interfaces that can be exploited, like the boundary
 between user permissions. This is where privilege escalations dwell.</p>
 <p>The idea of a privilege escalation is to gain more rights than you have by
@@ -322,14 +322,14 @@ escalations. There are lots of bugs that are in some way application
 specific. CSRF attacks or session fixations for example do not target
 anything but web applications. What is important is to learn and recognize
 the kind of bugs that is specific to your application.</p>
-</div>
-<div class="section" id="the-language-barrier">
-<h2>The language barrier</h2>
+</section>
+<section id="the-language-barrier">
+<h3>The language barrier</h3>
 <p>Maybe you've noticed that we didn't talk about any specific programming
 language yet. It is because all the bugs we saw are largely language
 agnostic.</p>
-<div class="section" id="language-specifics">
-<h3>Language specifics</h3>
+<section id="language-specifics">
+<h4>Language specifics</h4>
 <p>Of course this doesn't mean that the programming language doesn't matter.
 Some languages like Perl or Ruby strive on proposing many ways to do the same
 thing which complicates the analysis, contrary to languages like Python that
@@ -348,9 +348,9 @@ actually.</p>
 it's written in. If you don't know the language just look up what functions
 and syntax can be used to perform shell execution and look for it. Most
 languages share the same names for common functions.</p>
-</div>
-<div class="section" id="manual-memory-management">
-<h3>Manual memory management</h3>
+</section>
+<section id="manual-memory-management">
+<h4>Manual memory management</h4>
 <p>There is however one class of languages that hides a whole category of very
 specific and powerful bugs: those with manual memory management, and first
 and foremost the C programming language.</p>
@@ -374,10 +374,10 @@ in this task.</p>
 <p>We won't talk about them here because they deserve much more than a few lines
 in a blog post. However, remember that all the bugs we talked about earlier
 are also present in C programs.</p>
-</div>
-</div>
-<div class="section" id="going-further">
-<h2>Going further</h2>
+</section>
+</section>
+<section id="going-further">
+<h3>Going further</h3>
 <img alt="../image/fluttershy_mane_in_wind.png" src="../image/fluttershy_mane_in_wind.png" style="width: 40%;" />
 <p>There is of course much more to say about code reviews. I will write more
 detailed articles about some points I glanced over in this post and update
@@ -426,16 +426,16 @@ enlightening.</p>
 </li>
 </ul>
 <p>Have fun!</p>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png">http://mlpfanart.wikia.com/wiki/File:Twilight_Sparkle_reading_vector.png</a></p></li>
 <li><p><a class="reference external" href="http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258">http://drewdini.deviantart.com/art/After-a-Hard-Day-of-Applebucking-314492258</a></p></li>
 <li><p><a class="reference external" href="http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849">http://uxyd.deviantart.com/art/Windswept-Fluttershy-349655849</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

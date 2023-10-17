@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Ed: l'éditeur standard</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="ed-l-editeur-standard">
-<h1>Ed: l'éditeur standard</h1>
-<div class="section" id="introduction">
-<h2>Introduction</h2>
+      <section id="ed-l-editeur-standard">
+<h2>Ed: l'éditeur standard</h2>
+<section id="introduction">
+<h3>Introduction</h3>
 <p>Ed est un éditeur de texte datant de 1969, aujourd'hui encore, fait partie du
 standard POSIX normalement respecté par tout système UNIX ou Linux. A
 l'époque il n'était pas possible à cause des ressources limitées d'afficher
@@ -62,9 +62,9 @@ concision. Étant donné que ces outils sont maintenant communs cette
 introduction suppose une certaine familiarité du lecteur avec au moins vi ou
 sed bien qu'il soit possible de la suivre sans avoir utilisé ces outils
 auparavant.</p>
-</div>
-<div class="section" id="a-la-rencontre-du-monstre">
-<h2>À la rencontre du monstre</h2>
+</section>
+<section id="a-la-rencontre-du-monstre">
+<h3>À la rencontre du monstre</h3>
 <p>Lançons la bête puis essayons de la quitter :</p>
 <pre class="code text literal-block"><code>$ ed
 ^C
@@ -88,13 +88,13 @@ permettant de quitter l'éditeur. Toutes les commandes vous l'aurez deviné ne
 sont constituées que d'une seule lettre.</p>
 <p>Afin de faciliter l'édition nous allons définir un alias pour mettre en place
 un prompt et automatiquement afficher les messages d'erreur :</p>
-<pre class="code sh literal-block"><code><span class="nb">alias</span> <span class="nv">ed</span><span class="o">=</span><span class="s1">'ed --prompt=&quot;&gt;&gt;&gt; &quot; --verbose '</span></code></pre>
+<pre class="code sh literal-block"><code><span class="nb">alias</span><span class="w"> </span><span class="nv">ed</span><span class="o">=</span><span class="s1">'ed --prompt=&quot;&gt;&gt;&gt; &quot; --verbose '</span></code></pre>
 <p>Tout les exemples du reste de cette introduction employeront cet alias.</p>
-</div>
-<div class="section" id="edition-basique">
-<h2>Édition basique</h2>
-<div class="section" id="creer-un-nouveau-fichier">
-<h3>Créer un nouveau fichier</h3>
+</section>
+<section id="edition-basique">
+<h3>Édition basique</h3>
+<section id="creer-un-nouveau-fichier">
+<h4>Créer un nouveau fichier</h4>
 <p>Nous allons maintenant créer un nouveau fichier pour explorer les
 possibilités :</p>
 <pre class="code text literal-block"><code>$ ed myfile
@@ -140,9 +140,9 @@ puisse utiliser les deux commandes en une :</p>
 fichier. Write peut également prendre en argument un nom de fichier pour
 enregistrer tout ou partie (avec une plage d'adresse) du fichier courant
 dans un autre.</p>
-</div>
-<div class="section" id="editer-un-fichier-existant">
-<h3>Éditer un fichier existant</h3>
+</section>
+<section id="editer-un-fichier-existant">
+<h4>Éditer un fichier existant</h4>
 <p>Nous allons maintenant le reprendre, Ed nous placera naturellement à la
 dernière ligne.</p>
 <pre class="code text literal-block"><code>$ ed myfile
@@ -230,9 +230,9 @@ navigation plus aisée et sans répétition de ligne.</p>
 36      smtp               25/tcp
 37      smtp               25/udp
 38      nsw-fe             27/tcp</code></pre>
-</div>
-<div class="section" id="chercher-et-modifier">
-<h3>Chercher et modifier</h3>
+</section>
+<section id="chercher-et-modifier">
+<h4>Chercher et modifier</h4>
 <p>Chercher du texte est sans suprise pour un utilisateur de vim :</p>
 <ul class="simple">
 <li><p>'/regex/' ammène à la première occurence rencontrée dans le sens de lecture
@@ -377,12 +377,12 @@ Warning: buffer modified
 <p>Ce qui a été vu jusqu'ici suffit à une utilisation des plus basiques mais il
 y a plus à Ed que cela et le confort dépend beaucoup des petites choses qui
 facilitent la vie sans forcément la changer.</p>
-</div>
-</div>
-<div class="section" id="utilisation-avancee">
-<h2>Utilisation avancée</h2>
-<div class="section" id="interagir-avec-le-shell">
-<h3>Interagir avec le shell</h3>
+</section>
+</section>
+<section id="utilisation-avancee">
+<h3>Utilisation avancée</h3>
+<section id="interagir-avec-le-shell">
+<h4>Interagir avec le shell</h4>
 <p>Les interactions avec le shell sont sans doute le point le plus important du
 confort dans l'utilisation de Ed. Elle se fait avec la commande '!' et permet
 soit d'exécuter une commande shell, soit d'en récupérer le contenu dans le
@@ -421,9 +421,9 @@ videos
 <p>On a ici utilisé la commande 'r' pour 'read' que l'on avait pas eu l'occasion
 de croiser auparavant. Elle permet d'insérer à la position courante le
 contenu d'un autre fichier ou, comme ici avec '!', d'une commande shell.</p>
-</div>
-<div class="section" id="inserer-du-texte-au-debut-d-un-bloc">
-<h3>Insérer du texte au début d'un bloc</h3>
+</section>
+<section id="inserer-du-texte-au-debut-d-un-bloc">
+<h4>Insérer du texte au début d'un bloc</h4>
 <p>Moins une fonctionnalité avancée qu'un « truc » utile pour, par exemple
 commenter ou indenter du texte:</p>
 <pre class="code text literal-block"><code>$ ed
@@ -437,9 +437,9 @@ And Rainbow Dash is just the coolest
 # My best pony is Pinkie Pie
 # Although I like Twilight very much
 # And Rainbow Dash is just the coolest</code></pre>
-</div>
-<div class="section" id="deplacer-et-copier">
-<h3>Déplacer et copier</h3>
+</section>
+<section id="deplacer-et-copier">
+<h4>Déplacer et copier</h4>
 <p>Déplacer un bloc se fait avec 'm' pour 'move' et copier se fait avec 't' pour
 'transfer'. Le bloc est placé après la ligne à l'adresse indiquée, celle-ci
 pouvant être 0.</p>
@@ -490,10 +490,10 @@ elles sont également placées dans ce buffer ce qui permet de faire du
 5       # Source https://www.gnu.org/fun/jokes/ed.msg
 6       Note the consistent user interface and error reporting.
 7       Ed is generous enough to flag errors,</code></pre>
-</div>
-</div>
-<div class="section" id="ressources-externes">
-<h2>Ressources externes</h2>
+</section>
+</section>
+<section id="ressources-externes">
+<h3>Ressources externes</h3>
 <dl class="simple">
 <dt>Cheat Sheet</dt>
 <dd><p><a class="reference external" href="http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf">http://www.catonmat.net/download/ed.text.editor.cheat.sheet.pdf</a></p>
@@ -502,8 +502,8 @@ elles sont également placées dans ce buffer ce qui permet de faire du
 <dd><p><a class="reference external" href="http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf">http://www.verticalsysadmin.com/vi/a_tutorial_introduction_to_the_unix_text_editor.pdf</a></p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

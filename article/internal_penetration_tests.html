@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Internal Penetration Tests</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="internal-penetration-tests">
-<h1>Internal Penetration Tests</h1>
-<div class="section" id="introduction">
-<h2>Introduction</h2>
+      <section id="internal-penetration-tests">
+<h2>Internal Penetration Tests</h2>
+<section id="introduction">
+<h3>Introduction</h3>
 <p>Penetration testing covers a very wide range of topics, targets and
 methodologies. Of all these possibilities there is possibly none that is more
 representative of the field than internal penetration tests. Being on a
@@ -63,9 +63,9 @@ like to share some tips and methods to grasp the low-hanging fruits and get a
 starting point. You'll soon find out that the method we describe here almost
 never works directly on the field and that everybody has his pet techniques
 to get the best of the customer's network.</p>
-</div>
-<div class="section" id="starting-line">
-<h2>Starting line</h2>
+</section>
+<section id="starting-line">
+<h3>Starting line</h3>
 <p>Ok, so you're somehow on the internal network. Could be the Wi-Fi, a VPN, a
 dangling RJ45... What matters is that your shell's waiting and your customer
 knows that you're there. These techniques absolutely do not care about being
@@ -92,9 +92,9 @@ misconfigurations. I won't delve into it now though.</p></li>
 </ul>
 <p>At that point you should have a growing list of IPs and hostnames. It's time
 to start exploiting these information.</p>
-</div>
-<div class="section" id="identification">
-<h2>Identification</h2>
+</section>
+<section id="identification">
+<h3>Identification</h3>
 <p>This is a quick but important step: try to identify what those hosts are.
 We're not at a point where we're firing nmap up in every direction as that's
 generally way to long. But you might do so on a sample of hosts in order to
@@ -106,9 +106,9 @@ network (such as UDP packets in broadcast sent by <a class="reference external" 
 <img alt="../image/chibi_mouse.png" src="../image/chibi_mouse.png" style="width: 40%;" />
 <p>Does it look like it is mainly composed of Linux servers? We want to take
 that into account when doing our port scans later.</p>
-</div>
-<div class="section" id="weak-services-discovery">
-<h2>Weak services discovery</h2>
+</section>
+<section id="weak-services-discovery">
+<h3>Weak services discovery</h3>
 <p>We don't want to just <cite>nmap -AO -T4 10.0.0.1/16</cite> our way in. Scanning the
 whole network just takes too much time. Or more precisely we want to do that
 ultimately, but first we'll perform targeted scans to identify weak points
@@ -132,9 +132,9 @@ if it looks like there are lots of Linux hosts it wouldn't be strange that
 some of them are available through SSH with <cite>root/&lt;empty&gt;</cite> as credentials.
 Because typing passwords or using keys is so hard you know. These kind of
 basic errors is what we're looking for in the next section.</p>
-</div>
-<div class="section" id="automatic-data-collection">
-<h2>Automatic data collection</h2>
+</section>
+<section id="automatic-data-collection">
+<h3>Automatic data collection</h3>
 <p>So we have a list of hosts with web servers, lots of telnet access points
 etc... As always in internal penetration testing, the challenge is the
 amount of data generated. That's why we want to automate as many things as
@@ -151,9 +151,9 @@ that the servers that host them are probably too...</p>
 me down when there are passwords at all. Also, internal services are often in
 plain HTTP so if you're able to setup a Man in the Middle it becomes
 tremendously easy to get into new things.</p>
-</div>
-<div class="section" id="stepping-back-a-bit">
-<h2>Stepping back a bit</h2>
+</section>
+<section id="stepping-back-a-bit">
+<h3>Stepping back a bit</h3>
 <p>By this point you may already have a lot of NTLM hashes from Responder and a
 solid list of targets.</p>
 <p>Don't hesitate to launch a more extensive nmap scan at this point, you'll
@@ -175,9 +175,9 @@ company in 2016 never bothered changing his mail password from the default
 </ul>
 <p>You get the idea. Efficient password cracking is an art, but terribly
 powerful when mastered.</p>
-</div>
-<div class="section" id="ok-and-now">
-<h2>Ok, and now?</h2>
+</section>
+<section id="ok-and-now">
+<h3>Ok, and now?</h3>
 <p>So, you somehow got into something. Could be a web application, a mailbox, a
 workstation... I'll take that last example as it's the easiest to deal with.</p>
 <p>Look for accesses to other computers:</p>
@@ -196,9 +196,9 @@ finding more passwords, finding more hosts...</p>
 prioritize because you're never going to have the time to exploit
 <em>everything</em>.</p>
 <img alt="../image/youmu_konpaku_sigh.png" src="../image/youmu_konpaku_sigh.png" style="width: 40%;" />
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>The true difficulty of this kind of assignments is the time. Most company
 networks have so many obvious flaws that you will rarely find yourself in
 need for actual exploits or protocol reverse engineering on the fly (note
@@ -207,16 +207,16 @@ that I don't hope you get some of those too, they're great fun).</p>
 end up stuck wasting the day reading nmap scan reports while not actually
 knowing what to do with them. I hope this article provides some answers as to
 how to manage that complexity.</p>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://yoai.deviantart.com/art/happy-halloween-569514306">https://yoai.deviantart.com/art/happy-halloween-569514306</a></p></li>
 <li><p><a class="reference external" href="https://ninetail-fox.deviantart.com/art/My-mouse-chibi-257200172">https://ninetail-fox.deviantart.com/art/My-mouse-chibi-257200172</a></p></li>
 <li><p><a class="reference external" href="https://yukirumo990.deviantart.com/art/Youmu-Konpaku-251134451">https://yukirumo990.deviantart.com/art/Youmu-Konpaku-251134451</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

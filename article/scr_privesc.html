@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Privilege escalations</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,8 +46,8 @@
     </header>
 
     <div class="content">
-      <div class="section" id="privilege-escalations">
-<h1>Privilege escalations</h1>
+      <section id="privilege-escalations">
+<h2>Privilege escalations</h2>
 <p>This post is part of the <a class="reference external" href="source_code_review.html">Source Code Review</a> series.</p>
 <hr class="docutils" />
 <p>Privilege escalations lie in the mist of process permissions.</p>
@@ -61,15 +61,15 @@ some flashy bug.</p>
 memory corruption (although it is interesting to note that what is done with
 such corruption is very similar but with memory addresses instead of files).</p>
 <img alt="../image/rainbowdash_and_scootaloo_flying.png" src="../image/rainbowdash_and_scootaloo_flying.png" style="width: 60%;" />
-<div class="section" id="missing-verification">
-<h2>Missing verification</h2>
+<section id="missing-verification">
+<h3>Missing verification</h3>
 <p>The easiest case is when there is no verification at all:</p>
-<pre class="code python literal-block"><code><span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list&quot;</span>
-<span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list.bkp&quot;</span>
+<pre class="code python literal-block"><code><span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list&quot;</span><span class="w">
+</span><span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/mytmp/my-cd-list.bkp&quot;</span><span class="w">
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
-        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></code></pre>
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span><span class="w">
+</span>        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></code></pre>
 <p>Let's assume that this code is ran as a high-privileged process as a
 scheduled job and that the files always exist. We will also suppose for
 simplification that the rights over <em>/tmp/mytmp</em> allow any user to delete
@@ -80,35 +80,35 @@ files. Doing so the attacker would get at the same time an arbitrary read of
 any file by copying them elsewhere, or an arbitrary write which he could use
 to overwrite the content of sudo for example.</p>
 <pre class="literal-block">Keywords: open write read chmod rename chdir</pre>
-</div>
-<div class="section" id="race-condition">
-<h2>Race condition</h2>
+</section>
+<section id="race-condition">
+<h3>Race condition</h3>
 <p>It is not always as clear as in the previous snippet. It can happen as a race
 condition:</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span>
+<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span><span class="w">
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo 'Harmless script'&quot;</span><span class="p">)</span>
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo 'Harmless script'&quot;</span><span class="p">)</span><span class="w">
 
-<span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></code></pre>
+</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></code></pre>
 <p>When programming, we tend to see our code as one continuous flow of
 execution. That's not the case: the OS can stop our program at any time to
 execute someone else's code. Here one could swap the file by another between
 the moment when the file is written and the call to Popen.</p>
-</div>
-<div class="section" id="failed-exception">
-<h2>Failed exception</h2>
+</section>
+<section id="failed-exception">
+<h3>Failed exception</h3>
 <p>Another case is the bogus exception:</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span>
+<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span><span class="w">
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo 'Harmless script'&quot;</span><span class="p">)</span>
+</span><span class="k">try</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
+</span>        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo 'Harmless script'&quot;</span><span class="p">)</span><span class="w">
 
-<span class="k">except</span><span class="p">:</span> <span class="c1"># TODO: handle error</span>
-    <span class="k">pass</span>
+</span><span class="k">except</span><span class="p">:</span> <span class="c1"># TODO: handle error</span><span class="w">
+</span>    <span class="k">pass</span><span class="w">
 
-<span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></code></pre>
+</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">])</span></code></pre>
 <p>This makes the problem way easier for an attacker: just create a file
 <em>/tmp/mytmp/tmp.sh</em> that has no write rights. The call to <strong>open</strong> will
 raise an exception, the <strong>write</strong> will never be executed and the program will
@@ -116,23 +116,23 @@ gracefully continue its execution running your code.</p>
 <p>Any time an error is ignored it is important to understand what is really
 ignored and what it could mean to an attacker.</p>
 <pre class="literal-block">Keywords: catch(Exception) except:  &quot;return true;&quot;</pre>
-</div>
-<div class="section" id="time-of-check-to-time-of-use">
-<h2>Time Of Check To Time Of Use</h2>
+</section>
+<section id="time-of-check-to-time-of-use">
+<h3>Time Of Check To Time Of Use</h3>
 <p>TOCTTOUs are a special case of race condition. They happen when a program
 first checks a property and then uses a resource on the assumption of the
 first property.</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">os</span>
+<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">os</span><span class="w">
 
-<span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list&quot;</span>
-<span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list.bkp&quot;</span>
+</span><span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list&quot;</span><span class="w">
+</span><span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list.bkp&quot;</span><span class="w">
 
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">destination</span><span class="p">):</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">destination</span><span class="p">):</span><span class="w">
+</span>    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
-        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></code></pre>
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fi</span><span class="p">:</span><span class="w">
+</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span><span class="w">
+</span>        <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></code></pre>
 <p>The code looks fine at first: by checking that the argument is a real file
 and not some link we avoid the risk of the user maliciously putting a
 symbolic link to change the actual file used. However, with a closer look it
@@ -152,9 +152,9 @@ time frame as he only needs to win the race once.</p>
 <li><p>read/write the files</p></li>
 </ol>
 <pre class="literal-block">Keywords: isfile islink exists stat symlink</pre>
-</div>
-<div class="section" id="unsafe-paths">
-<h2>Unsafe paths</h2>
+</section>
+<section id="unsafe-paths">
+<h3>Unsafe paths</h3>
 <p>When executing a file, if a path isn't explicitly given, it is inferred from
 a list of directories containing common executables: the PATH.</p>
 <p>When calling <strong>ls</strong> which is used? What program is really being used? What if
@@ -189,9 +189,9 @@ same privileges as the attacker it is a privilege escalation.</p>
 <p>This unquoted path vulnerability is a great example of what can go wrong when
 relying on smart systems.</p>
 <pre class="literal-block">Keywords: path import loadlibrary filename dll so</pre>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>This covers the most common issues leading to privilege escalations. We
 talked a great deal about files because that's a common point of failure but
 note that it could very well be any other kind of resource.</p>
@@ -226,15 +226,15 @@ through the exploitation of a use-after-free.</p>
 </dl>
 </li>
 </ul>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="http://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876">http://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876</a></p></li>
 <li><p><a class="reference external" href="http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)">http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

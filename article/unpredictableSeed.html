@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: How secure is unpredictableSeed?</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,18 +46,18 @@
     </header>
 
     <div class="content">
-      <div class="section" id="how-secure-is-unpredictableseed">
-<h1>How secure is unpredictableSeed?</h1>
-<div class="section" id="tl-dr">
-<h2>tl;dr</h2>
+      <section id="how-secure-is-unpredictableseed">
+<h2>How secure is unpredictableSeed?</h2>
+<section id="tl-dr">
+<h3>tl;dr</h3>
 <ul class="simple">
 <li><p>D's unpredictableSeed isn't unpredictable enough for cryptographic purpose</p></li>
 <li><p>We'll crack a pseudo-random generator to crack a (fictive) website</p></li>
 <li><p>To know what to do about it, jump at the end</p></li>
 </ul>
-</div>
-<div class="section" id="the-origins-of-the-problem">
-<h2>The origins of the problem</h2>
+</section>
+<section id="the-origins-of-the-problem">
+<h3>The origins of the problem</h3>
 <p>I like <a class="reference external" href="https://dlang.org/">D</a> very much. It is a great, powerful and safe language. While it may
 be a tad complex at times it does a good job at providing a language that
 works, is fast and does not let you screw things up as fast and easily as C.</p>
@@ -75,15 +75,15 @@ even see many projects re-seeding their PRNG at each use.</p>
 <p>The problem with constant reseeding is apparent if you imagine that only
 three possible seeds are possible. Given the following code, how many
 different tokens can you generate?</p>
-<pre class="code java literal-block"><code><span class="n">uint</span> <span class="nf">mockUnpredictableSeed</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">:</span> <span class="n">uniform</span><span class="p">;</span>
-    <span class="k">return</span> <span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-<span class="p">}</span>
+<pre class="code java literal-block"><code><span class="n">uint</span><span class="w"> </span><span class="nf">mockUnpredictableSeed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">:</span><span class="w"> </span><span class="n">uniform</span><span class="p">;</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="n">auto</span> <span class="nf">newToken</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">auto</span> <span class="n">rnd</span> <span class="o">=</span> <span class="n">Random</span><span class="p">(</span><span class="n">mockUnpredictableSeed</span><span class="p">());</span>
-    <span class="k">return</span> <span class="n">rnd</span><span class="p">.</span><span class="na">front</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
+</span><span class="n">auto</span><span class="w"> </span><span class="nf">newToken</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">rnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Random</span><span class="p">(</span><span class="n">mockUnpredictableSeed</span><span class="p">());</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">rnd</span><span class="p">.</span><span class="na">front</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Right, as for each seed the first output value is deterministic only three
 tokens can be generated. By constantly reseeding you are delegating any
 random-generation work to the seed generation algorithm. The PRNG you
@@ -91,25 +91,25 @@ actually use doesn't matter the slightest.</p>
 <p>But this is no problem in practice right? Surely there is more than three
 possible seeds. Well it is time to have a real look at how secure those
 &quot;unpredictable seeds&quot; are.</p>
-</div>
-<div class="section" id="randomness-evaluation">
-<h2>Randomness evaluation</h2>
+</section>
+<section id="randomness-evaluation">
+<h3>Randomness evaluation</h3>
 <p>I first generated a random sample. Raw bytes are easier to reason about than
 integers in this case:</p>
-<pre class="code java literal-block"><code><span class="cm">/* gen_stream_1.d */</span>
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="p">:</span> <span class="n">writef</span><span class="p">;</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">:</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="cm">/* gen_stream_1.d */</span><span class="w">
+</span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.stdio</span><span class="p">:</span><span class="w"> </span><span class="n">writef</span><span class="p">;</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">:</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
 
-    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">s</span> <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">writef</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="kt">char</span><span class="p">)(</span><span class="n">s</span> <span class="o">&gt;&gt;</span> <span class="mf">8.</span><span class="n">i</span><span class="p">));</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
+        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">writef</span><span class="p">(</span><s>&quot;%c&quot;</s><span class="p">,</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">char</span><span class="p">)(</span><span class="n">s</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mf">8.</span><span class="n">i</span><span class="p">));</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>A bit of dd and we had a 20M file to play with:</p>
-<pre class="code sh literal-block"><code>rdmd gen_stream_1.d <span class="p">|</span> dd <span class="nv">bs</span><span class="o">=</span><span class="m">2048</span> <span class="nv">count</span><span class="o">=</span><span class="m">10240</span> <span class="nv">of</span><span class="o">=</span>test_1.raw</code></pre>
+<pre class="code sh literal-block"><code>rdmd<span class="w"> </span>gen_stream_1.d<span class="w"> </span><span class="p">|</span><span class="w"> </span>dd<span class="w"> </span><span class="nv">bs</span><span class="o">=</span><span class="m">2048</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">10240</span><span class="w"> </span><span class="nv">of</span><span class="o">=</span>test_1.raw</code></pre>
 <p>The first thing I do when evaluating randomness is plot a graph of the
 sample. I like <a class="reference external" href="https://codisec.com/veles/">Veles</a> very much for that. It is a tool that allows you to
 generate digrams and trigrams of data in order to see it under different
@@ -138,21 +138,21 @@ start of the file for 1, the other at the end for 0.</p>
 because I found that even the simplest crop was generating unwanted patterns.
 I advise opening the images in other tabs in order to see for yourself the
 patterns that may grow from the noise.</p>
-<div class="section" id="digram">
-<h3>Digram</h3>
+<section id="digram">
+<h4>Digram</h4>
 <p>The digram is fine, exactly what we would expect from such a random
 distribution: no value or set of value seems less used than another.</p>
 <img alt="../image/test_1_digram.png" src="../image/test_1_digram.png" />
-</div>
-<div class="section" id="trigram">
-<h3>Trigram</h3>
+</section>
+<section id="trigram">
+<h4>Trigram</h4>
 <p>The trigram looks also fine at first but with some specific angle we can see
 a cross dividing the cube's face into four squares... It is very faint, but
 maybe with another representation...</p>
 <img alt="../image/test_1_trigram.png" src="../image/test_1_trigram.png" />
-</div>
-<div class="section" id="layered-digram">
-<h3>Layered digram</h3>
+</section>
+<section id="layered-digram">
+<h4>Layered digram</h4>
 <p>Yes, there is definitely a pattern there.</p>
 <img alt="../image/test_1_ldigram_2.png" src="../image/test_1_ldigram_2.png" />
 <p>And things go even worse when rotating the cube: there is a clear layer that
@@ -160,10 +160,10 @@ has a different repartition. Both layers look fine independently but such a
 pattern indicates a real bias in randomness.</p>
 <img alt="../image/test_1_ldigram.png" src="../image/test_1_ldigram.png" />
 <p>So it's not as random as it was expected to be, but by how much?</p>
-</div>
-</div>
-<div class="section" id="stepping-through-the-code">
-<h2>Stepping through the code</h2>
+</section>
+</section>
+<section id="stepping-through-the-code">
+<h3>Stepping through the code</h3>
 <p>unpredictableSeed is defined in std.random:</p>
 <pre class="code java literal-block"><code><span class="cm">/**
 A &quot;good&quot; seed for initializing random number engines. Initializing
@@ -172,76 +172,76 @@ random number sequences every run.
 
 Returns:
 A single unsigned integer seed value, different on each successive call
-*/</span>
-<span class="nd">&#64;property</span> <span class="n">uint</span> <span class="nf">unpredictableSeed</span><span class="p">()</span> <span class="nd">&#64;trusted</span>
-<span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">core.thread</span> <span class="p">:</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">getpid</span><span class="p">,</span> <span class="n">MonoTime</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="n">bool</span> <span class="n">seeded</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="n">MinstdRand0</span> <span class="n">rand</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">seeded</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">threadID</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="n">cast</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span> <span class="n">Thread</span><span class="p">.</span><span class="na">getThis</span><span class="p">();</span>
-        <span class="n">rand</span><span class="p">.</span><span class="na">seed</span><span class="p">((</span><span class="n">getpid</span><span class="p">()</span><span class="o">+</span><span class="n">threadID</span><span class="p">)</span> <span class="o">^</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">);</span>
-        <span class="n">seeded</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">rand</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span>
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="p">(</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span> <span class="o">^</span> <span class="n">rand</span><span class="p">.</span><span class="na">front</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+*/</span><span class="w">
+</span><span class="nd">&#64;property</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="nf">unpredictableSeed</span><span class="p">()</span><span class="w"> </span><span class="nd">&#64;trusted</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">core.thread</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Thread</span><span class="p">,</span><span class="w"> </span><span class="n">getpid</span><span class="p">,</span><span class="w"> </span><span class="n">MonoTime</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="n">seeded</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="n">MinstdRand0</span><span class="w"> </span><span class="n">rand</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">seeded</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">threadID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">getThis</span><span class="p">();</span><span class="w">
+        </span><span class="n">rand</span><span class="p">.</span><span class="na">seed</span><span class="p">((</span><span class="n">getpid</span><span class="p">()</span><span class="o">+</span><span class="n">threadID</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">);</span><span class="w">
+        </span><span class="n">seeded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">rand</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="na">front</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>As we can see it embeds the Minimal Standard RNG (MinstdRand0) seeded it with
 the time and other process-specific values. Each unpredictableSeed is just a
 random number from this PRNG xored with the current time.</p>
 <p>For general purpose it is fine. But used directly for cryptographic purposes
 it is catastrophic because it is entirely predictable: any value is just the
 previous one times 16807 modulo 2147483647.</p>
-<div class="admonition note">
+<aside class="admonition note">
 <p class="admonition-title">Note</p>
 <p>In other word if the attacker is able to find one output of the PRNG any
 further output is just a multiplication away.</p>
-</div>
+</aside>
 <p>Still, it can't be that bad right? After all we are not presenting the raw
 output of the PRNG, we xor it with the current time and pass it through
 another PRNG before presenting it to the user right?</p>
 <p>We'll deal with each of these issues in a moment, but first let's illustrate
 more litterally the relation between MinstdRand0 and unpredictableSeed using
 the same visualizations as before on a raw MinstdRand0 PRNG:</p>
-<pre class="code java literal-block"><code><span class="nd">&#64;property</span> <span class="n">uint</span> <span class="nf">rand</span><span class="p">()</span> <span class="nd">&#64;trusted</span>
-<span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">:</span> <span class="n">MinstdRand0</span><span class="p">;</span>
-    <span class="kn">import</span> <span class="nn">core.thread</span> <span class="p">:</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">getpid</span><span class="p">,</span> <span class="n">MonoTime</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="n">bool</span> <span class="n">seeded</span><span class="p">;</span>
-    <span class="kd">static</span> <span class="n">MinstdRand0</span> <span class="n">rand</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">seeded</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">threadID</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="n">cast</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span> <span class="n">Thread</span><span class="p">.</span><span class="na">getThis</span><span class="p">();</span>
-        <span class="n">rand</span><span class="p">.</span><span class="na">seed</span><span class="p">((</span><span class="n">getpid</span><span class="p">()</span><span class="o">+</span><span class="n">threadID</span><span class="p">)</span> <span class="o">^</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">);</span>
-        <span class="n">seeded</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">rand</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span>
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="n">rand</span><span class="p">.</span><span class="na">front</span><span class="p">;</span>
-<span class="p">}</span>
+<pre class="code java literal-block"><code><span class="nd">&#64;property</span><span class="w"> </span><span class="n">uint</span><span class="w"> </span><span class="nf">rand</span><span class="p">()</span><span class="w"> </span><span class="nd">&#64;trusted</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">:</span><span class="w"> </span><span class="n">MinstdRand0</span><span class="p">;</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">core.thread</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Thread</span><span class="p">,</span><span class="w"> </span><span class="n">getpid</span><span class="p">,</span><span class="w"> </span><span class="n">MonoTime</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="n">seeded</span><span class="p">;</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="n">MinstdRand0</span><span class="w"> </span><span class="n">rand</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">seeded</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">threadID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">getThis</span><span class="p">();</span><span class="w">
+        </span><span class="n">rand</span><span class="p">.</span><span class="na">seed</span><span class="p">((</span><span class="n">getpid</span><span class="p">()</span><span class="o">+</span><span class="n">threadID</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">);</span><span class="w">
+        </span><span class="n">seeded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">rand</span><span class="p">.</span><span class="na">popFront</span><span class="p">();</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="n">rand</span><span class="p">.</span><span class="na">front</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="p">:</span> <span class="n">writef</span><span class="p">;</span>
+</span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.stdio</span><span class="p">:</span><span class="w"> </span><span class="n">writef</span><span class="p">;</span><span class="w">
 
-    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">s</span> <span class="o">=</span> <span class="n">rand</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span> <span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">writef</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="kt">char</span><span class="p">)(</span><span class="n">s</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="o">*</span><span class="n">i</span><span class="p">));</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre>
-<div class="section" id="id1">
-<h3>Digram</h3>
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">;</span><span class="w">
+        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">writef</span><span class="p">(</span><s>&quot;%c&quot;</s><span class="p">,</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">char</span><span class="p">)(</span><span class="n">s</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">8</span><span class="o">*</span><span class="n">i</span><span class="p">));</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
+<section id="digram-1">
+<h4>Digram</h4>
 <p>The bias is clearly visible here.</p>
 <img alt="../image/test_2_digram.png" src="../image/test_2_digram.png" />
-</div>
-<div class="section" id="id2">
-<h3>Trigram</h3>
+</section>
+<section id="trigram-1">
+<h4>Trigram</h4>
 <p>The cross is easier to see.</p>
 <img alt="../image/test_2_trigram.png" src="../image/test_2_trigram.png" />
-</div>
-<div class="section" id="id3">
-<h3>Layered digram</h3>
+</section>
+<section id="layered-digram-1">
+<h4>Layered digram</h4>
 <p>And of course the result is also visible on the layered diagram.</p>
 <img alt="../image/test_2_ldigram.png" src="../image/test_2_ldigram.png" />
 <p>However the sample doesn't exhibit the same temporal layers as before. What
@@ -249,66 +249,66 @@ we get from that is that when it comes to spectral repartition alone xoring
 the current time does provide some entropy (the crosses are almost blurred
 away). But it also added another strong temporal bias that we saw on the
 first layered diagram.</p>
-</div>
-</div>
-<div class="section" id="breaking-the-prng-obfuscation">
-<h2>Breaking the PRNG obfuscation</h2>
+</section>
+</section>
+<section id="breaking-the-prng-obfuscation">
+<h3>Breaking the PRNG obfuscation</h3>
 <p>The first problem we'll tackle is that of the second PRNG that makes it
 impossible to know the raw output of unpredictableSeed. As unpredictableSeed
 is just an uint we have 2³² possibilities. On a modern computer it is a
 matter of minutes to try all possibilities to find which seed gave us which
 random number. The following code finds it in the brutest possible way:</p>
-<pre class="code java literal-block"><code><span class="kn">import</span> <span class="nn">std.stdio</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">std.random</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="kn">import</span><span class="w"> </span><span class="nn">std.stdio</span><span class="p">;</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">;</span><span class="w">
 
-<span class="n">auto</span> <span class="nf">copyState</span><span class="p">(</span><span class="n">uint</span> <span class="n">origin</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">uint</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="n">Random</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="na">front</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</span><span class="n">auto</span><span class="w"> </span><span class="nf">copyState</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">origin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">origin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Random</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="na">front</span><span class="p">)</span><span class="w">
+            </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="kt">void</span> <span class="nf">main</span><span class="p">(</span><span class="n">string</span><span class="o">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">auto</span> <span class="n">seed</span>    <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
-    <span class="n">auto</span> <span class="n">jackpot</span> <span class="o">=</span> <span class="n">Random</span><span class="p">(</span><span class="n">unpredictableSeed</span><span class="p">).</span><span class="na">front</span><span class="p">;</span>
+</span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">string</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">seed</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">jackpot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Random</span><span class="p">(</span><span class="n">unpredictableSeed</span><span class="p">).</span><span class="na">front</span><span class="p">;</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">found</span> <span class="o">=</span> <span class="n">jackpot</span><span class="p">.</span><span class="na">copyState</span><span class="p">;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">found</span> <span class="o">==</span> <span class="n">seed</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jackpot</span><span class="p">.</span><span class="na">copyState</span><span class="p">;</span><span class="w">
+    </span><span class="k">assert</span><span class="p">(</span><span class="n">found</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">seed</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Done, and independently of the actual PRNG used.</p>
-</div>
-<div class="section" id="breaking-time">
-<h2>Breaking time</h2>
+</section>
+<section id="breaking-time">
+<h3>Breaking time</h3>
 <p>So we are able to get the unpredictableSeed, but how do we go from there to
 the actual state of MinstdRand0?</p>
 <p>Well, there's nothing more predictable than the flow of time so we'll just
 bruteforce it.</p>
 <p>Let's imagine that we have a website that allows you to recover your password
 by sending you a token by email.</p>
-<pre class="code java literal-block"><code><span class="kd">class</span> <span class="nc">Website</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">:</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="kd">class</span> <span class="nc">Website</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">:</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
 
-    <span class="n">ulong</span> <span class="n">tries</span><span class="p">;</span>
-    <span class="n">uint</span>  <span class="n">privateToken</span><span class="p">;</span>
+    </span><span class="n">ulong</span><span class="w"> </span><span class="n">tries</span><span class="p">;</span><span class="w">
+    </span><span class="n">uint</span><span class="w">  </span><span class="n">privateToken</span><span class="p">;</span><span class="w">
 
-    <span class="k">this</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">getPublicToken</span><span class="p">;</span> <span class="c1">// Seed unpredictableSeed
-</span>    <span class="p">}</span>
+    </span><span class="k">this</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">getPublicToken</span><span class="p">;</span><span class="w"> </span><span class="c1">// Seed unpredictableSeed</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">auto</span> <span class="nf">check</span><span class="p">(</span><span class="n">uint</span> <span class="n">token</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">tries</span><span class="o">++</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">privateToken</span> <span class="o">==</span> <span class="n">token</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">tries</span><span class="o">++</span><span class="p">;</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="n">privateToken</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">token</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">auto</span> <span class="nf">getPublicToken</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="nf">getPublicToken</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="kt">void</span> <span class="nf">setPrivateToken</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">privateToken</span> <span class="o">=</span> <span class="n">unpredictableSeed</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre>
+    </span><span class="kt">void</span><span class="w"> </span><span class="nf">setPrivateToken</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">privateToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unpredictableSeed</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Here we recover exactly one token for ourselves before asking for the token
 of another account that we never get of course. But we can try any number of
 tokens until we find it and get access to the account.</p>
@@ -317,34 +317,34 @@ between the time of the first call and the result of the second. We just have
 to try any time inbetween and see where that leads us by trying any time
 after that for the second token.</p>
 <p>The following code demonstrates roughly the idea.</p>
-<pre class="code java literal-block"><code><span class="kt">void</span> <span class="nf">main</span><span class="p">(</span><span class="n">string</span><span class="o">[]</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kn">import</span> <span class="nn">core.time</span><span class="p">;</span>
-    <span class="kn">import</span> <span class="nn">std.stdio</span><span class="p">;</span>
-    <span class="kn">import</span> <span class="nn">std.random</span><span class="p">:</span> <span class="n">MinstdRand0</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">string</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">core.time</span><span class="p">;</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.stdio</span><span class="p">;</span><span class="w">
+    </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="p">:</span><span class="w"> </span><span class="n">MinstdRand0</span><span class="p">;</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">ws</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Website</span><span class="p">();</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Website</span><span class="p">();</span><span class="w">
 
-    <span class="n">auto</span> <span class="n">before</span>    <span class="o">=</span> <span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span>
-    <span class="n">auto</span> <span class="n">token</span>     <span class="o">=</span> <span class="n">ws</span><span class="p">.</span><span class="na">getPublicToken</span><span class="p">;</span>
-    <span class="n">auto</span> <span class="n">inbetween</span> <span class="o">=</span> <span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span>
-    <span class="n">ws</span><span class="p">.</span><span class="na">setPrivateToken</span><span class="p">;</span>
-    <span class="n">auto</span> <span class="n">after</span>     <span class="o">=</span> <span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span>
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">before</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">token</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">ws</span><span class="p">.</span><span class="na">getPublicToken</span><span class="p">;</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">inbetween</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span><span class="w">
+    </span><span class="n">ws</span><span class="p">.</span><span class="na">setPrivateToken</span><span class="p">;</span><span class="w">
+    </span><span class="n">auto</span><span class="w"> </span><span class="n">after</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">MonoTime</span><span class="p">.</span><span class="na">currTime</span><span class="p">.</span><span class="na">ticks</span><span class="p">;</span><span class="w">
 
-    <span class="n">foreach</span><span class="p">(</span><span class="n">baseTime</span> <span class="p">;</span> <span class="n">before</span> <span class="p">..</span> <span class="n">inbetween</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">uint</span> <span class="n">originalSeed</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="p">(</span><span class="n">baseTime</span> <span class="o">^</span> <span class="n">token</span><span class="p">);</span>
-        <span class="n">auto</span> <span class="n">rnd</span> <span class="o">=</span> <span class="n">MinstdRand0</span><span class="p">(</span><span class="n">originalSeed</span><span class="p">);</span>
+    </span><span class="n">foreach</span><span class="p">(</span><span class="n">baseTime</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">before</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="n">inbetween</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">uint</span><span class="w"> </span><span class="n">originalSeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">baseTime</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">token</span><span class="p">);</span><span class="w">
+        </span><span class="n">auto</span><span class="w"> </span><span class="n">rnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MinstdRand0</span><span class="p">(</span><span class="n">originalSeed</span><span class="p">);</span><span class="w">
 
-        <span class="n">foreach</span> <span class="p">(</span><span class="n">nextTime</span> <span class="p">;</span> <span class="n">inbetween</span> <span class="p">..</span> <span class="n">after</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">uint</span> <span class="n">expectedOutput</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span> <span class="p">(</span><span class="n">rnd</span><span class="p">.</span><span class="na">front</span> <span class="o">^</span> <span class="n">nextTime</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ws</span><span class="p">.</span><span class="na">check</span><span class="p">(</span><span class="n">expectedOutput</span><span class="p">))</span> <span class="p">{</span>
-                <span class="n">writeln</span><span class="p">(</span><span class="s">&quot;Got it! &quot;</span><span class="p">,</span> <span class="n">expectedOutput</span><span class="p">,</span>
-                        <span class="s">&quot; in &quot;</span><span class="p">,</span> <span class="n">ws</span><span class="p">.</span><span class="na">tries</span><span class="p">,</span> <span class="s">&quot; tries&quot;</span><span class="p">);</span>
-                <span class="k">return</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="n">writeln</span><span class="p">(</span><span class="s">&quot;Missed it...&quot;</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+        </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">nextTime</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">inbetween</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="n">after</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="n">uint</span><span class="w"> </span><span class="n">expectedOutput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">uint</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">rnd</span><span class="p">.</span><span class="na">front</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">nextTime</span><span class="p">);</span><span class="w">
+            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ws</span><span class="p">.</span><span class="na">check</span><span class="p">(</span><span class="n">expectedOutput</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="n">writeln</span><span class="p">(</span><s>&quot;Got it! &quot;</s><span class="p">,</span><span class="w"> </span><span class="n">expectedOutput</span><span class="p">,</span><span class="w">
+                        </span><s>&quot; in &quot;</s><span class="p">,</span><span class="w"> </span><span class="n">ws</span><span class="p">.</span><span class="na">tries</span><span class="p">,</span><span class="w"> </span><s>&quot; tries&quot;</s><span class="p">);</span><span class="w">
+                </span><span class="k">return</span><span class="p">;</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">writeln</span><span class="p">(</span><s>&quot;Missed it...&quot;</s><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>There we go. On my computer I generally get the right token after something
 like 30000 tries. It is a lot but not so much that it can't be done in
 practice, especially since things like password recovery services generally
@@ -361,9 +361,9 @@ SHA-1 with his supercomputers, but of cracking any account with only a few
 hundred thousand requests. If the user of the account or a timeout mecanism
 doesn't invalidate the token this attack can even be spread along a week or
 so, making only a few thousand requests at a time.</p>
-</div>
-<div class="section" id="so-what-should-we-do">
-<h2>So, what should we do?</h2>
+</section>
+<section id="so-what-should-we-do">
+<h3>So, what should we do?</h3>
 <p>For cryptographic purpose use a cryptographically secure random number
 generator like /dev/urandom on Linux, the more recent getrandom system call or
 CryptGenRandom on Windows. Non-cryptographic PRNG like MinstdRand0 here are
@@ -376,8 +376,8 @@ generate <em>n</em> values you need a PRNG with a period of at least <em>n²</em
 means that if you have a PRNG with a period of <em>n²</em> you need to reseed it
 about every <em>n</em> values to perpetuate its randomness properties.</p>
 <p>I hope this helps push things in the good direction in the future.</p>
-</div>
-</div>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Crypter writeup</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,188 +46,188 @@
     </header>
 
     <div class="content">
-      <div class="section" id="crypter-writeup">
-<h1>Crypter writeup</h1>
-<div class="admonition note">
+      <section id="crypter-writeup">
+<h2>Crypter writeup</h2>
+<aside class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you haven't done the challenge yet I urge you to give it a try first.</p>
 <p>You can find it <a class="reference external" href="../file/crypter.tgz">here</a>.</p>
-</div>
+</aside>
 <p>So here is the crypter writeup. What is it about?</p>
 <pre class="literal-block">A file was encrypted.
 You have the encryption software and an encrypted file.
 Decrypt that file.</pre>
 <p>Challenge accepted!</p>
-<div class="section" id="identification">
-<h2>Identification</h2>
+<section id="identification">
+<h3>Identification</h3>
 <p>Let's first identify what we have:</p>
-<pre class="code bash literal-block"><code>$ file crypter
-crypter: ELF <span class="m">32</span>-bit LSB executable, Intel <span class="m">80386</span>, version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>,
-dynamically linked, interpreter /lib/ld-linux.so.2, <span class="k">for</span> GNU/Linux <span class="m">2</span>.6.32,
-BuildID<span class="o">[</span>sha1<span class="o">]=</span>75c7244d2ffea7d3ef05604bb829bb5a8976ba1d, not stripped
+<pre class="code bash literal-block"><code>$<span class="w"> </span>file<span class="w"> </span>crypter<span class="w">
+</span>crypter:<span class="w"> </span>ELF<span class="w"> </span><span class="m">32</span>-bit<span class="w"> </span>LSB<span class="w"> </span>executable,<span class="w"> </span>Intel<span class="w"> </span><span class="m">80386</span>,<span class="w"> </span>version<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">(</span>SYSV<span class="o">)</span>,<span class="w">
+</span>dynamically<span class="w"> </span>linked,<span class="w"> </span>interpreter<span class="w"> </span>/lib/ld-linux.so.2,<span class="w"> </span><span class="k">for</span><span class="w"> </span>GNU/Linux<span class="w"> </span><span class="m">2</span>.6.32,<span class="w">
+</span>BuildID<span class="o">[</span>sha1<span class="o">]=</span>75c7244d2ffea7d3ef05604bb829bb5a8976ba1d,<span class="w"> </span>not<span class="w"> </span>stripped<span class="w">
 
-$ file out.crypt
-out.crypt: data</code></pre>
+</span>$<span class="w"> </span>file<span class="w"> </span>out.crypt<span class="w">
+</span>out.crypt:<span class="w"> </span>data</code></pre>
 <p>So, an executable and an unknown binary file. Given its name (and the README)
 it sounds like it's encrypted. What's its entropy?</p>
-<pre class="code bash literal-block"><code>$ ent out.crypt
-<span class="nv">Entropy</span> <span class="o">=</span> <span class="m">7</span>.998705 bits per byte.
+<pre class="code bash literal-block"><code>$<span class="w"> </span>ent<span class="w"> </span>out.crypt<span class="w">
+</span><span class="nv">Entropy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">7</span>.998705<span class="w"> </span>bits<span class="w"> </span>per<span class="w"> </span>byte.<span class="w">
 
-Optimum compression would reduce the size
-of this <span class="m">145032</span> byte file by <span class="m">0</span> percent.
+</span>Optimum<span class="w"> </span>compression<span class="w"> </span>would<span class="w"> </span>reduce<span class="w"> </span>the<span class="w"> </span>size<span class="w">
+</span>of<span class="w"> </span>this<span class="w"> </span><span class="m">145032</span><span class="w"> </span>byte<span class="w"> </span>file<span class="w"> </span>by<span class="w"> </span><span class="m">0</span><span class="w"> </span>percent.<span class="w">
 
-Chi square distribution <span class="k">for</span> <span class="m">145032</span> samples is <span class="m">259</span>.60, and randomly
-would exceed this value <span class="m">40</span>.83 percent of the times.
+</span>Chi<span class="w"> </span>square<span class="w"> </span>distribution<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="m">145032</span><span class="w"> </span>samples<span class="w"> </span>is<span class="w"> </span><span class="m">259</span>.60,<span class="w"> </span>and<span class="w"> </span>randomly<span class="w">
+</span>would<span class="w"> </span>exceed<span class="w"> </span>this<span class="w"> </span>value<span class="w"> </span><span class="m">40</span>.83<span class="w"> </span>percent<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>times.<span class="w">
 
-Arithmetic mean value of data bytes is <span class="m">127</span>.2753 <span class="o">(</span><span class="m">127</span>.5 <span class="o">=</span> random<span class="o">)</span>.
-Monte Carlo value <span class="k">for</span> Pi is <span class="m">3</span>.151249379 <span class="o">(</span>error <span class="m">0</span>.31 percent<span class="o">)</span>.
-Serial correlation coefficient is -0.004602 <span class="o">(</span>totally <span class="nv">uncorrelated</span> <span class="o">=</span> <span class="m">0</span>.0<span class="o">)</span>.</code></pre>
+</span>Arithmetic<span class="w"> </span>mean<span class="w"> </span>value<span class="w"> </span>of<span class="w"> </span>data<span class="w"> </span>bytes<span class="w"> </span>is<span class="w"> </span><span class="m">127</span>.2753<span class="w"> </span><span class="o">(</span><span class="m">127</span>.5<span class="w"> </span><span class="o">=</span><span class="w"> </span>random<span class="o">)</span>.<span class="w">
+</span>Monte<span class="w"> </span>Carlo<span class="w"> </span>value<span class="w"> </span><span class="k">for</span><span class="w"> </span>Pi<span class="w"> </span>is<span class="w"> </span><span class="m">3</span>.151249379<span class="w"> </span><span class="o">(</span>error<span class="w"> </span><span class="m">0</span>.31<span class="w"> </span>percent<span class="o">)</span>.<span class="w">
+</span>Serial<span class="w"> </span>correlation<span class="w"> </span>coefficient<span class="w"> </span>is<span class="w"> </span>-0.004602<span class="w"> </span><span class="o">(</span>totally<span class="w"> </span><span class="nv">uncorrelated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>.0<span class="o">)</span>.</code></pre>
 <p>Almost 8 bits by byte... Ok, so the entropy is very high and that also means
 that it's likely to be really encrypted. A low entropy means lots of
 structure in the file which is exactly what cryptography tries to remove.</p>
 <p>Maybe there is some information in the file itself? Some kind of header?</p>
-<pre class="code bash literal-block"><code>$ xxd out.crypt <span class="p">|</span> head
-<span class="m">0000000</span>: 7d66 4fc6 acdb 7b27 ef50 9d4f c2a7 dac0  <span class="o">}</span>fO...<span class="o">{</span><span class="s1">'.P.O....
-0000010: 27a4 11f7 d5bb 29ea 465f 4c10 157f a16f  '</span>.....<span class="o">)</span>.F_L....o
-<span class="m">0000020</span>: <span class="m">1887</span> 8be4 58a5 b506 68f7 8b2b bff9 d438  ....X...h..+...8
-<span class="m">0000030</span>: 9bda <span class="m">3869</span> 1f56 23b3 d54b 9ef9 9c3d 52b7  ..8i.V#..K...<span class="o">=</span>R.
-<span class="m">0000040</span>: 5bd8 86f3 b7de 96e6 d9e4 bf44 5b3b b20b  <span class="o">[</span>..........D<span class="o">[</span><span class="p">;</span>..
-<span class="m">0000050</span>: e571 7f8f <span class="m">8516</span> 9ed2 a3d1 80a3 <span class="m">9762</span> 941f  .q...........b..
-<span class="m">0000060</span>: <span class="m">8554</span> <span class="m">5268</span> <span class="m">6319</span> <span class="m">8953</span> <span class="m">0652</span> <span class="m">6787</span> f756 cb3c  .TRhc..S.Rg..V.&lt;
-<span class="m">0000070</span>: 2faa da61 704a d60d 03aa 806a f881 6d5e  /..apJ.....j..m^
-<span class="m">0000080</span>: 81be a5e3 <span class="m">6678</span> abac 1b8c c08a fc33 bb97  ....fx.......3..
-<span class="m">0000090</span>: 1c7b e3cd e188 <span class="m">4525</span> <span class="m">5113</span> e0b2 fda0 156d  .<span class="o">{</span>....E%Q......m</code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>xxd<span class="w"> </span>out.crypt<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w">
+</span><span class="m">0000000</span>:<span class="w"> </span>7d66<span class="w"> </span>4fc6<span class="w"> </span>acdb<span class="w"> </span>7b27<span class="w"> </span>ef50<span class="w"> </span>9d4f<span class="w"> </span>c2a7<span class="w"> </span>dac0<span class="w">  </span><span class="o">}</span>fO...<span class="o">{</span><span class="s1">'.P.O....
+0000010: 27a4 11f7 d5bb 29ea 465f 4c10 157f a16f  '</span>.....<span class="o">)</span>.F_L....o<span class="w">
+</span><span class="m">0000020</span>:<span class="w"> </span><span class="m">1887</span><span class="w"> </span>8be4<span class="w"> </span>58a5<span class="w"> </span>b506<span class="w"> </span>68f7<span class="w"> </span>8b2b<span class="w"> </span>bff9<span class="w"> </span>d438<span class="w">  </span>....X...h..+...8<span class="w">
+</span><span class="m">0000030</span>:<span class="w"> </span>9bda<span class="w"> </span><span class="m">3869</span><span class="w"> </span>1f56<span class="w"> </span>23b3<span class="w"> </span>d54b<span class="w"> </span>9ef9<span class="w"> </span>9c3d<span class="w"> </span>52b7<span class="w">  </span>..8i.V#..K...<span class="o">=</span>R.<span class="w">
+</span><span class="m">0000040</span>:<span class="w"> </span>5bd8<span class="w"> </span>86f3<span class="w"> </span>b7de<span class="w"> </span>96e6<span class="w"> </span>d9e4<span class="w"> </span>bf44<span class="w"> </span>5b3b<span class="w"> </span>b20b<span class="w">  </span><span class="o">[</span>..........D<span class="o">[</span><span class="p">;</span>..<span class="w">
+</span><span class="m">0000050</span>:<span class="w"> </span>e571<span class="w"> </span>7f8f<span class="w"> </span><span class="m">8516</span><span class="w"> </span>9ed2<span class="w"> </span>a3d1<span class="w"> </span>80a3<span class="w"> </span><span class="m">9762</span><span class="w"> </span>941f<span class="w">  </span>.q...........b..<span class="w">
+</span><span class="m">0000060</span>:<span class="w"> </span><span class="m">8554</span><span class="w"> </span><span class="m">5268</span><span class="w"> </span><span class="m">6319</span><span class="w"> </span><span class="m">8953</span><span class="w"> </span><span class="m">0652</span><span class="w"> </span><span class="m">6787</span><span class="w"> </span>f756<span class="w"> </span>cb3c<span class="w">  </span>.TRhc..S.Rg..V.&lt;<span class="w">
+</span><span class="m">0000070</span>:<span class="w"> </span>2faa<span class="w"> </span>da61<span class="w"> </span>704a<span class="w"> </span>d60d<span class="w"> </span>03aa<span class="w"> </span>806a<span class="w"> </span>f881<span class="w"> </span>6d5e<span class="w">  </span>/..apJ.....j..m^<span class="w">
+</span><span class="m">0000080</span>:<span class="w"> </span>81be<span class="w"> </span>a5e3<span class="w"> </span><span class="m">6678</span><span class="w"> </span>abac<span class="w"> </span>1b8c<span class="w"> </span>c08a<span class="w"> </span>fc33<span class="w"> </span>bb97<span class="w">  </span>....fx.......3..<span class="w">
+</span><span class="m">0000090</span>:<span class="w"> </span>1c7b<span class="w"> </span>e3cd<span class="w"> </span>e188<span class="w"> </span><span class="m">4525</span><span class="w"> </span><span class="m">5113</span><span class="w"> </span>e0b2<span class="w"> </span>fda0<span class="w"> </span>156d<span class="w">  </span>.<span class="o">{</span>....E%Q......m</code></pre>
 <p>Nope. Doesn't look like it. We'll have to reverse the binary.</p>
-</div>
-<div class="section" id="reversing">
-<h2>Reversing</h2>
+</section>
+<section id="reversing">
+<h3>Reversing</h3>
 <p>We'll use radare2 to perform the reversing.</p>
-<pre class="code bash literal-block"><code>$ r2 crypter
--- Everytime you run radare2, a random file is removed :<span class="o">)</span>
-<span class="o">[</span>0x08048510<span class="o">]</span>&gt; s main
-<span class="o">[</span>0x0804860b<span class="o">]</span>&gt; af
-<span class="o">[</span>0x0804860b<span class="o">]</span>&gt; pdf
-...</code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>r2<span class="w"> </span>crypter<span class="w">
+</span>--<span class="w"> </span>Everytime<span class="w"> </span>you<span class="w"> </span>run<span class="w"> </span>radare2,<span class="w"> </span>a<span class="w"> </span>random<span class="w"> </span>file<span class="w"> </span>is<span class="w"> </span>removed<span class="w"> </span>:<span class="o">)</span><span class="w">
+</span><span class="o">[</span>0x08048510<span class="o">]</span>&gt;<span class="w"> </span>s<span class="w"> </span>main<span class="w">
+</span><span class="o">[</span>0x0804860b<span class="o">]</span>&gt;<span class="w"> </span>af<span class="w">
+</span><span class="o">[</span>0x0804860b<span class="o">]</span>&gt;<span class="w"> </span>pdf<span class="w">
+</span>...</code></pre>
 <p>Well, that's a long main. For the sake of readability I'll focus on specific
 parts. What functions are called in this main function?</p>
-<pre class="code bash literal-block"><code><span class="o">[</span>0x0804860b<span class="o">]</span>&gt; pdf~call
-<span class="p">|</span>           0x08048621      e86afeffff     call sym.imp.time
-<span class="p">|</span>           0x0804862d      e86efeffff     call sym.imp.srand
-<span class="p">|</span>           0x0804863d      e86efeffff     call sym.imp.unlink
-<span class="p">|</span>           0x08048652      e869feffff     call sym.imp.fopen
-<span class="p">|</span>           0x0804866a      e851feffff     call sym.imp.fopen
-<span class="p">|</span>      .--&gt; 0x08048677      e854feffff     call sym.imp.rand
-<span class="p">|</span>      <span class="o">||</span>   0x08048692      e849feffff     call sym.imp.fwrite
-<span class="p">|</span>      <span class="p">|</span>    0x080486a5      e846feffff     call sym.imp.fread
-<span class="p">|</span>           0x080486b7      e844feffff     call sym.imp.fclose</code></pre>
+<pre class="code bash literal-block"><code><span class="o">[</span>0x0804860b<span class="o">]</span>&gt;<span class="w"> </span>pdf~call<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048621<span class="w">      </span>e86afeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.time<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804862d<span class="w">      </span>e86efeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.srand<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804863d<span class="w">      </span>e86efeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.unlink<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048652<span class="w">      </span>e869feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fopen<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804866a<span class="w">      </span>e851feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fopen<span class="w">
+</span><span class="p">|</span><span class="w">      </span>.--&gt;<span class="w"> </span>0x08048677<span class="w">      </span>e854feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.rand<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048692<span class="w">      </span>e849feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fwrite<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486a5<span class="w">      </span>e846feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fread<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486b7<span class="w">      </span>e844feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fclose</code></pre>
 <p>The first thing we see is that all functions called are dynamically linked.
 This means that all the effective code of the process is in the main. We'll
 walk through it one section at a time.</p>
-<pre class="code bash literal-block"><code>/ <span class="o">(</span>fcn<span class="o">)</span> sym.main <span class="m">207</span>
-<span class="p">|</span>   sym.main <span class="o">()</span><span class="p">;</span>
-<span class="p">|</span>           <span class="p">;</span> var int local_11h &#64; ebp-0x11
-<span class="p">|</span>           <span class="p">;</span> var int local_10h &#64; ebp-0x10
-<span class="p">|</span>           <span class="p">;</span> var int local_ch &#64; ebp-0xc
-<span class="p">|</span>           <span class="p">;</span> var int local_4h &#64; ebp-0x4
-<span class="p">|</span>           <span class="p">;</span> var int local_4h_2 &#64; esp+0x4
-<span class="p">|</span>           0x0804860b      8d4c2404       lea ecx, <span class="o">[</span>esp + local_4h_2<span class="o">]</span>
-<span class="p">|</span>           0x0804860f      83e4f0         and esp, 0xfffffff0
-<span class="p">|</span>           0x08048612      ff71fc         push dword <span class="o">[</span>ecx - <span class="m">4</span><span class="o">]</span>
-<span class="p">|</span>           0x08048615      <span class="m">55</span>             push ebp
-<span class="p">|</span>           0x08048616      89e5           mov ebp, esp
-<span class="p">|</span>           0x08048618      <span class="m">51</span>             push ecx
-<span class="p">|</span>           0x08048619      83ec14         sub esp, 0x14</code></pre>
+<pre class="code bash literal-block"><code>/<span class="w"> </span><span class="o">(</span>fcn<span class="o">)</span><span class="w"> </span>sym.main<span class="w"> </span><span class="m">207</span><span class="w">
+</span><span class="p">|</span><span class="w">   </span>sym.main<span class="w"> </span><span class="o">()</span><span class="p">;</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span><span class="p">;</span><span class="w"> </span>var<span class="w"> </span>int<span class="w"> </span>local_11h<span class="w"> </span>&#64;<span class="w"> </span>ebp-0x11<span class="w">
+</span><span class="p">|</span><span class="w">           </span><span class="p">;</span><span class="w"> </span>var<span class="w"> </span>int<span class="w"> </span>local_10h<span class="w"> </span>&#64;<span class="w"> </span>ebp-0x10<span class="w">
+</span><span class="p">|</span><span class="w">           </span><span class="p">;</span><span class="w"> </span>var<span class="w"> </span>int<span class="w"> </span>local_ch<span class="w"> </span>&#64;<span class="w"> </span>ebp-0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span><span class="p">;</span><span class="w"> </span>var<span class="w"> </span>int<span class="w"> </span>local_4h<span class="w"> </span>&#64;<span class="w"> </span>ebp-0x4<span class="w">
+</span><span class="p">|</span><span class="w">           </span><span class="p">;</span><span class="w"> </span>var<span class="w"> </span>int<span class="w"> </span>local_4h_2<span class="w"> </span>&#64;<span class="w"> </span>esp+0x4<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804860b<span class="w">      </span>8d4c2404<span class="w">       </span>lea<span class="w"> </span>ecx,<span class="w"> </span><span class="o">[</span>esp<span class="w"> </span>+<span class="w"> </span>local_4h_2<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804860f<span class="w">      </span>83e4f0<span class="w">         </span>and<span class="w"> </span>esp,<span class="w"> </span>0xfffffff0<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048612<span class="w">      </span>ff71fc<span class="w">         </span>push<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ecx<span class="w"> </span>-<span class="w"> </span><span class="m">4</span><span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048615<span class="w">      </span><span class="m">55</span><span class="w">             </span>push<span class="w"> </span>ebp<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048616<span class="w">      </span>89e5<span class="w">           </span>mov<span class="w"> </span>ebp,<span class="w"> </span>esp<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048618<span class="w">      </span><span class="m">51</span><span class="w">             </span>push<span class="w"> </span>ecx<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048619<span class="w">      </span>83ec14<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0x14</code></pre>
 <p>Function prologue. Radare2 tells us that he identifies 5 local variables. We
 allocate 0x14 bytes of memory on the stack for those variables. 0x14/4=5 so
 it is coherent with what radare says if all variables are considered to be of
 size 4 which is what it identifies given the offsets it gives.</p>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x0804861c      83ec0c         sub esp, 0xc
-<span class="p">|</span>           0x0804861f      6a00           push <span class="m">0</span>
-<span class="p">|</span>           0x08048621      e86afeffff     call sym.imp.time
-<span class="p">|</span>           0x08048626      83c410         add esp, 0x10</code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x0804861c<span class="w">      </span>83ec0c<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804861f<span class="w">      </span>6a00<span class="w">           </span>push<span class="w"> </span><span class="m">0</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048621<span class="w">      </span>e86afeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.time<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048626<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10</code></pre>
 <p>Standard call to an external function for an x86 binary. We first allocate
 the stack frame of the function, push the argument (0) and end up
 deallocating it. This call is really:</p>
 <pre class="code c literal-block"><code><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span></code></pre>
 <p>The next call is similar:</p>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x08048629      83ec0c         sub esp, 0xc
-<span class="p">|</span>           0x0804862c      <span class="m">50</span>             push eax
-<span class="p">|</span>           0x0804862d      e86efeffff     call sym.imp.srand
-<span class="p">|</span>           0x08048632      83c410         add esp, 0x10</code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x08048629<span class="w">      </span>83ec0c<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804862c<span class="w">      </span><span class="m">50</span><span class="w">             </span>push<span class="w"> </span>eax<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804862d<span class="w">      </span>e86efeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.srand<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048632<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10</code></pre>
 <p>We pass eax, the return value of the call to time, to srand.
 So our code is really:</p>
 <pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span></code></pre>
 <p>This initializes the global random number generator with the current time.</p>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x08048635      83ec0c         sub esp, 0xc
-<span class="p">|</span>           0x08048638      <span class="m">6860870408</span>     push str.out.crypt
-<span class="p">|</span>           0x0804863d      e86efeffff     call sym.imp.unlink
-<span class="p">|</span>           0x08048642      83c410         add esp, 0x10</code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x08048635<span class="w">      </span>83ec0c<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048638<span class="w">      </span><span class="m">6860870408</span><span class="w">     </span>push<span class="w"> </span>str.out.crypt<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804863d<span class="w">      </span>e86efeffff<span class="w">     </span>call<span class="w"> </span>sym.imp.unlink<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048642<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10</code></pre>
 <p>Here we call unlink with the argument &quot;out.crypt&quot;. Unlink is used to delete a
 file.</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span></code></pre>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x08048645      83ec08         sub esp, <span class="m">8</span>
-<span class="p">|</span>           0x08048648      686a870408     push str.wr_______________
-<span class="p">;</span> str.wr_______________ <span class="p">;</span> <span class="s2">&quot;wrsource.png&quot;</span> &#64; 0x804876a
-<span class="p">|</span>           0x0804864d      <span class="m">6860870408</span>     push str.out.crypt
-<span class="p">;</span> str.out.crypt <span class="p">;</span> <span class="s2">&quot;out.crypt&quot;</span> &#64; 0x8048760
-<span class="p">|</span>           0x08048652      e869feffff     call sym.imp.fopen
-<span class="p">|</span>           0x08048657      83c410         add esp, 0x10
-<span class="p">|</span>           0x0804865a      8945f4         mov dword <span class="o">[</span>ebp - local_ch<span class="o">]</span>, eax</code></pre>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span></code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x08048645<span class="w">      </span>83ec08<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span><span class="m">8</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048648<span class="w">      </span>686a870408<span class="w">     </span>push<span class="w"> </span>str.wr_______________<span class="w">
+</span><span class="p">;</span><span class="w"> </span>str.wr_______________<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="s2">&quot;wrsource.png&quot;</span><span class="w"> </span>&#64;<span class="w"> </span>0x804876a<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804864d<span class="w">      </span><span class="m">6860870408</span><span class="w">     </span>push<span class="w"> </span>str.out.crypt<span class="w">
+</span><span class="p">;</span><span class="w"> </span>str.out.crypt<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="s2">&quot;out.crypt&quot;</span><span class="w"> </span>&#64;<span class="w"> </span>0x8048760<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048652<span class="w">      </span>e869feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fopen<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048657<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804865a<span class="w">      </span>8945f4<span class="w">         </span>mov<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_ch<span class="o">]</span>,<span class="w"> </span>eax</code></pre>
 <p>We open a file with fopen. Its arguments are a filename (here out.crypt) and
 the permissions in the form of a string. This argument seems fishy:
 wrsource.png doesn't sound like a valid permission qualifier... Let's check:</p>
-<pre class="code bash literal-block"><code><span class="o">[</span>0x08048645<span class="o">]</span>&gt; px <span class="m">5</span> &#64; str.wr_______________
-- offset -   <span class="m">0</span> <span class="m">1</span>  <span class="m">2</span> <span class="m">3</span>  <span class="m">4</span> <span class="m">5</span>  <span class="m">6</span> <span class="m">7</span>  <span class="m">8</span> <span class="m">9</span>  A B  C D  E F  0123456789ABCDEF
- 0x0804876a  <span class="m">7700</span> <span class="m">7200</span> <span class="m">73</span>                             w.r.s</code></pre>
+<pre class="code bash literal-block"><code><span class="o">[</span>0x08048645<span class="o">]</span>&gt;<span class="w"> </span>px<span class="w"> </span><span class="m">5</span><span class="w"> </span>&#64;<span class="w"> </span>str.wr_______________<span class="w">
+</span>-<span class="w"> </span>offset<span class="w"> </span>-<span class="w">   </span><span class="m">0</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="m">2</span><span class="w"> </span><span class="m">3</span><span class="w">  </span><span class="m">4</span><span class="w"> </span><span class="m">5</span><span class="w">  </span><span class="m">6</span><span class="w"> </span><span class="m">7</span><span class="w">  </span><span class="m">8</span><span class="w"> </span><span class="m">9</span><span class="w">  </span>A<span class="w"> </span>B<span class="w">  </span>C<span class="w"> </span>D<span class="w">  </span>E<span class="w"> </span>F<span class="w">  </span>0123456789ABCDEF<span class="w">
+ </span>0x0804876a<span class="w">  </span><span class="m">7700</span><span class="w"> </span><span class="m">7200</span><span class="w"> </span><span class="m">73</span><span class="w">                             </span>w.r.s</code></pre>
 <p>Ok, so as C strings are null-terminated the string really is &quot;w0&quot;. Radare
 must have thought that it was a wide string where all characters are encoded
 on two bytes.</p>
 <p>fopen returns a pointer to a file which is stored in the local variable
 local_ch.</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_ch</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">);</span></code></pre>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x0804865d      83ec08         sub esp, <span class="m">8</span>
-<span class="p">|</span>           0x08048660      686c870408     push 0x804876c<span class="p">;</span> <span class="s2">&quot;rsource.png&quot;</span>
-<span class="p">|</span>           0x08048665      686e870408     push 0x804876e<span class="p">;</span> <span class="s2">&quot;source.png&quot;</span>
-<span class="p">|</span>           0x0804866a      e851feffff     call sym.imp.fopen
-<span class="p">|</span>           0x0804866f      83c410         add esp, 0x10
-<span class="p">|</span>           0x08048672      8945f0         mov dword <span class="o">[</span>ebp - local_10h<span class="o">]</span>, eax</code></pre>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;w&quot;</s><span class="p">);</span></code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x0804865d<span class="w">      </span>83ec08<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span><span class="m">8</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048660<span class="w">      </span>686c870408<span class="w">     </span>push<span class="w"> </span>0x804876c<span class="p">;</span><span class="w"> </span><span class="s2">&quot;rsource.png&quot;</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048665<span class="w">      </span>686e870408<span class="w">     </span>push<span class="w"> </span>0x804876e<span class="p">;</span><span class="w"> </span><span class="s2">&quot;source.png&quot;</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804866a<span class="w">      </span>e851feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fopen<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x0804866f<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x08048672<span class="w">      </span>8945f0<span class="w">         </span>mov<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_10h<span class="o">]</span>,<span class="w"> </span>eax</code></pre>
 <p>Another similar call to fopen. Radare2 is still fooled by the strings but we
 won't be! It's clear that we open source.png in read mode and store the
 handle in local_10h.</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_ch</span>  <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span>  <span class="s">&quot;w&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_10h</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;source.png&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span></code></pre>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_ch</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w">  </span><s>&quot;w&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_10h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;source.png&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span></code></pre>
 <p>Let's stop there for a second because we just discovered something very
 important: the source is a PNG file! This means that our cryptographic
 analysis just turned (partially) into a known-text attack as the structure
 presents some static parts like a MAGIC number. We'll come back to that
 later.</p>
-<pre class="code bash literal-block"><code><span class="p">|</span>       ,<span class="o">=</span>&lt; 0x08048675      eb23           jmp 0x804869a
-<span class="p">|</span>      .--&gt; 0x08048677      e854feffff     call sym.imp.rand
-<span class="p">|</span>      <span class="o">||</span>   0x0804867c      89c2           mov edx, eax
-<span class="p">|</span>      <span class="o">||</span>   0x0804867e      0fb645ef       movzx eax, byte <span class="o">[</span>ebp - local_11h<span class="o">]</span>
-<span class="p">|</span>      <span class="o">||</span>   0x08048682      31d0           xor eax, edx
-<span class="p">|</span>      <span class="o">||</span>   0x08048684      8845ef         mov byte <span class="o">[</span>ebp - local_11h<span class="o">]</span>, al
-<span class="p">|</span>      <span class="o">||</span>   0x08048687      ff75f4         push dword <span class="o">[</span>ebp - local_ch<span class="o">]</span>
-<span class="p">|</span>      <span class="o">||</span>   0x0804868a      6a01           push <span class="m">1</span>
-<span class="p">|</span>      <span class="o">||</span>   0x0804868c      6a01           push <span class="m">1</span>
-<span class="p">|</span>      <span class="o">||</span>   0x0804868e      8d45ef         lea eax, <span class="o">[</span>ebp - local_11h<span class="o">]</span>
-<span class="p">|</span>      <span class="o">||</span>   0x08048691      <span class="m">50</span>             push eax
-<span class="p">|</span>      <span class="o">||</span>   0x08048692      e849feffff     call sym.imp.fwrite
-<span class="p">|</span>      <span class="o">||</span>   0x08048697      83c410         add esp, 0x10
-<span class="p">|</span>      <span class="p">|</span><span class="sb">`</span>-&gt; 0x0804869a      ff75f0         push dword <span class="o">[</span>ebp - local_10h<span class="o">]</span>
-<span class="p">|</span>      <span class="p">|</span>    0x0804869d      6a01           push <span class="m">1</span>
-<span class="p">|</span>      <span class="p">|</span>    0x0804869f      6a01           push <span class="m">1</span>
-<span class="p">|</span>      <span class="p">|</span>    0x080486a1      8d45ef         lea eax, <span class="o">[</span>ebp - local_11h<span class="o">]</span>
-<span class="p">|</span>      <span class="p">|</span>    0x080486a4      <span class="m">50</span>             push eax
-<span class="p">|</span>      <span class="p">|</span>    0x080486a5      e846feffff     call sym.imp.fread
-<span class="p">|</span>      <span class="p">|</span>    0x080486aa      83c410         add esp, 0x10
-<span class="p">|</span>      <span class="p">|</span>    0x080486ad      85c0           <span class="nb">test</span> eax, eax
-<span class="p">|</span>      <span class="sb">`</span><span class="o">==</span>&lt; 0x080486af      75c6           jne 0x8048677</code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">       </span>,<span class="o">=</span>&lt;<span class="w"> </span>0x08048675<span class="w">      </span>eb23<span class="w">           </span>jmp<span class="w"> </span>0x804869a<span class="w">
+</span><span class="p">|</span><span class="w">      </span>.--&gt;<span class="w"> </span>0x08048677<span class="w">      </span>e854feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.rand<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x0804867c<span class="w">      </span>89c2<span class="w">           </span>mov<span class="w"> </span>edx,<span class="w"> </span>eax<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x0804867e<span class="w">      </span>0fb645ef<span class="w">       </span>movzx<span class="w"> </span>eax,<span class="w"> </span>byte<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_11h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048682<span class="w">      </span>31d0<span class="w">           </span>xor<span class="w"> </span>eax,<span class="w"> </span>edx<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048684<span class="w">      </span>8845ef<span class="w">         </span>mov<span class="w"> </span>byte<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_11h<span class="o">]</span>,<span class="w"> </span>al<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048687<span class="w">      </span>ff75f4<span class="w">         </span>push<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_ch<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x0804868a<span class="w">      </span>6a01<span class="w">           </span>push<span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x0804868c<span class="w">      </span>6a01<span class="w">           </span>push<span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x0804868e<span class="w">      </span>8d45ef<span class="w">         </span>lea<span class="w"> </span>eax,<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_11h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048691<span class="w">      </span><span class="m">50</span><span class="w">             </span>push<span class="w"> </span>eax<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048692<span class="w">      </span>e849feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fwrite<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="o">||</span><span class="w">   </span>0x08048697<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="sb">`</span>-&gt;<span class="w"> </span>0x0804869a<span class="w">      </span>ff75f0<span class="w">         </span>push<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_10h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x0804869d<span class="w">      </span>6a01<span class="w">           </span>push<span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x0804869f<span class="w">      </span>6a01<span class="w">           </span>push<span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486a1<span class="w">      </span>8d45ef<span class="w">         </span>lea<span class="w"> </span>eax,<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_11h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486a4<span class="w">      </span><span class="m">50</span><span class="w">             </span>push<span class="w"> </span>eax<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486a5<span class="w">      </span>e846feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fread<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486aa<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="p">|</span><span class="w">    </span>0x080486ad<span class="w">      </span>85c0<span class="w">           </span><span class="nb">test</span><span class="w"> </span>eax,<span class="w"> </span>eax<span class="w">
+</span><span class="p">|</span><span class="w">      </span><span class="sb">`</span><span class="o">==</span>&lt;<span class="w"> </span>0x080486af<span class="w">      </span>75c6<span class="w">           </span>jne<span class="w"> </span>0x8048677</code></pre>
 <p>This snippet is longer because it really is a loop. We can see that with the
 two intricated jumps. The loop condition is tested at 0x080486ad: <cite>test eax,
 eax</cite> which reads as “The last function call returned 0”. In that case we exit
@@ -240,14 +240,14 @@ size_t nmemb  = 1;
 FILE*  stream = local_10h; (&quot;source.png&quot;)</pre>
 <p>So we read source.png one byte at a time into local_11h until there's nothing
 to read anymore.</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_ch</span>  <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span>  <span class="s">&quot;w&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_10h</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;source.png&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_ch</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w">  </span><s>&quot;w&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_10h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;source.png&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span><span class="w">
 
-<span class="kt">char</span> <span class="n">local_11h</span><span class="p">;</span>
-<span class="k">while</span> <span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">local_10h</span><span class="p">))</span> <span class="p">{</span>
-    <span class="c1">// ...
+</span><span class="kt">char</span><span class="w"> </span><span class="n">local_11h</span><span class="p">;</span><span class="w">
+</span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">local_10h</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="c1">// ...
 </span><span class="p">}</span></code></pre>
 <p>What do we do in that loop? We call rand, move its result in a register (1
 byte), xor that byte with our local_11h byte-long buffer. We then push that
@@ -259,50 +259,50 @@ FILE*  stream = local_ch; (&quot;out.crypt&quot;)</pre>
 <p>We write that byte into out.crypt.</p>
 <p>This is a simple stream cipher based on rand xored with the plaintext, and we
 now have understood the more important part of the program:</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_ch</span>  <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span>  <span class="s">&quot;w&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_10h</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;source.png&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_ch</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w">  </span><s>&quot;w&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_10h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;source.png&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span><span class="w">
 
-<span class="kt">char</span> <span class="n">local_11h</span><span class="p">;</span>
-<span class="k">while</span> <span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">local_10h</span><span class="p">))</span> <span class="p">{</span>
-    <span class="n">local_11h</span> <span class="o">^=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="n">rand</span><span class="p">();</span>
-    <span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">local_ch</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+</span><span class="kt">char</span><span class="w"> </span><span class="n">local_11h</span><span class="p">;</span><span class="w">
+</span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">local_10h</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">local_11h</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">rand</span><span class="p">();</span><span class="w">
+    </span><span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">local_ch</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>The end is quite clear:</p>
-<pre class="code bash literal-block"><code><span class="p">|</span>           0x080486b1      83ec0c         sub esp, 0xc
-<span class="p">|</span>           0x080486b4      ff75f0         push dword <span class="o">[</span>ebp - local_10h<span class="o">]</span>
-<span class="p">|</span>           0x080486b7      e844feffff     call sym.imp.fclose
-<span class="p">|</span>           0x080486bc      83c410         add esp, 0x10
-<span class="p">|</span>           0x080486bf      83ec0c         sub esp, 0xc
-<span class="p">|</span>           0x080486c2      ff75f4         push dword <span class="o">[</span>ebp - local_ch<span class="o">]</span>
-<span class="p">|</span>           0x080486c5      e836feffff     call sym.imp.fclose
-<span class="p">|</span>           0x080486ca      83c410         add esp, 0x10
-<span class="p">|</span>           0x080486cd      b800000000     mov eax, <span class="m">0</span>
-<span class="p">|</span>           0x080486d2      8b4dfc         mov ecx, dword <span class="o">[</span>ebp - local_4h<span class="o">]</span>
-<span class="p">|</span>           0x080486d5      c9             leave
-<span class="p">|</span>           0x080486d6      8d61fc         lea esp, <span class="o">[</span>ecx - <span class="m">4</span><span class="o">]</span>
-<span class="se">\ </span>          0x080486d9      c3             ret</code></pre>
+<pre class="code bash literal-block"><code><span class="p">|</span><span class="w">           </span>0x080486b1<span class="w">      </span>83ec0c<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486b4<span class="w">      </span>ff75f0<span class="w">         </span>push<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_10h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486b7<span class="w">      </span>e844feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fclose<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486bc<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486bf<span class="w">      </span>83ec0c<span class="w">         </span>sub<span class="w"> </span>esp,<span class="w"> </span>0xc<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486c2<span class="w">      </span>ff75f4<span class="w">         </span>push<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_ch<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486c5<span class="w">      </span>e836feffff<span class="w">     </span>call<span class="w"> </span>sym.imp.fclose<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486ca<span class="w">      </span>83c410<span class="w">         </span>add<span class="w"> </span>esp,<span class="w"> </span>0x10<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486cd<span class="w">      </span>b800000000<span class="w">     </span>mov<span class="w"> </span>eax,<span class="w"> </span><span class="m">0</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486d2<span class="w">      </span>8b4dfc<span class="w">         </span>mov<span class="w"> </span>ecx,<span class="w"> </span>dword<span class="w"> </span><span class="o">[</span>ebp<span class="w"> </span>-<span class="w"> </span>local_4h<span class="o">]</span><span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486d5<span class="w">      </span>c9<span class="w">             </span>leave<span class="w">
+</span><span class="p">|</span><span class="w">           </span>0x080486d6<span class="w">      </span>8d61fc<span class="w">         </span>lea<span class="w"> </span>esp,<span class="w"> </span><span class="o">[</span>ecx<span class="w"> </span>-<span class="w"> </span><span class="m">4</span><span class="o">]</span><span class="w">
+</span><span class="se">\ </span><span class="w">          </span>0x080486d9<span class="w">      </span>c3<span class="w">             </span>ret</code></pre>
 <p>We close local_10h and local_ch and exit the program returning eax so 0.</p>
-<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="n">unlink</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_ch</span>  <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span>  <span class="s">&quot;w&quot;</span><span class="p">);</span>
-<span class="kt">FILE</span><span class="o">*</span> <span class="n">local_10h</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;source.png&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+<pre class="code c literal-block"><code><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w">
+</span><span class="n">unlink</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_ch</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w">  </span><s>&quot;w&quot;</s><span class="p">);</span><span class="w">
+</span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">local_10h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;source.png&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span><span class="w">
 
-<span class="kt">char</span> <span class="n">local_11h</span><span class="p">;</span>
-<span class="k">while</span> <span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">local_10h</span><span class="p">))</span> <span class="p">{</span>
-    <span class="n">local_11h</span> <span class="o">^=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="n">rand</span><span class="p">();</span>
-    <span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">local_ch</span><span class="p">);</span>
-<span class="p">}</span>
+</span><span class="kt">char</span><span class="w"> </span><span class="n">local_11h</span><span class="p">;</span><span class="w">
+</span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">local_10h</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">local_11h</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">rand</span><span class="p">();</span><span class="w">
+    </span><span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_11h</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">local_ch</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="n">fclose</span><span class="p">(</span><span class="n">local_ch</span><span class="p">);</span>
-<span class="n">fclose</span><span class="p">(</span><span class="n">local_10h</span><span class="p">);</span>
-<span class="k">return</span> <span class="mi">0</span><span class="p">;</span></code></pre>
+</span><span class="n">fclose</span><span class="p">(</span><span class="n">local_ch</span><span class="p">);</span><span class="w">
+</span><span class="n">fclose</span><span class="p">(</span><span class="n">local_10h</span><span class="p">);</span><span class="w">
+</span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span></code></pre>
 <p>Yeah! We now have the whole source code of the crypter (or a good enough
 approximation).</p>
-</div>
-<div class="section" id="cryptanalysis">
-<h2>Cryptanalysis</h2>
+</section>
+<section id="cryptanalysis">
+<h3>Cryptanalysis</h3>
 <p>We may have discovered the algorithm but we still can't decrypt our file, can
 we?</p>
 <p>The algorithm goes like this:</p>
@@ -326,10 +326,10 @@ so we must find this seed.</p>
 <p>Wait a second... That call to time() wasn't long before the fwrite() one.
 This means that the time used to seed and the time used to build the
 encrypted file must be close to each other.</p>
-<pre class="code bash literal-block"><code>$ ls -l out.crypt
--rw-r--r-- <span class="m">1</span> cym13 cym13 <span class="m">145032</span> Oct <span class="m">20</span> <span class="m">11</span>:31 out.crypt
-$ date -d <span class="s2">&quot;Oct 20 11:31&quot;</span> <span class="s2">&quot;+%s&quot;</span>
-<span class="m">1476955860</span></code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>out.crypt<span class="w">
+</span>-rw-r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>cym13<span class="w"> </span>cym13<span class="w"> </span><span class="m">145032</span><span class="w"> </span>Oct<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="m">11</span>:31<span class="w"> </span>out.crypt<span class="w">
+</span>$<span class="w"> </span>date<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;Oct 20 11:31&quot;</span><span class="w"> </span><span class="s2">&quot;+%s&quot;</span><span class="w">
+</span><span class="m">1476955860</span></code></pre>
 <p>Here we have our time! Well, it's quite approximative, but it's ok for us.
 Why so? Because it is not a blackbox analysis, remember, it's a
 known-plaintext analysis! As we know that we are looking for a PNG file we
@@ -348,71 +348,71 @@ gives us a valid PNG file.</p>
 <li><p>Once we have the right seed we just have to decrypt the whole file!</p></li>
 </ol>
 <p>Let's get to it!</p>
-</div>
-<div class="section" id="exploitation">
-<h2>Exploitation</h2>
+</section>
+<section id="exploitation">
+<h3>Exploitation</h3>
 <p>The following is the code of the solver as described previously. The
 decryption code is almost a copy-paste of the encryption one because xor
 nullifies itself.</p>
-<pre class="code c literal-block"><code><span class="cp">#include</span> <span class="cpf">&lt;time.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span>
-<span class="cp">#define start_seed 1476955850 </span><span class="c1">// A bit under the actual time found
+<pre class="code c literal-block"><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;time.h&gt;</span><span class="cp">
+#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span><span class="w"> </span><span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="w">
+</span><span class="cp">#define start_seed 1476955850 </span><span class="c1">// A bit under the actual time found
 </span><span class="cp">#define end_seed   1476960000 </span><span class="c1">// We need some kind of limit, &gt;1h seems good
-</span>
-<span class="kt">void</span> <span class="nf">decrypt</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">seed</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">srand</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span>
-    <span class="kt">FILE</span><span class="o">*</span> <span class="n">fi</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
-    <span class="kt">FILE</span><span class="o">*</span> <span class="n">fo</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.png&quot;</span><span class="p">,</span>   <span class="s">&quot;w&quot;</span><span class="p">);</span>
+</span><span class="w">
+</span><span class="kt">void</span><span class="w"> </span><span class="nf">decrypt</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">seed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">srand</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span><span class="w">
+    </span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">fi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span><span class="w">
+    </span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">fo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.png&quot;</s><span class="p">,</span><span class="w">   </span><s>&quot;w&quot;</s><span class="p">);</span><span class="w">
 
-    <span class="kt">char</span> <span class="n">buf</span><span class="p">;</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fi</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">buf</span> <span class="o">^=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="n">rand</span><span class="p">();</span>
-        <span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fo</span><span class="p">);</span>
-    <span class="p">}</span>
+    </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">;</span><span class="w">
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fi</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">buf</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">rand</span><span class="p">();</span><span class="w">
+        </span><span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fo</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">fclose</span><span class="p">(</span><span class="n">fo</span><span class="p">);</span>
-    <span class="n">fclose</span><span class="p">(</span><span class="n">fi</span><span class="p">);</span>
-<span class="p">}</span>
+    </span><span class="n">fclose</span><span class="p">(</span><span class="n">fo</span><span class="p">);</span><span class="w">
+    </span><span class="n">fclose</span><span class="p">(</span><span class="n">fi</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="kt">int</span> <span class="nf">try_decrypt</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">seed</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">char</span> <span class="n">magic</span><span class="p">[]</span>  <span class="o">=</span> <span class="s">&quot;</span><span class="se">\x89\x50\x4e\x47\x0d\x0a\x1a\x0a</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span><span class="kt">int</span><span class="w"> </span><span class="nf">try_decrypt</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">seed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kt">char</span><span class="w"> </span><span class="n">magic</span><span class="p">[]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><s>&quot;</s><span class="se">\x89\x50\x4e\x47\x0d\x0a\x1a\x0a</span><s>&quot;</s><span class="p">;</span><span class="w">
+    </span><span class="kt">char</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span><span class="w">
 
-    <span class="kt">FILE</span><span class="o">*</span> <span class="n">fi</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;out.crypt&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
-    <span class="n">fread</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fi</span><span class="p">);</span>
-    <span class="n">fclose</span><span class="p">(</span><span class="n">fi</span><span class="p">);</span>
+    </span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">fi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><s>&quot;out.crypt&quot;</s><span class="p">,</span><span class="w"> </span><s>&quot;r&quot;</s><span class="p">);</span><span class="w">
+    </span><span class="n">fread</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fi</span><span class="p">);</span><span class="w">
+    </span><span class="n">fclose</span><span class="p">(</span><span class="n">fi</span><span class="p">);</span><span class="w">
 
-    <span class="n">srand</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span>
+    </span><span class="n">srand</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">8</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="n">rand</span><span class="p">();</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">8</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="n">rand</span><span class="p">();</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">memcmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">magic</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">memcmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="n">magic</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-    <span class="kt">unsigned</span> <span class="n">seed</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">start_seed</span><span class="p">;</span> <span class="n">seed</span><span class="o">&lt;</span><span class="n">end_seed</span><span class="p">;</span> <span class="n">seed</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">try_decrypt</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Seed found! %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">);</span>
-    <span class="n">decrypt</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
+</span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">seed</span><span class="p">;</span><span class="w">
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">start_seed</span><span class="p">;</span><span class="w"> </span><span class="n">seed</span><span class="o">&lt;</span><span class="n">end_seed</span><span class="p">;</span><span class="w"> </span><span class="n">seed</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">try_decrypt</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">
+            </span><span class="k">break</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="n">printf</span><span class="p">(</span><s>&quot;Seed found! %u</s><span class="se">\n</span><s>&quot;</s><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="p">);</span><span class="w">
+    </span><span class="n">decrypt</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>Don't forget to compile this code in 32bits mode:</p>
-<pre class="code bash literal-block"><code>$ gcc -m32 solver.c -o solver
-$ ./solver
-Seed found! <span class="m">1476955866</span></code></pre>
+<pre class="code bash literal-block"><code>$<span class="w"> </span>gcc<span class="w"> </span>-m32<span class="w"> </span>solver.c<span class="w"> </span>-o<span class="w"> </span>solver<span class="w">
+</span>$<span class="w"> </span>./solver<span class="w">
+</span>Seed<span class="w"> </span>found!<span class="w"> </span><span class="m">1476955866</span></code></pre>
 <p>And here is our image:</p>
 <img alt="../image/hacker_manifesto.png" src="../image/hacker_manifesto.png" style="width: 100%;" />
-</div>
-</div>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

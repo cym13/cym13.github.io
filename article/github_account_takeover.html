@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Breaking dependencies with Github account takeover</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="breaking-dependencies-with-github-account-takeover">
-<h1>Breaking dependencies with Github account takeover</h1>
-<div class="section" id="tl-dr">
-<h2>tl;dr</h2>
+      <section id="breaking-dependencies-with-github-account-takeover">
+<h2>Breaking dependencies with Github account takeover</h2>
+<section id="tl-dr">
+<h3>tl;dr</h3>
 <ul class="simple">
 <li><p>Github allows users to change names by forwarding requests to the new
 repository;</p></li>
@@ -58,9 +58,9 @@ URLs;</p></li>
 <li><p>We can take projects over by re-creating old repositories;</p></li>
 <li><p>Non-exhaustive lists of impacted repositories: <a class="reference external" href="../file/github_takeover_dub_impacted_projects.txt">Dub</a>, <a class="reference external" href="../file/github_takeover_go_impacted_projects.txt">Go</a> and <a class="reference external" href="../file/github_takeover_aur_impacted_projects.txt">AUR</a>.</p></li>
 </ul>
-</div>
-<div class="section" id="getting-started">
-<h2>Getting started</h2>
+</section>
+<section id="getting-started">
+<h3>Getting started</h3>
 <p>Everybody seems to be talking about Github these days so I'll follow the
 trend. I don't want to talk about Microsoft though, so instead we'll explore
 Github account takeover.</p>
@@ -69,9 +69,9 @@ advantage of leftover redirections, digging old graves to reanimate dead
 projects and see where that leads us.</p>
 <p>So let's go digging!</p>
 <img alt="../image/girl_shovel.png" src="../image/girl_shovel.png" style="width: 60%;" />
-</div>
-<div class="section" id="github-redirections">
-<h2>Github redirections</h2>
+</section>
+<section id="github-redirections">
+<h3>Github redirections</h3>
 <p>Github proposes a mechanism to help users change their usernames without
 breaking other projects altogether: <a class="reference external" href="https://help.github.com/articles/what-happens-when-i-change-my-username/">redirections</a>.</p>
 <p>In summary Github maintains a redirection from your old account URL to your
@@ -83,9 +83,9 @@ changing their projects to the new URL.</p>
 since this is done transparently by Github other projects don't get any kind
 of warning. After all, working transparently is the goal of this mechanism.</p>
 <p>So, what kind of project would rely on Github URLs? Dependency systems.</p>
-</div>
-<div class="section" id="dub-d-s-package-manager">
-<h2>Dub: D's package manager</h2>
+</section>
+<section id="dub-d-s-package-manager">
+<h3>Dub: D's package manager</h3>
 <p>We'll first have a look at Dub since it is where I first noticed the issue.</p>
 <p>Dub's backend, <a class="reference external" href="https://code.dlang.org">https://code.dlang.org</a>, essentially works by registering a
 repository through its Github URL (other providers are supported, but Github
@@ -99,29 +99,29 @@ registered a project on Dub, then it is possible to create a new Github
 account and project with the old name and get Dub to use our code instead of
 the original one.</p>
 <img alt="../image/zombie_girl_rabbit.png" src="../image/zombie_girl_rabbit.png" style="width: 40%;" />
-<div class="section" id="listing-listing">
-<h3>Listing, listing...</h3>
+<section id="listing-listing">
+<h4>Listing, listing...</h4>
 <p>So, we'll start by enumerating all dead Github accounts that are still in
 use. I'm certain there are better ways to do this, but a bit of bash is
 easy enough to get the job done.</p>
-<pre class="code sh literal-block"><code>dead<span class="o">()</span> <span class="o">{</span>
-    curl -s <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>           <span class="se">\
-</span>    <span class="p">|</span> grep <span class="s2">&quot;blind github&quot;</span>  <span class="se">\
-</span>    <span class="p">|</span> cut -d <span class="s1">'&quot;'</span> -f <span class="m">4</span>      <span class="se">\
-</span>    <span class="p">|</span> cut -d <span class="s1">'/'</span> -f -4     <span class="se">\
-</span>    <span class="p">|</span> xargs curl -s        <span class="se">\
-</span>    <span class="p">|</span> grep -q <span class="s2">&quot;^Not Found&quot;</span>
-<span class="o">}</span>
+<pre class="code sh literal-block"><code>dead<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w">
+    </span>curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w">           </span><span class="se">\
+</span><span class="w">    </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;blind github&quot;</span><span class="w">  </span><span class="se">\
+</span><span class="w">    </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">'&quot;'</span><span class="w"> </span>-f<span class="w"> </span><span class="m">4</span><span class="w">      </span><span class="se">\
+</span><span class="w">    </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">'/'</span><span class="w"> </span>-f<span class="w"> </span>-4<span class="w">     </span><span class="se">\
+</span><span class="w">    </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>curl<span class="w"> </span>-s<span class="w">        </span><span class="se">\
+</span><span class="w">    </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^Not Found&quot;</span><span class="w">
+</span><span class="o">}</span><span class="w">
 
-curl -s <span class="s1">'https://code.dlang.org/search?q=+'</span> <span class="se">\
-</span><span class="p">|</span> tr <span class="s1">'&quot;'</span> <span class="s1">'\n'</span>                               <span class="se">\
-</span><span class="p">|</span> grep packages/                            <span class="se">\
-</span><span class="p">|</span> sed <span class="s1">'s|^|https://code.dlang.org/|'</span>        <span class="se">\
-</span><span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> url <span class="p">;</span> <span class="k">do</span>
-    <span class="k">if</span> dead <span class="nv">$url</span> <span class="p">;</span> <span class="k">then</span>
-        <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span>
-    <span class="k">fi</span>
-<span class="k">done</span></code></pre>
+</span>curl<span class="w"> </span>-s<span class="w"> </span><span class="s1">'https://code.dlang.org/search?q=+'</span><span class="w"> </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span><span class="s1">'&quot;'</span><span class="w"> </span><span class="s1">'\n'</span><span class="w">                               </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>packages/<span class="w">                            </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">'s|^|https://code.dlang.org/|'</span><span class="w">        </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>url<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span>dead<span class="w"> </span><span class="nv">$url</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w">
+        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span><span class="w">
+    </span><span class="k">fi</span><span class="w">
+</span><span class="k">done</span></code></pre>
 <p>And sure enough we find 16 dead projects (list below). This may not sound
 like much but some of them touch cryptography or online payment and together
 they totalize about 500 downloads a month. Being able to inject a backdoor
@@ -152,9 +152,9 @@ original it shouldn't break anything.</p>
 <p>This also caused <strong>post-rock</strong> to disappear from the list although it's still
 using the redirection. That's because that package is provided by the same
 user as <strong>d-beard</strong>.</p>
-</div>
-<div class="section" id="exploitation">
-<h3>Exploitation</h3>
+</section>
+<section id="exploitation">
+<h4>Exploitation</h4>
 <p>As one would expect, exploitation is very easy. I just created a new account
 name &quot;nuisanceofcats&quot; (love the name by the way).</p>
 <img alt="../image/github_takeover_account_creation.png" src="../image/github_takeover_account_creation.png" style="width: 60%;" />
@@ -171,10 +171,10 @@ tagged.</p>
 <p>And that's it. Nice, easy, and quite hard to detect if the legitimate owner
 doesn't notice it himself since we obtained the account in a proper way and
 no code was broken.</p>
-</div>
-</div>
-<div class="section" id="well-go-on-then">
-<h2>Well, Go on then!</h2>
+</section>
+</section>
+<section id="well-go-on-then">
+<h3>Well, Go on then!</h3>
 <p>This is not restricted to Dub of course. Another language that had my
 attention was Go. While it doesn't have a package manager its import system
 natively supports importing libraries from Github repositories. This is very
@@ -217,9 +217,9 @@ though as at least with Dub we were able to quickly find an exhaustive list
 (at a given time, of course things can change fast), but with Go all projects
 are potentially impacted with no easy way to test for legitimacy.</p>
 <img alt="../image/zombie_rabbit.png" src="../image/zombie_rabbit.png" style="width: 40%;" />
-</div>
-<div class="section" id="there-s-maur">
-<h2>There's mAUR</h2>
+</section>
+<section id="there-s-maur">
+<h3>There's mAUR</h3>
 <p>No let's have a look at Archlinux's semi-official package system: <a class="reference external" href="https://aur.archlinux.org/">AUR</a>.</p>
 <p>AUR is a collection of installation scripts named PKGBUILD. They allow
 installing things easily even though they are not precompiled in the official
@@ -241,31 +241,31 @@ about 84 by my latest count. I won't burden you with the list, it's <a class="re
 <p>84 is much lower than what I had imagined but it's still a good catch. I fear
 my approach wasn't that good on that one so I must have missed some. Here's
 the dirty script if anyone cares to do better:</p>
-<pre class="code sh literal-block"><code><span class="nv">pkgurl</span><span class="o">=</span><span class="s2">&quot;https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h&quot;</span>
+<pre class="code sh literal-block"><code><span class="nv">pkgurl</span><span class="o">=</span><span class="s2">&quot;https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h&quot;</span><span class="w">
 
-<span class="k">for</span> i <span class="k">in</span> <span class="o">{</span><span class="m">0</span>..48<span class="o">}</span> <span class="p">;</span> <span class="k">do</span>
-    curl -i -s -k -X  <span class="s1">'GET'</span>                              <span class="se">\
-</span>      <span class="s2">&quot;https://aur.archlinux.org/packages/?O=</span><span class="k">$((</span>i*250<span class="k">))</span><span class="s2">&quot;</span> <span class="se">\
-</span>      <span class="s2">&quot;&amp;SeB=nd&amp;K=-git&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=1000&amp;do_Search=Go&quot;</span>
-<span class="k">done</span>                                                                     <span class="se">\
-</span><span class="p">|</span> grep <span class="s2">&quot;/packages/[^?]&quot;</span>                                                  <span class="se">\
-</span><span class="p">|</span> cut -d <span class="s1">'&quot;'</span> -f <span class="m">2</span>                                                        <span class="se">\
-</span><span class="p">|</span> sed -n <span class="s2">&quot;s|^/packages/\([^/]\+\)/|</span><span class="nv">$pkgurl</span><span class="s2">=\1|p&quot;</span>                         <span class="se">\
-</span><span class="p">|</span> xargs curl -s                                                          <span class="se">\
-</span><span class="p">|</span> sed -n <span class="s2">&quot;s|^.*source=.*\(github.com/[^</span>$<span class="s2">][^'\&quot;]\+\)['\&quot;].*|https://\1|p&quot;</span> <span class="se">\
-</span><span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> url <span class="p">;</span> <span class="k">do</span>
-    <span class="k">if</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span> <span class="p">|</span> cut -d / -f -4 <span class="p">|</span> xargs curl -s <span class="p">|</span> grep -q <span class="s2">&quot;^Not Found&quot;</span> <span class="p">;</span> <span class="k">then</span>
-        <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span>
-    <span class="k">fi</span>
-<span class="k">done</span></code></pre>
+</span><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">0</span>..48<span class="o">}</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w">
+    </span>curl<span class="w"> </span>-i<span class="w"> </span>-s<span class="w"> </span>-k<span class="w"> </span>-X<span class="w">  </span><span class="s1">'GET'</span><span class="w">                              </span><span class="se">\
+</span><span class="w">      </span><span class="s2">&quot;https://aur.archlinux.org/packages/?O=</span><span class="k">$((</span><span class="nv">i</span><span class="o">*</span><span class="m">250</span><span class="k">))</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\
+</span><span class="w">      </span><span class="s2">&quot;&amp;SeB=nd&amp;K=-git&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=1000&amp;do_Search=Go&quot;</span><span class="w">
+</span><span class="k">done</span><span class="w">                                                                     </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;/packages/[^?]&quot;</span><span class="w">                                                  </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">'&quot;'</span><span class="w"> </span>-f<span class="w"> </span><span class="m">2</span><span class="w">                                                        </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;s|^/packages/\([^/]\+\)/|</span><span class="nv">$pkgurl</span><span class="s2">=\1|p&quot;</span><span class="w">                         </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>curl<span class="w"> </span>-s<span class="w">                                                          </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;s|^.*source=.*\(github.com/[^</span>$<span class="s2">][^'\&quot;]\+\)['\&quot;].*|https://\1|p&quot;</span><span class="w"> </span><span class="se">\
+</span><span class="p">|</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>url<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span>/<span class="w"> </span>-f<span class="w"> </span>-4<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;^Not Found&quot;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w">
+        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$url</span><span class="s2">&quot;</span><span class="w">
+    </span><span class="k">fi</span><span class="w">
+</span><span class="k">done</span></code></pre>
 <p>It should be noted that even though the packages follow master, no update
 usually happen until someone updates the AUR package. This means we get to
 inject our malicious commit into new user's packages but not old ones until
 there is an update.</p>
 <img alt="../image/chibi_zombie.png" src="../image/chibi_zombie.png" style="width: 25%;" />
-</div>
-<div class="section" id="what-to-do">
-<h2>What to do</h2>
+</section>
+<section id="what-to-do">
+<h3>What to do</h3>
 <dl>
 <dt><strong>If you are a developer:</strong></dt>
 <dd><p>Please, do the responsible thing and don't let your projects behind.
@@ -295,9 +295,9 @@ overwrites a redirection so that the owner can tell that something fishy
 is going on.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>The story doesn't end here. Many other projects rely on Github URLs, and I am
 pretty sure that it will be attacked if it's not already the case.</p>
 <p>And this is not a new attack, a very common way to use Github account
@@ -310,17 +310,17 @@ the attacker is the legitimate owner of the repository there is no way to
 link it back to its previous owner, especially if the account is well copied.
 The only possibility I see is for the owner to find that fake account, but
 why would he ever check for such things?</p>
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://zettaiyuki.deviantart.com/art/Kurumi-vector-566268555">https://zettaiyuki.deviantart.com/art/Kurumi-vector-566268555</a></p></li>
 <li><p><a class="reference external" href="https://pumpkinsushi.deviantart.com/art/Zombie-girl-693528661">https://pumpkinsushi.deviantart.com/art/Zombie-girl-693528661</a></p></li>
 <li><p><a class="reference external" href="https://www.pinterest.ca/pin/390054017698693935/">https://www.pinterest.ca/pin/390054017698693935/</a></p></li>
 <li><p><a class="reference external" href="https://iydimm.deviantart.com/art/Chibi-Zombie-Ly-577468784">https://iydimm.deviantart.com/art/Chibi-Zombie-Ly-577468784</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

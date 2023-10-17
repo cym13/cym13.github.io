@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Review of Crypto for D</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="review-of-crypto-for-d">
-<h1>Review of Crypto for D</h1>
-<div class="section" id="context">
-<h2>Context</h2>
+      <section id="review-of-crypto-for-d">
+<h2>Review of Crypto for D</h2>
+<section id="context">
+<h3>Context</h3>
 <p>I have always liked cryptography and code review and often take time
 reviewing open source code to help nurture a safer environment. About a year
 ago I decided to have a look at a cryptography library for D: <a class="reference external" href="https://github.com/shove70/crypto">shove70/crypto</a> (also present on DUB at
@@ -63,8 +63,8 @@ claim to have found all possible issues but I am confident in the issues I do
 point out. Furthermore I intend no personal attack here, the author has
 proved very nice in all our exchanges. But I feel a responsibility toward the
 users to state things as they stand.</p>
-<div class="section" id="wait-i-m-a-user-what-should-i-know">
-<h3>Wait, I'm a user, what should I know?</h3>
+<section id="wait-i-m-a-user-what-should-i-know">
+<h4>Wait, I'm a user, what should I know?</h4>
 <p>Long story short, I strongly recommend not to use this library.</p>
 <ul class="simple">
 <li><p>RSA's key generation is unsafe because there are issues with prime numbers
@@ -94,36 +94,38 @@ Sadly not much have changed since my first review so I will indicate any
 modification explicitly. We will start with prime number generation,
 continue with RSA key generation to end with RSA padding. I hope you enjoy
 the ride, grab a tea, it should be fun (in a somewhat hellish way).</p>
-<div class="figure">
+<figure>
 <img alt="../image/pinkie_pie_sitting.png" src="../image/pinkie_pie_sitting.png" style="width: 40%;" />
-<p class="caption">Also, there will be ponies. Because it is going to be hard and we can
+<figcaption>
+<p>Also, there will be ponies. Because it is going to be hard and we can
 all really use some friends.</p>
-</div>
-</div>
-</div>
-<div class="section" id="prime-number-generation">
-<h2>Prime number generation</h2>
-<div class="section" id="general-strategy">
-<h3>General strategy</h3>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="prime-number-generation">
+<h3>Prime number generation</h3>
+<section id="general-strategy">
+<h4>General strategy</h4>
 <p>Prime number generation is the basis of key generation in RSA. <strong>Crypto</strong>
 uses a two step strategy based on probable prime generation, which means that
 it uses algorithms that check that a number is prime with a high enough
 probability.</p>
-<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">bool</span> <span class="nf">isProbablePrime</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="n">size_t</span> <span class="n">confidence</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">bool</span> <span class="n">passed</span> <span class="o">=</span> <span class="n">millerRabinPrimeTest</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">confidence</span><span class="p">);</span>
+<pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="nf">isProbablePrime</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">confidence</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">bool</span><span class="w"> </span><span class="n">passed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">millerRabinPrimeTest</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">confidence</span><span class="p">);</span><span class="w">
 
-    <span class="cm">/**
+    </span><span class="cm">/**
     When n &lt; 10_000_000_000_000_000,
     there is no need to lucasLehmerTest, And trust the result of millerRabinPrimeTest.
-    */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">passed</span> <span class="o">||</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">10_000_000_000_000_000</span><span class="p">))</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="n">passed</span><span class="p">;</span>
-    <span class="p">}</span>
+    */</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">passed</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10_000_000_000_000_000</span><span class="p">))</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="n">passed</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">lucasLehmerTest</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">lucasLehmerTest</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>As we can see the first step is performed by <em>millerRabinPrimeTest</em> which,
 contrary to what its name suggests, does not implement the Miller-Rabin prime
 test but the Fermat one. This function is discussed later.</p>
@@ -138,78 +140,78 @@ so was I. But I promise it will get clearer by the end of this section.</p>
 <p>I am getting a bit ahead of myself though. This Lucas-Lehmer test is an
 addition compared to the first review so I will review it for the first time in
 this article. Spoiler alert: it is not even a Lucas-Lehmer test.</p>
-</div>
-<div class="section" id="miller-rabin-prime-test-fermat-test">
-<h3>“Miller-Rabin prime test”: Fermat test</h3>
+</section>
+<section id="miller-rabin-prime-test-fermat-test">
+<h4>“Miller-Rabin prime test”: Fermat test</h4>
 <p>Prime number generation is done in the function
 <em>BigIntHelper.millerRabinPrimeTest</em> within <em>bigint.d</em>. Contrary to what the
 name suggests it actually performs a <a class="reference external" href="https://en.wikipedia.org/wiki/Fermat_primality_test">Fermat primality test</a>, not a
 <a class="reference external" href="https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test">Miller-Rabin test</a>.</p>
-<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">bool</span> <span class="nf">millerRabinPrimeTest</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="n">size_t</span> <span class="n">confidence</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">enforce</span><span class="p">(</span><span class="n">confidence</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;confidence must be a positive integer greater than 0.&quot;</span><span class="p">);</span>
+<pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="nf">millerRabinPrimeTest</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">confidence</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">enforce</span><span class="p">(</span><span class="n">confidence</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><s>&quot;confidence must be a positive integer greater than 0.&quot;</s><span class="p">);</span><span class="w">
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">BigInt</span><span class="o">[]</span> <span class="n">bases</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1_373_653</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">9_080_191</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">31</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">73</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">4_759_123_141</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">2_152_302_898_747</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">341_550_071_728_320</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">46_856_248_255_981</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="p">}</span>
+    </span><span class="n">BigInt</span><span class="o">[]</span><span class="w"> </span><span class="n">bases</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1_373_653</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">9_080_191</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">31</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">73</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">4_759_123_141</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2_152_302_898_747</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">341_550_071_728_320</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">46_856_248_255_981</span><span class="p">)</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+        </span><span class="p">}</span><span class="w">
 
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
-                 <span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">10_000_000_000_000_000</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">),</span> <span class="n">BigInt</span><span class="p">(</span><span class="mi">24251</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">smallPrimesTable</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">prime</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">prime</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)))</span>
-        <span class="p">{</span>
-            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="p">}</span>
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span><span class="w">
+                 </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10_000_000_000_000_000</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">BigInt</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">61</span><span class="p">),</span><span class="w"> </span><span class="n">BigInt</span><span class="p">(</span><span class="mi">24251</span><span class="p">)</span><span class="o">]</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">smallPrimesTable</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">prime</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">prime</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)))</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w">
+        </span><span class="p">}</span><span class="w">
 
-        <span class="cm">/**
+        </span><span class="cm">/**
         Although in theory base should be between 2 and n - 1, because
         confidence is optimized before call, the larger n is, the smaller
         confidence is, so the requirement for base cannot be too small,
         so the minimum value does not use 2, but uses n / 2 instead.
-        */</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigInt</span><span class="o">[</span><span class="n">confidence</span><span class="o">]</span><span class="p">;</span>
-        <span class="kn">import</span> <span class="nn">std.algorithm.iteration</span> <span class="p">:</span> <span class="n">each</span><span class="p">;</span>
-        <span class="n">bases</span><span class="p">.</span><span class="na">each</span><span class="o">!</span><span class="p">((</span><span class="n">ref</span> <span class="n">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">randomGenerate</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)));</span>
-        <span class="c1">//bases.each!((ref b) =&gt; (b = randomGenerate(BigInt(2), n - 1)));
-</span>    <span class="p">}</span>
+        */</span><span class="w">
+        </span><span class="n">bases</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigInt</span><span class="o">[</span><span class="n">confidence</span><span class="o">]</span><span class="p">;</span><span class="w">
+        </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.algorithm.iteration</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">each</span><span class="p">;</span><span class="w">
+        </span><span class="n">bases</span><span class="p">.</span><span class="na">each</span><span class="o">!</span><span class="p">((</span><span class="n">ref</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randomGenerate</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)));</span><span class="w">
+        </span><span class="c1">//bases.each!((ref b) =&gt; (b = randomGenerate(BigInt(2), n - 1)));</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">bases</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">base</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)));</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">bases</span><span class="p">.</span><span class="na">all</span><span class="o">!</span><span class="p">((</span><span class="n">base</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">powmod</span><span class="p">(</span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)));</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>The Fermat test is not a correct choice:</p>
 <ul class="simple">
 <li><p>It has false positives: Carmichael numbers will never be identified as
@@ -229,7 +231,7 @@ verified for many composite numbers, just not for every number between <em>1</em
 and <em>p-1</em>. I will call “liar” a number <em>ak</em> for which <em>ak^(p-1)-1</em> is a
 multiple of <em>p</em> even though <em>p</em> is not prime.</p>
 <div class="formula">
-<i>liars</i> = {<i>a</i><sub><i>k</i></sub> ∈ ℕ|∃<i>q</i> ∈ ℕ, <i>a</i><span class="scripts"><sup class="script"><i>p</i> − 1</sup><sub class="script"><i>k</i></sub></span> − 1 = <i>pq</i>, <i>p</i><span class="text"> not prime</span>}
+<i>liars</i> = {<i>a</i><sub><i>k</i></sub> ∈ ℕ|∃<i>q</i> ∈ ℕ, <i>a</i><span class="scripts"><sup class="script"><i>p</i> − 1</sup><sub class="script"><i>k</i></sub></span> − 1 = <i>pq</i>, <i>p</i><span class="text"> not prime</span>}
 </div>
 <p>For example 77=7×11 but 34^(76)-1 is a multiple of 77 and the same goes for
 43: 34 and 43 are liars when testing 77. 1 and 76 are also trivial liars.</p>
@@ -240,28 +242,28 @@ liars below <em>n/2</em> as there are above.</p>
 <p>Let's suppose that <em>n</em> has at least one liar: <em>a</em>.</p>
 <p>We have:</p>
 <div class="formula">
-<i>a</i><sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+<i>a</i><sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
 </div>
 <p>Let's consider the number symmetric to <em>a</em> relatively to <em>n/2</em>: <em>n-a</em></p>
 <div class="formula">
-<i>n</i> − <i>a</i> =  − <i>a</i><span class="text"> mod </span><i>n</i>
+<i>n</i> − <i>a</i> =  − <i>a</i><span class="text"> mod </span><i>n</i>
 </div>
 <div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − <i>a</i>)<sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − <i>a</i>)<sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
 </div>
 <div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − 1)<sup><i>n</i> − 1</sup>⋅<i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − 1)<sup><i>n</i> − 1</sup>⋅<i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
 </div>
 <p>But n is odd, so</p>
 <div class="formula">
-( − 1)<sup><i>n</i> − 1</sup> = 1
+( − 1)<sup><i>n</i> − 1</sup> = 1
 </div>
 <p>giving</p>
 <div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = <i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = <i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
 </div>
 <div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
 </div>
 <p>So for any liar a we have proved that <em>n-a</em> is also a liar.
 Furthermore if <em>a &lt; n/2</em> then <em>n-a &gt; n/2</em> and inversely. Therefore there are
@@ -277,9 +279,9 @@ list of small primes (from 2 to 241). It performs the Fermat test with each
 of these primes. I really have no idea why. I think the intent was to perform
 trial division by small primes but it is not trying to divide n so who knows.
 At the moment I cannot say that it serves any purpose.</p>
-</div>
-<div class="section" id="lucas-lehmer-test-baillie-psw">
-<h3>“Lucas-Lehmer test”? Baillie-PSW!</h3>
+</section>
+<section id="lucas-lehmer-test-baillie-psw">
+<h4>“Lucas-Lehmer test”? Baillie-PSW!</h4>
 <p>Without much surprise, the function <em>lucasLehmerTest</em> does not perform a
 <a class="reference external" href="https://en.wikipedia.org/wiki/Lucas%E2%80%93Lehmer_primality_test">Lucas-Lehmer test</a>.</p>
 <p>So, I had some trouble identifying what the test was exactly due to the
@@ -327,63 +329,63 @@ Returns true if n is a Lucas-Lehmer probable prime.
     The following assumptions are made:
     BigInt n is a positive, odd number. So it can only be call after
     millerRabinPrimeTest is passed.
-*/</span>
-<span class="kd">static</span> <span class="n">bool</span> <span class="nf">lucasLehmerTest</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">immutable</span> <span class="n">BigInt</span> <span class="n">nPlusOne</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+*/</span><span class="w">
+</span><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="nf">lucasLehmerTest</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">immutable</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">nPlusOne</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
 
-    <span class="kt">int</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">jacobiSymbol</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// 5, -7, 9, -11, ...
-</span>        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="n">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">}</span>
+    </span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">jacobiSymbol</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="c1">// 5, -7, 9, -11, ...</span><span class="w">
+        </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">lucasLehmerSequence</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">nPlusOne</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">lucasLehmerSequence</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">nPlusOne</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="kd">static</span> <span class="n">BigInt</span> <span class="nf">lucasLehmerSequence</span><span class="p">(</span><span class="kd">const</span> <span class="kt">int</span> <span class="n">z</span><span class="p">,</span> <span class="kd">const</span> <span class="n">BigInt</span> <span class="n">k</span><span class="p">,</span> <span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">bool</span> <span class="nf">testBit</span><span class="p">(</span><span class="kd">const</span> <span class="n">BigInt</span> <span class="n">n</span><span class="p">,</span> <span class="kd">const</span> <span class="kt">int</span> <span class="n">m</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">int</span> <span class="n">digit</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="na">getDigit</span><span class="o">!</span><span class="n">uint</span><span class="p">(</span><span class="n">m</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">5</span><span class="p">));</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">digit</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">m</span> <span class="o">&amp;</span> <span class="mi">31</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
+</span><span class="kd">static</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="nf">lucasLehmerSequence</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">bool</span><span class="w"> </span><span class="nf">testBit</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="kt">int</span><span class="w"> </span><span class="n">digit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="na">getDigit</span><span class="o">!</span><span class="n">uint</span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="mi">5</span><span class="p">));</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">digit</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">31</span><span class="p">)))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">BigInt</span> <span class="n">d</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span>
-    <span class="n">BigInt</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">u2</span><span class="p">;</span>
-    <span class="n">BigInt</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v2</span><span class="p">;</span>
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span><span class="p">;</span><span class="w">
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">u2</span><span class="p">;</span><span class="w">
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">v2</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">k</span><span class="p">.</span><span class="na">uintLength</span> <span class="o">*</span> <span class="n">uint</span><span class="p">.</span><span class="na">sizeof</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
-        <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-            <span class="n">v2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
-        <span class="n">v2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">k</span><span class="p">.</span><span class="na">uintLength</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">uint</span><span class="p">.</span><span class="na">sizeof</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+        </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">
+            </span><span class="n">v2</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+        </span><span class="n">v2</span><span class="w"> </span><span class="o">&gt;&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
 
-        <span class="n">u</span> <span class="o">=</span> <span class="n">u2</span><span class="p">;</span> <span class="n">v</span> <span class="o">=</span> <span class="n">v2</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
-        <span class="p">{</span>
-            <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-                <span class="n">u2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+        </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2</span><span class="p">;</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v2</span><span class="p">;</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">u2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">
+                </span><span class="n">u2</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
 
-            <span class="n">u2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
-            <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">;</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-                <span class="n">v2</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
-            <span class="n">v2</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+            </span><span class="n">u2</span><span class="w"> </span><span class="o">&gt;&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+            </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">testBit</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">
+                </span><span class="n">v2</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">
+            </span><span class="n">v2</span><span class="w"> </span><span class="o">&gt;&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
 
-            <span class="n">u</span> <span class="o">=</span> <span class="n">u2</span><span class="p">;</span> <span class="n">v</span> <span class="o">=</span> <span class="n">v2</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+            </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2</span><span class="p">;</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v2</span><span class="p">;</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">u</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
-</div>
-<div class="section" id="so-what-s-the-conclusion-on-prime-generation">
-<h3>So... What's the conclusion on prime generation?</h3>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">u</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span></code></pre>
+</section>
+<section id="so-what-s-the-conclusion-on-prime-generation">
+<h4>So... What's the conclusion on prime generation?</h4>
 <p>See, the issue when you start implementing fantasies into cryptographic code
 is that while it is most certainly bad it can be quite hard to say how bad
 exactly.</p>
@@ -391,10 +393,10 @@ exactly.</p>
 correctly. It is therefore my professional opinion that this algorithm should
 not be trusted to produce consistently strong primes, or even primes at all.</p>
 <img alt="../image/sweetie_bell_look_up.png" src="../image/sweetie_bell_look_up.png" style="width: 30%;" />
-</div>
-</div>
-<div class="section" id="key-generation">
-<h2>Key generation</h2>
+</section>
+</section>
+<section id="key-generation">
+<h3>Key generation</h3>
 <p>The key generation process, as implemented currently, is essentially the
 following:</p>
 <ul class="simple">
@@ -405,52 +407,52 @@ following:</p>
 <li><p>Encode the key pair</p></li>
 </ul>
 <p>Here is the relevant code from <em>rsa.d</em>:</p>
-<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">RSAKeyPair</span> <span class="nf">generateKeyPair</span><span class="p">(</span><span class="n">uint</span> <span class="n">bitLength</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">assert</span><span class="p">((</span><span class="n">bitLength</span> <span class="o">&gt;=</span> <span class="mi">128</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="s">&quot;Bitlength is required to be a multiple of 8 and not less than 128.&quot;</span>
-      <span class="o">~</span> <span class="s">&quot;It’s recommended that it be no less than 2048.&quot;</span><span class="p">);</span>
+<pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">RSAKeyPair</span><span class="w"> </span><span class="nf">generateKeyPair</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">bitLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">assert</span><span class="p">((</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w">
+        </span><s>&quot;Bitlength is required to be a multiple of 8 and not less than 128.&quot;</s><span class="w">
+      </span><span class="o">~</span><span class="w"> </span><s>&quot;It’s recommended that it be no less than 2048.&quot;</s><span class="p">);</span><span class="w">
 
-    <span class="n">BigInt</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w">
 
-    <span class="n">BigInt</span> <span class="nf">ex_gcd</span><span class="p">(</span><span class="n">BigInt</span> <span class="n">a</span><span class="p">,</span> <span class="n">BigInt</span> <span class="n">b</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="cm">/* gcd ... */</span>
-    <span class="p">}</span>
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="nf">ex_gcd</span><span class="p">(</span><span class="n">BigInt</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="cm">/* gcd ... */</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">BigInt</span> <span class="nf">cal</span><span class="p">(</span><span class="n">BigInt</span> <span class="n">a</span><span class="p">,</span> <span class="n">BigInt</span> <span class="n">k</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="cm">/* private exponent computation ... */</span>
-    <span class="p">}</span>
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="nf">cal</span><span class="p">(</span><span class="n">BigInt</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="cm">/* private exponent computation ... */</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="n">size_t</span> <span class="n">confidence</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">)</span>       <span class="n">confidence</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">27</span><span class="p">;</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">512</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">768</span><span class="p">)</span>  <span class="n">confidence</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bitLength</span> <span class="o">&lt;=</span> <span class="mi">1024</span><span class="p">)</span> <span class="n">confidence</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-    <span class="k">else</span>                        <span class="n">confidence</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    </span><span class="n">size_t</span><span class="w"> </span><span class="n">confidence</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">128</span><span class="p">)</span><span class="w">       </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span><span class="p">;</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">256</span><span class="p">)</span><span class="w">  </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">27</span><span class="p">;</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">512</span><span class="p">)</span><span class="w">  </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">;</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">768</span><span class="p">)</span><span class="w">  </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w">
+    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">1024</span><span class="p">)</span><span class="w"> </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">
+    </span><span class="k">else</span><span class="w">                        </span><span class="n">confidence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">
 
-    <span class="n">BigInt</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">d</span><span class="p">;</span>
+    </span><span class="n">BigInt</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">;</span><span class="w">
 
-    <span class="k">do</span>
-    <span class="p">{</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">confidence</span><span class="p">));</span>
-    <span class="k">do</span>
-    <span class="p">{</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">confidence</span><span class="p">));</span>
+    </span><span class="k">do</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">confidence</span><span class="p">));</span><span class="w">
+    </span><span class="k">do</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">randomGenerate</span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">isProbablePrime</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">confidence</span><span class="p">));</span><span class="w">
 
-    <span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">;</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span><span class="p">;</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">cal</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
+    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q</span><span class="p">;</span><span class="w">
+    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">q</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+    </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65537</span><span class="p">;</span><span class="w">
+    </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cal</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span><span class="w">
 
-    <span class="k">return</span> <span class="n">RSAKeyPair</span><span class="p">(</span><span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span> <span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="p">));</span>
-<span class="p">}</span></code></pre>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">RSAKeyPair</span><span class="p">(</span><span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">),</span><span class="w"> </span><span class="n">encodeKey</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">));</span><span class="w">
+</span><span class="p">}</span></code></pre>
 <p>This process is rather text-book, but books are simplified. There is a number
 of flaws in this process. Essentially there are techniques to easily factor
 prime numbers that verify some properties. The most prevalent of these
@@ -473,9 +475,9 @@ warning that these keys are too small for modern use as well as implementing
 weak prime detection in all cases. I would also recommend implementing the
 three checks mentionned at least.</p>
 <img alt="../image/applebloom_cute.png" src="../image/applebloom_cute.png" style="width: 30%;" />
-</div>
-<div class="section" id="padding">
-<h2>Padding</h2>
+</section>
+<section id="padding">
+<h3>Padding</h3>
 <p>RSA needs padding for different reasons than a block cipher and therefore
 block cipher paddings are not adequate for RSA. A bad padding could go as far
 as leaking <a class="reference external" href="https://en.wikipedia.org/wiki/Coppersmith%27s_attack#Coppersmith%E2%80%99s_short-pad_attack">the message</a>
@@ -484,32 +486,32 @@ or even the <a class="reference external" href="https://crypto.stackexchange.com
 default RSA padding used is &quot;Customized&quot;. In fact each message is prefixed by
 one random byte. Upon decryption that random byte is simply discarded.</p>
 <p>In <em>rsa.d</em>:</p>
-<pre class="code java literal-block"><code><span class="kd">static</span> <span class="n">ubyte</span><span class="o">[]</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">string</span> <span class="n">T</span><span class="p">)(</span><span class="n">RSAKeyInfo</span> <span class="n">key</span><span class="p">,</span> <span class="n">ubyte</span><span class="o">[]</span> <span class="n">data</span><span class="p">,</span> <span class="n">bool</span> <span class="n">mixinXteaMode</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="cm">/* ... */</span>
-        <span class="p">{</span>
-            <span class="c1">// Prevent preamble 0, and make the encrypto results random
-</span>            <span class="n">ubyte</span> <span class="n">preamble</span> <span class="o">=</span> <span class="n">rnd</span><span class="p">.</span><span class="na">next</span><span class="o">!</span><span class="n">ubyte</span><span class="p">(</span><span class="mh">0x01</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">);</span>
-            <span class="n">blockSize</span> <span class="o">=</span> <span class="p">(</span><span class="n">keySize</span> <span class="o">&lt;=</span> <span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">)</span> <span class="o">?</span> <span class="n">keySize</span> <span class="p">:</span> <span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">;</span>
+<pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">ubyte</span><span class="o">[]</span><span class="w"> </span><span class="nf">crypt</span><span class="p">(</span><span class="n">string</span><span class="w"> </span><span class="n">T</span><span class="p">)(</span><span class="n">RSAKeyInfo</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">ubyte</span><span class="o">[]</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="n">mixinXteaMode</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="cm">/* ... */</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="c1">// Prevent preamble 0, and make the encrypto results random</span><span class="w">
+            </span><span class="n">ubyte</span><span class="w"> </span><span class="n">preamble</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rnd</span><span class="p">.</span><span class="na">next</span><span class="o">!</span><span class="n">ubyte</span><span class="p">(</span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">);</span><span class="w">
+            </span><span class="n">blockSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">keySize</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">keySize</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">length</span><span class="p">;</span><span class="w">
 
-            <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="n">ubyte</span><span class="o">[]</span> <span class="n">block</span> <span class="o">=</span> <span class="o">[</span><span class="n">preamble</span><span class="o">]</span> <span class="o">~</span> <span class="n">data</span><span class="o">[</span><span class="mi">0</span> <span class="p">..</span> <span class="n">blockSize</span><span class="o">]</span><span class="p">;</span>
-                <span class="n">BigInt</span> <span class="n">t</span> <span class="o">=</span> <span class="n">BigIntHelper</span><span class="p">.</span><span class="na">fromBytes</span><span class="p">(</span><span class="n">block</span><span class="p">);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">key</span><span class="p">.</span><span class="na">modulus</span><span class="p">)</span>
-                <span class="p">{</span>
-                    <span class="n">blockSize</span><span class="o">--</span><span class="p">;</span>
-                    <span class="k">assert</span><span class="p">(</span><span class="n">blockSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Key bits is too small.&quot;</span><span class="p">);</span>
-                    <span class="k">continue</span><span class="p">;</span>
-                <span class="p">}</span>
-                <span class="k">return</span> <span class="n">t</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span></code></pre>
+            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w">
+            </span><span class="p">{</span><span class="w">
+                </span><span class="n">ubyte</span><span class="o">[]</span><span class="w"> </span><span class="n">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">preamble</span><span class="o">]</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">data</span><span class="o">[</span><span class="mi">0</span><span class="w"> </span><span class="p">..</span><span class="w"> </span><span class="n">blockSize</span><span class="o">]</span><span class="p">;</span><span class="w">
+                </span><span class="n">BigInt</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BigIntHelper</span><span class="p">.</span><span class="na">fromBytes</span><span class="p">(</span><span class="n">block</span><span class="p">);</span><span class="w">
+                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">key</span><span class="p">.</span><span class="na">modulus</span><span class="p">)</span><span class="w">
+                </span><span class="p">{</span><span class="w">
+                    </span><span class="n">blockSize</span><span class="o">--</span><span class="p">;</span><span class="w">
+                    </span><span class="k">assert</span><span class="p">(</span><span class="n">blockSize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><s>&quot;Key bits is too small.&quot;</s><span class="p">);</span><span class="w">
+                    </span><span class="k">continue</span><span class="p">;</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+                </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span></code></pre>
 <p>This short padding is not safe and we will discuss two attacks that rely
 on padding exploitation alone.</p>
-<div class="section" id="padding-bruteforcing">
-<h3>Padding bruteforcing</h3>
+<section id="padding-bruteforcing">
+<h4>Padding bruteforcing</h4>
 <p>First of all, why is there padding here at all? Padding-less RSA is well
 known under the name &quot;Textbook RSA&quot; and has many well-documented flaws. One
 of them is that two identical messages will produce two identical ciphertexts.
@@ -526,9 +528,9 @@ two different ciphertexts.</p>
 possibilities. This does make it harder in many situations, but when few
 messages are possible an attacker can quite easily encrypt each possibility
 256 times for comparison, bypassing the security.</p>
-</div>
-<div class="section" id="message-modification">
-<h3>Message modification</h3>
+</section>
+<section id="message-modification">
+<h4>Message modification</h4>
 <p>Given an encrypted message it is possible to create a different encrypted
 message, derived from the first, without any key.</p>
 <p>To understand how we must first think about our padding in mathematical
@@ -539,25 +541,25 @@ base 2) by an amount relative to the length of <em>m</em> written in base 2 (let
 call it <em>l</em>). All of this is taken to a large power that we will call <em>e</em> to
 produce a ciphertext: <em>c</em>.</p>
 <div class="formula">
-<i>c</i> = (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+<i>c</i> = (<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
 </div>
 <p>The question we must now ask is, how can we produce another valid message
 <em>c'</em> (therefore, of the same structure) given these conditions? Let's see
 what happens when multiplying that encrypted message by 2^e:</p>
 <div class="formula">
-<i>c</i> = (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+<i>c</i> = (<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
 </div>
 <div class="formula">
-2<sup><i>e</i></sup> × <i>c</i> = 2<sup><i>e</i></sup> × (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+2<sup><i>e</i></sup>×<i>c</i> = 2<sup><i>e</i></sup>×(<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
 </div>
 <div class="formula">
- = (2 × (<i>s</i> × 2<sup><i>l</i></sup> + <i>m</i>))<sup><i>e</i></sup>
+ = (2×(<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>))<sup><i>e</i></sup>
 </div>
 <div class="formula">
- = (2<i>s</i> × 2<sup><i>l</i></sup> + 2<i>m</i>)<sup><i>e</i></sup>
+ = (2<i>s</i>×2<sup><i>l</i></sup> + 2<i>m</i>)<sup><i>e</i></sup>
 </div>
 <div class="formula">
-2<sup><i>e</i></sup> × <i>c</i> = <i>c</i>’<sup><i>e</i></sup>
+2<sup><i>e</i></sup>×<i>c</i> = <i>c</i>’<sup><i>e</i></sup>
 </div>
 <p>If <em>2s</em> still fits in one byte, that padding byte will be discarded and we
 will have successfully crafted the message <em>2m</em> (or <em>m</em> with an added 0 at
@@ -569,16 +571,16 @@ modification.</p>
 padded with a random byte, 0x12 for example, to form the padded message
 0x1242. The encrypted message can then be written schematically:</p>
 <div class="formula">
-<i>c</i> = (0<i>x</i>1242)<sup><i>e</i></sup>
+<i>c</i> = (0<i>x</i>1242)<sup><i>e</i></sup>
 </div>
 <div class="formula">
-2<sup><i>e</i></sup> × <i>c</i> = 2<sup><i>e</i></sup> × (0<i>x</i>1242)<sup><i>e</i></sup>
+2<sup><i>e</i></sup>×<i>c</i> = 2<sup><i>e</i></sup>×(0<i>x</i>1242)<sup><i>e</i></sup>
 </div>
 <div class="formula">
- = (2 × 0<i>x</i>1242)<sup><i>e</i></sup>
+ = (2×0<i>x</i>1242)<sup><i>e</i></sup>
 </div>
 <div class="formula">
- = (0<i>x</i>2484)<sup><i>e</i></sup>
+ = (0<i>x</i>2484)<sup><i>e</i></sup>
 </div>
 <p>Upon decryption of this modified message the first byte (0x24) is discarded
 leaving the message 0x84. All we had to do was multiply by 2^e.</p>
@@ -600,10 +602,10 @@ improvising a solution is not the way to go.</p>
 the message length to the original message) would not be a good fit for RSA.
 Hint: you can apply a reasoning very similar to the one outlined here.</em></p>
 <img alt="../image/starlight_glimmer_defiant.png" src="../image/starlight_glimmer_defiant.png" style="width: 30%;" />
-</div>
-</div>
-<div class="section" id="solutions">
-<h2>Solutions</h2>
+</section>
+</section>
+<section id="solutions">
+<h3>Solutions</h3>
 <p>Given that the library wants to support short (&lt;=1024 bits) keys I believe
 it should switch entirely to generating provable primes that enforce the
 different properties we discussed. This means however scratching most of the
@@ -628,9 +630,9 @@ verifying that the algorithms are implemented correctly. They must be fixed
 and removed.</p>
 <p>The avid reader will find more RSA-related attacks and studies in the
 splendid paper <a class="reference external" href="http://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf">Twenty Years of Attacks on the RSA Cryptosystem</a> by Dan Boneh.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>While I salute the effort made in creating and maintaining a useful library,
 I think the issues identified show clearly that the author is no
 cryptographer. I do not blame anyone for getting things wrong, nobody is
@@ -644,10 +646,10 @@ inventing anything and strive to follow a strong, proven standard as closely
 as possible. It is also easier to spot implementation errors that way.</p>
 <p>So, if I had only one advice for programmers wanting to write cryptographic
 code:</p>
-<div class="admonition admonition-please">
+<aside class="admonition admonition-please">
 <p class="admonition-title">Please</p>
 <p>Leave your brain at home.</p>
-</div>
+</aside>
 <p>Cryptographic code is definitely important and programmers should not be
 afraid of implementing cryptographic primitives. However it <strong>must</strong> follow
 the guidelines down to the last detail. This is not the place for smart
@@ -662,8 +664,8 @@ our exchanges and his attempt, misguided as it is, tries to fill a real need
 of our ecosystem.</p>
 <img alt="../image/rarity_look_up_gentle.png" src="../image/rarity_look_up_gentle.png" style="width: 40%;" />
 <hr class="docutils" />
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <ul class="simple">
 <li><p><a class="reference external" href="http://www.gamer.ru/questions/gallery/page3">http://www.gamer.ru/questions/gallery/page3</a></p></li>
 <li><p><a class="reference external" href="https://www.deviantart.com/yanoda/art/Unamused-Fluttershy-298158404">https://www.deviantart.com/yanoda/art/Unamused-Fluttershy-298158404</a></p></li>
@@ -672,9 +674,9 @@ of our ecosystem.</p>
 <li><p><a class="reference external" href="https://www.equestriadaily.com/2018/01/editorial-why-i-love-me-some-starlight.html">https://www.equestriadaily.com/2018/01/editorial-why-i-love-me-some-starlight.html</a></p></li>
 <li><p><a class="reference external" href="https://www.deviantart.com/the-smiling-pony/art/Rarity-01-252735198">https://www.deviantart.com/the-smiling-pony/art/Rarity-01-252735198</a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">
