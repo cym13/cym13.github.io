@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
-  <head> <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.16: http://docutils.sourceforge.net/" />
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Cracking Phobos UUID</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -46,10 +46,10 @@
     </header>
 
     <div class="content">
-      <div class="section" id="cracking-phobos-uuid">
-<h1>Cracking Phobos UUID</h1>
-<div class="section" id="tl-dr-for-busy-people">
-<h2>tl;dr for busy people</h2>
+      <section id="cracking-phobos-uuid">
+<h2>Cracking Phobos UUID</h2>
+<section id="tl-dr-for-busy-people">
+<h3>tl;dr for busy people</h3>
 <ul class="simple">
 <li><p>Contrary to other languages, D's current standard implementation of UUID4
 isn't cryptographically secure and shouldn't be used to generate secrets
@@ -74,9 +74,9 @@ secure randomness.</p></li>
 seems that anything explained in this article will be applicable there as
 well.</strong></p></li>
 </ul>
-</div>
-<div class="section" id="context">
-<h2>Context</h2>
+</section>
+<section id="context">
+<h3>Context</h3>
 <p>Some time ago I had a nice chat with a library's maintainer about Random
 Number Generation and their relation to security. It reminded me that the
 topic is not obvious and I decided to have a look at the state of things in
@@ -103,8 +103,8 @@ road map:</p>
 </ul>
 <p>This will be quite the long and technical post, but come along anyway, it is
 sure to be interesting!</p>
-<div class="section" id="a-word-on-randomness">
-<h3>A word on randomness</h3>
+<section id="a-word-on-randomness">
+<h4>A word on randomness</h4>
 <p>Before going further we need to be clear about what we mean by
 cryptographically secure randomness and how it differs from regular
 randomness.</p>
@@ -140,12 +140,12 @@ see at the end). It has some bias (not much admittedly), but most importantly
 it's both possible to predict the future and recover the past from just a few
 outputs.</p>
 <img alt="../image/chibi_cat_hurry_up.png" src="../image/chibi_cat_hurry_up.png" />
-</div>
-</div>
-<div class="section" id="structure-of-a-uuid">
-<span id="identify"></span><h2>Structure of a UUID</h2>
-<div class="section" id="the-standard">
-<h3>The standard</h3>
+</section>
+</section>
+<section id="structure-of-a-uuid">
+<span id="identify"></span><h3>Structure of a UUID</h3>
+<section id="the-standard">
+<h4>The standard</h4>
 <p>Universally Unique Identifiers (UUID) are a category of identifiers defined
 in <a class="reference external" href="https://tools.ietf.org/html/rfc4122.html">RFC 4122</a>. Their goal is, as
 the name suggests, to provide a way got generate IDs that are guaranteed to
@@ -166,16 +166,16 @@ output.</p>
 <p>Note that the RFC does not require the use of cryptographically secure random
 numbers, but it does warn against using UUIDs for sensitive values if normal
 randomness is used.</p>
-</div>
-<div class="section" id="phobos-implementation">
-<h3>Phobos implementation</h3>
+</section>
+<section id="phobos-implementation">
+<h4>Phobos implementation</h4>
 <p>Phobos' <strong>randomUUID()</strong> follows these lines perfectly, using non-secure
 randomness.</p>
 <pre class="code java literal-block"><code><span class="n">UUID</span><span class="w"> </span><span class="nf">randomUUID</span><span class="p">(</span><span class="n">RNG</span><span class="p">)(</span><span class="n">ref</span><span class="w"> </span><span class="n">RNG</span><span class="w"> </span><span class="n">randomGen</span><span class="p">)</span><span class="w">
 </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isInputRange</span><span class="o">!</span><span class="n">RNG</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isIntegral</span><span class="o">!</span><span class="p">(</span><span class="n">ElementType</span><span class="o">!</span><span class="n">RNG</span><span class="p">))</span><span class="w">
 </span><span class="p">{</span><span class="w">
     </span><span class="kn">import</span><span class="w"> </span><span class="nn">std.random</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">isUniformRNG</span><span class="p">;</span><span class="w">
-    </span><span class="kd">static</span><span class="w"> </span><span class="nf">assert</span><span class="p">(</span><span class="n">isUniformRNG</span><span class="o">!</span><span class="n">RNG</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;randomGen must be a uniform RNG&quot;</span><span class="p">);</span><span class="w">
+    </span><span class="kd">static</span><span class="w"> </span><span class="nf">assert</span><span class="p">(</span><span class="n">isUniformRNG</span><span class="o">!</span><span class="n">RNG</span><span class="p">,</span><span class="w"> </span><s>&quot;randomGen must be a uniform RNG&quot;</s><span class="p">);</span><span class="w">
 
     </span><span class="n">alias</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ElementEncodingType</span><span class="o">!</span><span class="n">RNG</span><span class="p">;</span><span class="w">
     </span><span class="kd">enum</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">elemSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E</span><span class="p">.</span><span class="na">sizeof</span><span class="p">;</span><span class="w">
@@ -207,12 +207,12 @@ Xorshift192 (<a class="reference external" href="https://github.com/dlang/phobos
 <p>So our main target is Mersenne Twister 19937, possibly the most common PRNG
 in use.</p>
 <img alt="../image/chibi_cat_me_want.png" src="../image/chibi_cat_me_want.png" />
-</div>
-</div>
-<div class="section" id="cracking-mt19937">
-<span id="prepare"></span><h2>Cracking MT19937</h2>
-<div class="section" id="previous-work">
-<h3>Previous work</h3>
+</section>
+</section>
+<section id="cracking-mt19937">
+<span id="prepare"></span><h3>Cracking MT19937</h3>
+<section id="previous-work">
+<h4>Previous work</h4>
 <p>So, <a class="reference external" href="https://en.wikipedia.org/wiki/Mersenne_Twister">MT19937</a> is
 well-known, used a lot, and insecure. Surely other people have written about
 cracking it in the past?</p>
@@ -231,9 +231,9 @@ seed by inverting its process. Good stuff. We will not get to use it but it
 is definitely worth a read.</p>
 <p>In the end all Mersenne Twisters are a bit different so we need to tailor the
 approach for Phobos, but we will use two values to predict the next one.</p>
-</div>
-<div class="section" id="how-mt19937-works">
-<h3>How MT19937 works</h3>
+</section>
+<section id="how-mt19937-works">
+<h4>How MT19937 works</h4>
 <p>MT19337's internal state is an array of 624 32-bit integers. That array is
 seeded at initialization but we will not discuss seeding in this article. For
 all intent and purposes, we start with an array of 624 random integers.</p>
@@ -256,9 +256,9 @@ loops back to the end of the array.</p>
 that, in order to improve caching performances, both the blue and orange
 processes are interweaved.</p>
 <p>And with this we are ready to crack normal MT19937!</p>
-</div>
-<div class="section" id="reversing-the-scrambling">
-<h3>Reversing the scrambling</h3>
+</section>
+<section id="reversing-the-scrambling">
+<h4>Reversing the scrambling</h4>
 <p>MT19937 is entirely defined by its internal state. If we can identify all its
 624 components then we can just set the state of our own MT19937 PRNG with
 these values and it'll output the same numbers. Now, given one output, if we
@@ -311,10 +311,10 @@ predict all future numbers is to collect 624 consecutive numbers, unscramble
 them and use them to seed our own MersenneTwisterEngine. But that is not our
 goal, so let's move on.</p>
 <img alt="../image/chibi_cat_disillusioned.png" src="../image/chibi_cat_disillusioned.png" />
-</div>
-</div>
-<div class="section" id="predicting-one-number">
-<h2>Predicting one number</h2>
+</section>
+</section>
+<section id="predicting-one-number">
+<h3>Predicting one number</h3>
 <p>This is an intermediate step toward our goal. We saw that we have the
 elements to crack MT19937 if we get 624 consecutive outputs, but when we get
 to UUIDs we won't have that luxury. Remember that each UUID is made of 4
@@ -373,9 +373,9 @@ value &quot;index&quot; will have, so 624 outputs later. Now, let's move to the 
 the challenge: can we still do this efficiently when we start removing bits
 due to how UUIDs are formatted?</p>
 <img alt="../image/chibi_cat_catching_prey.png" src="../image/chibi_cat_catching_prey.png" />
-</div>
-<div class="section" id="cracking-mt19937-uuids">
-<span id="attack"></span><h2>Cracking MT19937 UUIDs</h2>
+</section>
+<section id="cracking-mt19937-uuids">
+<span id="attack"></span><h3>Cracking MT19937 UUIDs</h3>
 <p>The main issue with UUIDs comes, of course, from the fact that some
 information is missing. There is nothing we can do to magically summon up
 these missing bits, but if few enough are missing we can enumerate all
@@ -511,11 +511,11 @@ matter of seconds so it is definitely a practical attack.</p></li>
 reset tokens (the best since you can ask to reset another account, there is
 no need to wait), API endpoints that are supposed to be unguessable etc.</p>
 <img alt="../image/chibi_cat_computer_savy.png" src="../image/chibi_cat_computer_savy.png" />
-</div>
-<div class="section" id="mitigations">
-<span id="defend"></span><h2>Mitigations</h2>
-<div class="section" id="proper-solution-use-the-csprng-from-your-system">
-<h3>Proper solution: use the CSPRNG from your system</h3>
+</section>
+<section id="mitigations">
+<span id="defend"></span><h3>Mitigations</h3>
+<section id="proper-solution-use-the-csprng-from-your-system">
+<h4>Proper solution: use the CSPRNG from your system</h4>
 <p>Secrets must be generated using cryptographic randomness. On Windows this
 means <a class="reference external" href="https://docs.microsoft.com/en-gb/archive/blogs/michael_howard/cryptographically-secure-random-number-on-windows-without-using-cryptoapi">RtlGenRandom</a>, on Linux getrandom() or /dev/urandom, on unix
 /dev/random. There are libraries that implement a cross-platform wrapper
@@ -535,9 +535,9 @@ cryptography in the standard library, but here we are not talking about
 reimplementing an algorithm. It is a case where not acting is provably
 causing more damage than providing a standard solution. Especially at the web
 era, access to cryptographic randomness is a must.</p>
-</div>
-<div class="section" id="improper-solution-let-s-use-the-cpu-s-csprng">
-<h3>Improper solution: let's use the CPU's CSPRNG</h3>
+</section>
+<section id="improper-solution-let-s-use-the-cpu-s-csprng">
+<h4>Improper solution: let's use the CPU's CSPRNG</h4>
 <p><em>The CPU generally embeds a CSPRNG nowadays no? Why not use this instead of
 dealing with OS specific resources?</em></p>
 <p>There are several reasons. For example the system has access to more
@@ -550,9 +550,9 @@ never a good thing for security.</p>
 Not all CPUs do, far from it, so what are you supposed to do? Fallback
 silently on a method that we know causes issues? That would be giving a false
 sense of security even more harmful than what is currently done.</p>
-</div>
-<div class="section" id="improper-solution-let-s-write-our-own-csprng">
-<h3>Improper solution: let's write our own CSPRNG</h3>
+</section>
+<section id="improper-solution-let-s-write-our-own-csprng">
+<h4>Improper solution: let's write our own CSPRNG</h4>
 <p><em>Still, having to deal with platform-specific code is a pain. Can't I just
 write my own CSPRNG instead of depending on the system?</em></p>
 <p>Nobody should roll their own crypto and expect it to be usable in production.
@@ -564,9 +564,9 @@ bugs.</p>
 <p>You might try to collect entropy elsewhere, but you're bound to have less
 access to it than the system, and any such collection involves platform
 specific code anyway. There's nothing to be gained from this.</p>
-</div>
-<div class="section" id="improper-solution-let-s-reseed-often">
-<h3>Improper solution: let's reseed often</h3>
+</section>
+<section id="improper-solution-let-s-reseed-often">
+<h4>Improper solution: let's reseed often</h4>
 <p><em>This attack requires you to read many values. I just need to reseed more
 often so that the value you're predicting never comes out.</em></p>
 <p>There is this common misconception that the issue with non-cryptographic PRNG
@@ -587,10 +587,10 @@ to determine the entire internal state by reading only 2 values.</p>
 errand to try to twist it into being secure when it is neither its purpose
 nor its strength.</p>
 <img alt="../image/chibi_cat_sleeping.png" src="../image/chibi_cat_sleeping.png" />
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
+</section>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
 <p>As we have seen, it is fairly easy to predict Phobos UUIDs. While the RFC
 does not require UUIDs to be unpredictable, practice shows that many people
 expect them to be cryptographically secure. This causes many security issues
@@ -601,16 +601,16 @@ issue but also many similar issues that stem from the fact that it is
 currently much easier to use a regular PRNG than a CSPRNG, even when one is
 absolutely required.</p>
 <hr class="docutils" />
-<div class="section" id="image-sources">
-<h3>Image sources</h3>
+<section id="image-sources">
+<h4>Image sources</h4>
 <p>All schemas were made by me and are provided under the <a class="reference external" href="https://creativecommons.org/licenses/by/3.0/">creative commons
 3.0 unported license</a> like
 any other original content on this blog.</p>
 <p>All cat pictures in this article come from
 <a class="reference external" href="https://chatsticker.com/sticker/tibi-neko-sticker-no-language-ver-1">https://chatsticker.com/sticker/tibi-neko-sticker-no-language-ver-1</a>.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
     </div>
     <footer "class"="site-footer">
       <div "class"="publication_date">

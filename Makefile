@@ -12,6 +12,7 @@ article/%.html: source/%.rst template/article.tpl
 		--title "Breakpoint: $$(grep "^\w" $< | head -1)" \
 		--template template/article.tpl       \
 		$< $@
+	sed -i '/<meta name="viewport"/d' $@
 	sed -i 's|http://cdn.mathjax.org/mathjax/latest|../resource/mathjax|' $@
 	sed -i "s|»PUB_DATE«|$$(git log --format=%aD $$'$@' | tail -1)|" $@
 	chmod -w $@
@@ -19,6 +20,7 @@ article/%.html: source/%.rst template/article.tpl
 %.html: %.rst template/base.tpl
 	@ if [ -e $@ ] ; then chmod +w $@ ; fi
 	rst2html5 $(RST2HTMLOPT) --template template/base.tpl $< > $@
+	sed -i '/<meta name="viewport"/d' $@
 	chmod -w $@
 
 rss.xml: gen_rss.py index.html $(articles)
