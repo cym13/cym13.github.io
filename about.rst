@@ -13,11 +13,6 @@ Luxembourg.
 I spend most of my free time auditing free software, reversing malwares,
 developping new GNU/Linux tools and watching animes or My Little Pony.
 
-Do you have a resume?
-=====================
-
-For you, always ;) `Here it is! <file/CV_Cédric_Picard.pdf>`_
-
 Where's the girl at the top coming from?
 ========================================
 
