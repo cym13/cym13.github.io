@@ -14,9 +14,27 @@ that message really from who I think it is, unmodified?") and doesn't care
 about its confidentiality.
 
 By modern standards I can think of no reason to ever consider using this
-protocol. It relies heavily on pre-shared keys between participants and a
-trusted "Cookie Jar" as well as on decryption of hashes as proof of
-authenticity. As we'll see, this turns out to be a big mistake.
+protocol. Like Kerberos, it relies heavily on pre-shared keys between
+participants and a trusted reference server: the "Cookie Jar". It also relies
+on decryption of hashes as proof of authenticity. If you consider this
+protocol, you should probably just be using Kerberos.
+
+Here is an outline of the protocol where Alice attempts to authenticate with
+Bob:
+
+.. image:: ../image/rfc1004.png
+    :width: 100%
+
+As we can see each message contains an encrypted hash that englobes the
+parameters of the message. The security of this message-authentication code
+relies on the idea that only someone with the correct secret key can properly
+create then encrypt the message hash. There are also nonces to avoid replay
+attacks.
+
+Furthermore we see that there are two phases: first Alice exchanges with Jar,
+then Alice exchanges with Bob. Jar never talks to Bob and Bob's first
+discovers Alice's authentication attempt when presented with an encrypted
+temporary key.
 
 In this article we'll show a non-trivial attack against this protocol found
 using Verifpal.

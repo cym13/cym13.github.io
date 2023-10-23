@@ -1,0 +1,56 @@
+@startuml
+
+Alice -> Alice
+note left
+    Generates message ID m1_id
+    Hashes then encrypts A_alice, A_jar, m1_id and A_bob with K_alice -> m1_hash_enc
+end note
+
+autonumber 1
+Alice -> Jar: A_alice, A_Jar, m1_id, A_Bob, m1_hash_enc
+autonumber stop
+
+Jar -> Jar
+note right
+    Decrypts then checks m1_hash_enc
+    Generates temporary Alice-Bob key Kab
+    Hashes then encrypts A_alice, A_jar, m1_id, Kab with K_alice -> m2_hash_enc
+    Encrypts Kab with K_alice -> cookie_a
+    Encrypts Kab with K_bob then with K_alice -> cookie_b
+end note
+
+autonumber resume
+Jar -> Alice: A_Jar, A_Alice, m2_hash_enc, cookie_a, cookie_b
+autonumber stop
+
+Alice -> Alice
+note left
+    Decrypts and checks m2_hash_enc
+    Decrypts cookie_a to get Kab
+    Decrypts cookie_b to get Bob's encrypted version of Kab (cookie_b_dec)
+    Generates message ID m3_id as well as noise x
+    Hashes then encrypts A_alice, A_bob, m3_id, x with Kab -> m3_hash_enc
+end note
+
+autonumber resume
+Alice -> Bob: A_Alice, A_Bob, m3_id, x, cookie_b_dec, m3_hash_enc
+autonumber stop
+
+Bob -> Bob
+note right
+    Decrypts cookie_b_dec to get Kab
+    Decrypts and checks m3_hash_enc
+    Generates message ID m4_id
+    Hashes then encrypts A_bob, A_alice, m4_id with Kab -> m4_hash_enc
+end note
+
+autonumber resume
+Bob -> Alice: A_bob, A_alice, m4_id, m4_hash_enc
+autonumber stop
+
+Alice -> Alice
+note left
+    Decrypts and verifies m4_hash_enc
+end note
+
+@enduml
