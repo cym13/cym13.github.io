@@ -37,6 +37,7 @@
                   <img src="image/rss.png" />
               </a>
           </li>
+          <li><a href="cve.html">CVE</a></li>
           <li><a href="about.html">About</a></li>
         </ul>
       </div>
