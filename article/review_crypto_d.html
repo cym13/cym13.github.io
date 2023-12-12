@@ -150,7 +150,7 @@ name suggests it actually performs a <a class="reference external" href="https:/
 <a class="reference external" href="https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test">Miller-Rabin test</a>.</p>
 <pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="nf">millerRabinPrimeTest</span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="n">BigInt</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="n">size_t</span><span class="w"> </span><span class="n">confidence</span><span class="p">)</span><span class="w">
 </span><span class="p">{</span><span class="w">
-    </span><span class="n">enforce</span><span class="p">(</span><span class="n">confidence</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><s>&quot;confidence must be a positive integer greater than 0.&quot;</s><span class="p">);</span><span class="w">
+    </span><span class="n">enforce</span><span class="p">(</span><span class="n">confidence</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;confidence must be a positive integer greater than 0.&quot;</span><span class="p">);</span><span class="w">
 
     </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">
     </span><span class="p">{</span><span class="w">
@@ -411,8 +411,8 @@ following:</p>
 <pre class="code java literal-block"><code><span class="kd">static</span><span class="w"> </span><span class="n">RSAKeyPair</span><span class="w"> </span><span class="nf">generateKeyPair</span><span class="p">(</span><span class="n">uint</span><span class="w"> </span><span class="n">bitLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span><span class="p">)</span><span class="w">
 </span><span class="p">{</span><span class="w">
     </span><span class="k">assert</span><span class="p">((</span><span class="n">bitLength</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">bitLength</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w">
-        </span><s>&quot;Bitlength is required to be a multiple of 8 and not less than 128.&quot;</s><span class="w">
-      </span><span class="o">~</span><span class="w"> </span><s>&quot;It’s recommended that it be no less than 2048.&quot;</s><span class="p">);</span><span class="w">
+        </span><span class="s">&quot;Bitlength is required to be a multiple of 8 and not less than 128.&quot;</span><span class="w">
+      </span><span class="o">~</span><span class="w"> </span><span class="s">&quot;It’s recommended that it be no less than 2048.&quot;</span><span class="p">);</span><span class="w">
 
     </span><span class="n">BigInt</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w">
 
@@ -502,7 +502,7 @@ one random byte. Upon decryption that random byte is simply discarded.</p>
                 </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">key</span><span class="p">.</span><span class="na">modulus</span><span class="p">)</span><span class="w">
                 </span><span class="p">{</span><span class="w">
                     </span><span class="n">blockSize</span><span class="o">--</span><span class="p">;</span><span class="w">
-                    </span><span class="k">assert</span><span class="p">(</span><span class="n">blockSize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><s>&quot;Key bits is too small.&quot;</s><span class="p">);</span><span class="w">
+                    </span><span class="k">assert</span><span class="p">(</span><span class="n">blockSize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Key bits is too small.&quot;</span><span class="p">);</span><span class="w">
                     </span><span class="k">continue</span><span class="p">;</span><span class="w">
                 </span><span class="p">}</span><span class="w">
                 </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w">

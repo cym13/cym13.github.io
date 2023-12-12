@@ -145,12 +145,12 @@ line (shell-dependant, but true for most):</p>
 <h3>Read from standard input</h3>
 <p>You want to write multiple lines to a program's standard input without pain ?
 Use '&lt;&lt;':</p>
-<pre class="code bash literal-block"><code>$<span class="w"> </span>grep<span class="w"> </span>kitten<span class="w"> </span><s>&lt;&lt;EOF
+<pre class="code bash literal-block"><code>$<span class="w"> </span>grep<span class="w"> </span>kitten<span class="w"> </span><span class="s">&lt;&lt;EOF
 . A kitten
 . Another kitten
 . Another kitten
 . It keeps going
-. EOF</s><span class="w">
+. EOF</span><span class="w">
 </span>A<span class="w"> </span>kitten<span class="w">
 </span>Another<span class="w"> </span>kitten<span class="w">
 </span>Another<span class="w"> </span>kitten</code></pre>
@@ -158,13 +158,13 @@ Use '&lt;&lt;':</p>
 it sends all output to the program. Still not really useful as it is, but it
 can come in handy sometimes, like when needing to write a small file (real
 programmers use cat by the way):</p>
-<pre class="code bash literal-block"><code>$<span class="w"> </span>cat<span class="w"> </span>&gt;truth.sh<span class="w"> </span><s>&lt;&lt;EOF
+<pre class="code bash literal-block"><code>$<span class="w"> </span>cat<span class="w"> </span>&gt;truth.sh<span class="w"> </span><span class="s">&lt;&lt;EOF
 . #!/bin/sh
 . while [ 42 ] ; do
 .     echo &quot;KITTENS!!!&quot;
 .     echo &quot;KITTENS EVERYWHERE!!!&quot;
 . done
-. EOF</s><span class="w">
+. EOF</span><span class="w">
 
 </span>$<span class="w"> </span>cat<span class="w"> </span>truth.sh<span class="w">
 </span><span class="c1">#!/bin/sh
@@ -199,11 +199,11 @@ The naive solution would be:</p>
 <p>How does it work? What xargs does is that it takes each line and calls its
 arguments with those lines as arguments. The two following expressions are
 indeed equivalent:</p>
-<pre class="code bash literal-block"><code>$<span class="w"> </span>xargs<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span><s>&lt;&lt;EOF
+<pre class="code bash literal-block"><code>$<span class="w"> </span>xargs<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span><span class="s">&lt;&lt;EOF
 . abc
 . bcd
 . cde
-. EOF</s><span class="w">
+. EOF</span><span class="w">
 </span>...<span class="w">
 
 </span>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>abc<span class="w"> </span>bcd<span class="w"> </span>cde<span class="w">
