@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head> <meta charset="utf-8" />
-<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Privilege escalations</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -86,7 +86,7 @@ to overwrite the content of sudo for example.</p>
 <h3>Race condition</h3>
 <p>It is not always as clear as in the previous snippet. It can happen as a race
 condition:</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span><span class="w">
+<pre class="code python literal-block"><code><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span><span class="w">
 
 </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
 </span>    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;echo 'Harmless script'&quot;</span><span class="p">)</span><span class="w">
@@ -100,7 +100,7 @@ the moment when the file is written and the call to Popen.</p>
 <section id="failed-exception">
 <h3>Failed exception</h3>
 <p>Another case is the bogus exception:</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">subprocess</span><span class="w">
+<pre class="code python literal-block"><code><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span><span class="w">
 
 </span><span class="k">try</span><span class="p">:</span><span class="w">
 </span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/mytmp/tmp.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
@@ -123,7 +123,7 @@ ignored and what it could mean to an attacker.</p>
 <p>TOCTTOUs are a special case of race condition. They happen when a program
 first checks a property and then uses a resource on the assumption of the
 first property.</p>
-<pre class="code python literal-block"><code><span class="kn">import</span> <span class="nn">os</span><span class="w">
+<pre class="code python literal-block"><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w">
 
 </span><span class="n">origin</span>      <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list&quot;</span><span class="w">
 </span><span class="n">destination</span> <span class="o">=</span> <span class="s2">&quot;/tmp/cd-list/my-cd-list.bkp&quot;</span><span class="w">
