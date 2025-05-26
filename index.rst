@@ -9,6 +9,13 @@ with the starred articles!
 Recent articles
 ===============
 
+May 2025
+--------
+
+`A look at the Vault password manager <article/vault_password_manager.html>`_
+    Let's study a broken password manager to understand some vulnerabilities
+    specific to storage encryption.
+
 October 2023
 ------------
 
