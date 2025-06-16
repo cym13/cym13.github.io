@@ -366,6 +366,16 @@ Every element of the data analysis can be replicated using `this R script
 <../file/allergic_rhinitis_data_analysis.r>`_ and `this data file
 <../file/allergic_rhinitis_data.csv>`_.
 
+All in all, it is pretty disappointing that we'll never get to the bottom of
+this story. I do think however that we're very lucky to have the opportunity
+to audit the scientific process and I hope that this deep delve will help
+people feel more confident reading scientific papers. Just remember that if
+you find numerical inconsistencies they're probably not the result of fraud.
+They may come from a misunderstanding on your part, a legitimate mistake or
+an aspect of the study that wasn't made very clear in the paper (for example,
+participants dropping off mid-study is often a cause of confusion). Keep an
+open mind and ask questions before throwing accusations.
+
 Timeline
 --------
 

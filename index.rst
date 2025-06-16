@@ -9,6 +9,14 @@ with the starred articles!
 Recent articles
 ===============
 
+June 2025
+---------
+
+`★ Suspicious Statistics in Allergic Rhinitis Study <article/suspicious_statistics_rct.html>`_
+    An analysis of strange statistical mistakes in a biology paper about a
+    randomized controlled trial studying the effect of probiotics on
+    allergic rhinitis.
+
 May 2025
 --------
 
