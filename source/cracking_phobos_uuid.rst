@@ -561,6 +561,8 @@ did test that attack in practice as such:
 - Try all candidates, one of them will work. 8000 requests can be done in a
   matter of seconds so it is definitely a practical attack.
 
+Here is a `working demo <https://github.com/cym13/demo_uuid>`_.
+
 A similar strategy can be applied for filenames in symlink attacks, password
 reset tokens (the best since you can ask to reset another account, there is
 no need to wait), API endpoints that are supposed to be unguessable etc.
