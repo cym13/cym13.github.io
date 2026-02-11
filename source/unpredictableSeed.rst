@@ -97,7 +97,7 @@ definition of random).
 
 I won't go into much details about how these representations work because
 `they do it better than me
-<http://codisec.com/binary-visualization-explained/>`_, but it is necessary
+<https://codisec.com/binary-visualization-explained/>`_, but it is necessary
 to understand the basics to interpret what is at play.
 
 Veles proposes three kinds of representations:

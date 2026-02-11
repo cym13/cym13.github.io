@@ -697,7 +697,7 @@ and removed.
 
 The avid reader will find more RSA-related attacks and studies in the
 splendid paper `Twenty Years of Attacks on the RSA Cryptosystem
-<http://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf>`_ by Dan Boneh.
+<https://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf>`_ by Dan Boneh.
 
 Conclusion
 ==========

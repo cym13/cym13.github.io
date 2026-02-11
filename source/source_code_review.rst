@@ -109,7 +109,7 @@ Specific bugs
 Those are the bugs that make the news.
 
 Subtle off-by-one errors like the `Cryptocat case
-<http://www.cryptofails.com/page/23>`_, slight indentation mistakes like
+<https://www.cryptofails.com/page/23>`_, slight indentation mistakes like
 `Goto fail <https://www.imperialviolet.org/2014/02/22/applebug.html>`_,
 buffer overruns like `Heartbleed <https://xkcd.com/1354/>`_. They are often
 typos where a single character makes the difference. They don't span out of

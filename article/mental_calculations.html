@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head> <meta charset="utf-8" />
-<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<meta name="generator" content="Docutils 0.22.3: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Mental calculations for IT professionals</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -66,7 +66,7 @@ nearly as hard as it seems using a few tricks and methods.</p>
 we rarely need more than a few digits of precision. What we're talking about
 is efficient yet educated estimates that lands within 10% of the actual
 result. That's enough to take a decision or identify a risk. It's all in the
-spirit of <a class="reference external" href="http://lesswrong.com/lw/h5e/fermi_estimates/">Fermi estimates</a>.</p>
+spirit of <a class="reference external" href="https://lesswrong.com/lw/h5e/fermi_estimates/">Fermi estimates</a>.</p>
 <p>So, what about looking at a concrete case to see some of those?</p>
 <img alt="../image/math_kawaii.png" src="../image/math_kawaii.png" style="width: 50%;" />
 </section>
@@ -88,8 +88,38 @@ a power of 10 instead.</p>
 multiply by three. The integer part is the power of ten.</p>
 </aside>
 <p>So in our case, that means:</p>
-<div class="formula">
-2<sup>128</sup>  →  128  →  <span class="fraction"><span class="ignored">(</span><span class="numerator">128</span><span class="ignored">)/(</span><span class="denominator">10</span><span class="ignored">)</span></span> = 12.8  →  12.8×3 = 38.4  →  38
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mn>2</mn>
+    <mn>128</mn>
+  </msup>
+  <mspace width="0.25em"></mspace>
+  <mo>→</mo>
+  <mspace width="0.25em"></mspace>
+  <mn>128</mn>
+  <mspace width="0.25em"></mspace>
+  <mo>→</mo>
+  <mspace width="0.25em"></mspace>
+  <mfrac>
+    <mn>128</mn>
+    <mn>10</mn>
+  </mfrac>
+  <mo>=</mo>
+  <mn>12.8</mn>
+  <mspace width="0.25em"></mspace>
+  <mo>→</mo>
+  <mspace width="0.25em"></mspace>
+  <mn>12.8</mn>
+  <mo>×</mo>
+  <mn>3</mn>
+  <mo>=</mo>
+  <mn>38.4</mn>
+  <mspace width="0.25em"></mspace>
+  <mo>→</mo>
+  <mspace width="0.25em"></mspace>
+  <mn>38</mn>
+</math>
 </div>
 <p>So 2¹²⁸ ≃ 10³⁸. That's way better for us because about everything is
 expressed on a base 10 so a power of ten is easier to manipulate and compare
@@ -137,8 +167,40 @@ to imagine many of them working in parallel: just an additional division.</p>
 <h4>Back in track</h4>
 <p>So, 1GHz means a billion (10⁹) operations a second. How many seconds do we
 need then?</p>
-<div class="formula">
-<span class="fraction"><span class="ignored">(</span><span class="numerator">10<sup>38</sup></span><span class="ignored">)/(</span><span class="denominator">10<sup>9</sup></span><span class="ignored">)</span></span> = 10<sup>38 − 9</sup> = 10<sup>29</sup><i>seconds</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mfrac>
+    <msup>
+      <mn>10</mn>
+      <mn>38</mn>
+    </msup>
+    <msup>
+      <mn>10</mn>
+      <mn>9</mn>
+    </msup>
+  </mfrac>
+  <mo>=</mo>
+  <msup>
+    <mn>10</mn>
+    <mrow>
+      <mn>38</mn>
+      <mo>−</mo>
+      <mn>9</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <msup>
+    <mn>10</mn>
+    <mn>29</mn>
+  </msup>
+  <mi>s</mi>
+  <mi>e</mi>
+  <mi>c</mi>
+  <mi>o</mi>
+  <mi>n</mi>
+  <mi>d</mi>
+  <mi>s</mi>
+</math>
 </div>
 <p>Whoa. I have no idea how much that represents. Let's express this in years
 instead.</p>
@@ -147,8 +209,43 @@ instead.</p>
 <p>There are about π×10⁷ seconds in a year (π=3.14).</p>
 </aside>
 <p>That's good to know! We can now write:</p>
-<div class="formula">
-<span class="fraction"><span class="ignored">(</span><span class="numerator">10<sup>29</sup></span><span class="ignored">)/(</span><span class="denominator">3.14</span><span class="ignored">)</span></span>10<sup>7</sup> = <span class="fraction"><span class="ignored">(</span><span class="numerator">1</span><span class="ignored">)/(</span><span class="denominator">3</span><span class="ignored">)</span></span>10<sup>29 − 7</sup> = 10<sup>22</sup><i>years</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mfrac>
+    <msup>
+      <mn>10</mn>
+      <mn>29</mn>
+    </msup>
+    <mn>3.14</mn>
+  </mfrac>
+  <msup>
+    <mn>10</mn>
+    <mn>7</mn>
+  </msup>
+  <mo>=</mo>
+  <mfrac>
+    <mn>1</mn>
+    <mn>3</mn>
+  </mfrac>
+  <msup>
+    <mn>10</mn>
+    <mrow>
+      <mn>29</mn>
+      <mo>−</mo>
+      <mn>7</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <msup>
+    <mn>10</mn>
+    <mn>22</mn>
+  </msup>
+  <mi>y</mi>
+  <mi>e</mi>
+  <mi>a</mi>
+  <mi>r</mi>
+  <mi>s</mi>
+</math>
 </div>
 <p><em>Wait, you did a mistake, 1/3 is 0.33 so shouldn't it be 3×10²¹ ?</em></p>
 <p>Remember when earlier we rounded down? Now we round up to make for it. That's

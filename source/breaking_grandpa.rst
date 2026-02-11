@@ -301,7 +301,7 @@ use the ability to decrypt something as a proof of authentication. There's a
 reason why we have dedicated tools such as signatures and Message
 Authentication Codes (MAC), and why we require them to use separate keys.
 `Proper authentication is important
-<http://breakpoint.purrfect.fr/article/demo_bank.html>`_.
+<https://breakpoint.purrfect.fr/article/demo_bank.html>`_.
 
 And yet the main takeaway, I think, should be that Verifpal is a nice tool to
 have in your arsenal. The modeling stage forces you to express the protocol

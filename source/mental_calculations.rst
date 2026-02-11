@@ -23,7 +23,7 @@ We're not talking about precise results here. When dealing with real numbers
 we rarely need more than a few digits of precision. What we're talking about
 is efficient yet educated estimates that lands within 10% of the actual
 result. That's enough to take a decision or identify a risk. It's all in the
-spirit of `Fermi estimates <http://lesswrong.com/lw/h5e/fermi_estimates/>`_.
+spirit of `Fermi estimates <https://lesswrong.com/lw/h5e/fermi_estimates/>`_.
 
 So, what about looking at a concrete case to see some of those?
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head> <meta charset="utf-8" />
-<meta name="generator" content="Docutils 0.20.1: https://docutils.sourceforge.io/" />
+<meta name="generator" content="Docutils 0.22.3: https://docutils.sourceforge.io/" />
 <title>Breakpoint: Review of Crypto for D</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -231,8 +231,46 @@ number or a <a class="reference external" href="https://en.wikipedia.org/wiki/Ca
 verified for many composite numbers, just not for every number between <em>1</em>
 and <em>p-1</em>. I will call “liar” a number <em>ak</em> for which <em>ak^(p-1)-1</em> is a
 multiple of <em>p</em> even though <em>p</em> is not prime.</p>
-<div class="formula">
-<i>liars</i> = {<i>a</i><sub><i>k</i></sub> ∈ ℕ|∃<i>q</i> ∈ ℕ, <i>a</i><span class="scripts"><sup class="script"><i>p</i> − 1</sup><sub class="script"><i>k</i></sub></span> − 1 = <i>pq</i>, <i>p</i><span class="text"> not prime</span>}
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>l</mi>
+  <mi>i</mi>
+  <mi>a</mi>
+  <mi>r</mi>
+  <mi>s</mi>
+  <mo>=</mo>
+  <mo>{</mo>
+  <msub>
+    <mi>a</mi>
+    <mi>k</mi>
+  </msub>
+  <mo>∈</mo>
+  <mi>ℕ</mi>
+  <mo stretchy="false">|</mo>
+  <mi>∃</mi>
+  <mi>q</mi>
+  <mo>∈</mo>
+  <mi>ℕ</mi>
+  <mo>,</mo>
+  <msubsup>
+    <mi>a</mi>
+    <mi>k</mi>
+    <mrow>
+      <mi>p</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msubsup>
+  <mo>−</mo>
+  <mn>1</mn>
+  <mo>=</mo>
+  <mi>p</mi>
+  <mi>q</mi>
+  <mo>,</mo>
+  <mi>p</mi>
+  <mtext> not prime</mtext>
+  <mo>}</mo>
+</math>
 </div>
 <p>For example 77=7×11 but 34^(76)-1 is a multiple of 77 and the same goes for
 43: 34 and 43 are liars when testing 77. 1 and 76 are also trivial liars.</p>
@@ -242,29 +280,169 @@ liars below <em>n/2</em> as there are above.</p>
 <p>If <em>n</em> does not have any liar, then the property is verified.</p>
 <p>Let's suppose that <em>n</em> has at least one liar: <em>a</em>.</p>
 <p>We have:</p>
-<div class="formula">
-<i>a</i><sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mi>a</mi>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <mn>1</mn>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
 <p>Let's consider the number symmetric to <em>a</em> relatively to <em>n/2</em>: <em>n-a</em></p>
-<div class="formula">
-<i>n</i> − <i>a</i> =  − <i>a</i><span class="text"> mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>n</mi>
+  <mo>−</mo>
+  <mi>a</mi>
+  <mo>=</mo>
+  <mo form="prefix">−</mo>
+  <mi>a</mi>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
-<div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − <i>a</i>)<sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">(</mo>
+  <mi>n</mi>
+  <mo>−</mo>
+  <mi>a</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mo form="prefix">−</mo>
+  <mi>a</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
-<div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = ( − 1)<sup><i>n</i> − 1</sup>⋅<i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">(</mo>
+  <mi>n</mi>
+  <mo>−</mo>
+  <mi>a</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mo form="prefix">−</mo>
+  <mn>1</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>⋅</mo>
+  <msup>
+    <mi>a</mi>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
 <p>But n is odd, so</p>
-<div class="formula">
-( − 1)<sup><i>n</i> − 1</sup> = 1
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">(</mo>
+  <mo form="prefix">−</mo>
+  <mn>1</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <mn>1</mn>
+</math>
 </div>
 <p>giving</p>
-<div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = <i>a</i><sup><i>n</i> − 1</sup><span class="text">  mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">(</mo>
+  <mi>n</mi>
+  <mo>−</mo>
+  <mi>a</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <msup>
+    <mi>a</mi>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
-<div class="formula">
-(<i>n</i> − <i>a</i>)<sup><i>n</i> − 1</sup> = 1<span class="text">  mod </span><i>n</i>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">(</mo>
+  <mi>n</mi>
+  <mo>−</mo>
+  <mi>a</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mo>=</mo>
+  <mn>1</mn>
+  <mtext> mod </mtext>
+  <mi>n</mi>
+</math>
 </div>
 <p>So for any liar a we have proved that <em>n-a</em> is also a liar.
 Furthermore if <em>a &lt; n/2</em> then <em>n-a &gt; n/2</em> and inversely. Therefore there are
@@ -541,26 +719,133 @@ and our padding <em>s</em> shifted to the left (so multiplied by some power of 2
 base 2) by an amount relative to the length of <em>m</em> written in base 2 (let's
 call it <em>l</em>). All of this is taken to a large power that we will call <em>e</em> to
 produce a ciphertext: <em>c</em>.</p>
-<div class="formula">
-<i>c</i> = (<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>c</mi>
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mi>s</mi>
+  <mo>×</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>l</mi>
+  </msup>
+  <mo>+</mo>
+  <mi>m</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
 <p>The question we must now ask is, how can we produce another valid message
 <em>c'</em> (therefore, of the same structure) given these conditions? Let's see
 what happens when multiplying that encrypted message by 2^e:</p>
-<div class="formula">
-<i>c</i> = (<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>c</mi>
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mi>s</mi>
+  <mo>×</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>l</mi>
+  </msup>
+  <mo>+</mo>
+  <mi>m</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
-2<sup><i>e</i></sup>×<i>c</i> = 2<sup><i>e</i></sup>×(<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mn>2</mn>
+    <mi>e</mi>
+  </msup>
+  <mo>×</mo>
+  <mi>c</mi>
+  <mo>=</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>e</mi>
+  </msup>
+  <mo>×</mo>
+  <mo stretchy="false">(</mo>
+  <mi>s</mi>
+  <mo>×</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>l</mi>
+  </msup>
+  <mo>+</mo>
+  <mi>m</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
- = (2×(<i>s</i>×2<sup><i>l</i></sup> + <i>m</i>))<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mn>2</mn>
+  <mo>×</mo>
+  <mo stretchy="false">(</mo>
+  <mi>s</mi>
+  <mo>×</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>l</mi>
+  </msup>
+  <mo>+</mo>
+  <mi>m</mi>
+  <mo stretchy="false">)</mo>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
- = (2<i>s</i>×2<sup><i>l</i></sup> + 2<i>m</i>)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mn>2</mn>
+  <mi>s</mi>
+  <mo>×</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>l</mi>
+  </msup>
+  <mo>+</mo>
+  <mn>2</mn>
+  <mi>m</mi>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
-2<sup><i>e</i></sup>×<i>c</i> = <i>c</i>’<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mn>2</mn>
+    <mi>e</mi>
+  </msup>
+  <mo>×</mo>
+  <mi>c</mi>
+  <mo>=</mo>
+  <mi>c</mi>
+  <msup>
+    <mo>'</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
 <p>If <em>2s</em> still fits in one byte, that padding byte will be discarded and we
 will have successfully crafted the message <em>2m</em> (or <em>m</em> with an added 0 at
@@ -571,17 +856,71 @@ modification.</p>
 <p>To take a concrete example, let's consider the message 0x42. That message is
 padded with a random byte, 0x12 for example, to form the padded message
 0x1242. The encrypted message can then be written schematically:</p>
-<div class="formula">
-<i>c</i> = (0<i>x</i>1242)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>c</mi>
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mn>0</mn>
+  <mi>x</mi>
+  <mn>1242</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
-2<sup><i>e</i></sup>×<i>c</i> = 2<sup><i>e</i></sup>×(0<i>x</i>1242)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mn>2</mn>
+    <mi>e</mi>
+  </msup>
+  <mo>×</mo>
+  <mi>c</mi>
+  <mo>=</mo>
+  <msup>
+    <mn>2</mn>
+    <mi>e</mi>
+  </msup>
+  <mo>×</mo>
+  <mo stretchy="false">(</mo>
+  <mn>0</mn>
+  <mi>x</mi>
+  <mn>1242</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
- = (2×0<i>x</i>1242)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mn>2</mn>
+  <mo>×</mo>
+  <mn>0</mn>
+  <mi>x</mi>
+  <mn>1242</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
-<div class="formula">
- = (0<i>x</i>2484)<sup><i>e</i></sup>
+<div>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo>=</mo>
+  <mo stretchy="false">(</mo>
+  <mn>0</mn>
+  <mi>x</mi>
+  <mn>2484</mn>
+  <msup>
+    <mo stretchy="false">)</mo>
+    <mi>e</mi>
+  </msup>
+</math>
 </div>
 <p>Upon decryption of this modified message the first byte (0x24) is discarded
 leaving the message 0x84. All we had to do was multiply by 2^e.</p>
@@ -630,7 +969,7 @@ am mainly indicating PSS as a general reference.</p>
 verifying that the algorithms are implemented correctly. They must be fixed
 and removed.</p>
 <p>The avid reader will find more RSA-related attacks and studies in the
-splendid paper <a class="reference external" href="http://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf">Twenty Years of Attacks on the RSA Cryptosystem</a> by Dan Boneh.</p>
+splendid paper <a class="reference external" href="https://crypto.stanford.edu/~dabo/papers/RSA-survey.pdf">Twenty Years of Attacks on the RSA Cryptosystem</a> by Dan Boneh.</p>
 </section>
 <section id="conclusion">
 <h3>Conclusion</h3>

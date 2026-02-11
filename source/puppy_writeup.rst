@@ -6,7 +6,7 @@ Introduction
 ============
 
 Quelqu'un sur irc hier a proposé un `petit challenge de steganographie
-<http://imgur.com/pb2jkGn>`_ pas méchant. La victime du jour ? Un chiot qui
+<https://imgur.com/pb2jkGn>`_ pas méchant. La victime du jour ? Un chiot qui
 renferme, nous dit-on, des secrets.
 
 **puppy.png**

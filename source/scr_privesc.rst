@@ -239,7 +239,7 @@ __ linuxvuln_
 Image sources
 -------------
 
-- http://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876
+- https://lazysushi.deviantart.com/art/Rainbowdash-and-Scootaloo-Flying-Vector-342030876
 
-- `http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)
-  <http://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)>`_
+- `https://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)
+  <https://infinite-loops.wikia.com/wiki/Rainbow_Dash_(My_Little_Pony)>`_
