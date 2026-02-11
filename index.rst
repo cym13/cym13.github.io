@@ -9,6 +9,13 @@ with the starred articles!
 Recent articles
 ===============
 
+February 2026
+-------------
+
+`★ A Security audit of GRR <article/grr_audit.html>`_
+    GRR is a French open-source booking management system. This audit
+    revealed many important vulnerabilities that have since been fixed.
+
 June 2025
 ---------
 
