@@ -333,4 +333,5 @@ Timeline
 - 2025-11-06: Initial report communicated to Team Devome
 - 2026-01-15: Review of the fixes, some corrections
 - 2026-01-18: Last changes are implemented in 4.5.0 RC2
+- 2026-01-28: Publication of GRR 4.5.0
 - 2026-02-11: Publication of the vulnerabilities
