@@ -49,7 +49,7 @@ modern designs would prefer POST or PUT requests. In practice this means that
 there are too many exploitation points to list them all and that their impact
 is very important.
 
-This can be reproduced by creating a webpage *csrf.html* containing the
+This can be reproduced by creating a web page *csrf.html* containing the
 following:
 
 .. code:: html
@@ -117,7 +117,7 @@ Here is the impacted source code:
         $res = grr_sql_query("SELECT repeat_id FROM ".TABLE_PREFIX."_entry WHERE id=".$_GET['id'].";");
 
 Using such an injection, it's possible to extract the entire database,
-including password hashe which are, thankfully, hashed with bcrypt in recent
+including password hashes which are, thankfully, hashed with bcrypt in recent
 versions.
 
 To reproduce, go to the following URL:
@@ -137,7 +137,7 @@ V3: SQL injection in vuereservation.php
 
 **CVSSv4** `Score: 7.1/High <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N>`_
 
-In *reservation/contoleurs/vuereservation.php*, if *reg_part* is set, an
+In *reservation/controleurs/vuereservation.php*, if *reg_part* is set, an
 authenticated SQL injection is possible via *$_GET["reg_participants"]*.
 
 .. code:: bash

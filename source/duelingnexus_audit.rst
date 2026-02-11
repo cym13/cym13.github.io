@@ -145,16 +145,16 @@ request isn't made from the same website.
 In practice the attack would go as follows :
 
 * Eve prepares a website (something juicy, like some ygo scandal at a YCS).
-  In the website, she puts a special bit of javascript that makes a request
+  In the website, she puts a special bit of JavaScript that makes a request
   to https://duelingnexus.com that changes the current account's email to
   eve@malicious.net.
 
-* Eve sends her website's adress on the discord
+* Eve sends her website's address on the discord
 
 * Alice is connected on Dueling Nexus when she sees Eve's message. Intrigued,
   she clicks on the link.
 
-* Alice loads Eve's website, and the associated javascript. A request is made
+* Alice loads Eve's website, and the associated JavaScript. A request is made
   to change the current account's email (so Alice's in this case) to one
   owned by Eve. It works because, since Alice is connected, that change
   request is made with Alice's credentials (session cookie).
@@ -233,8 +233,8 @@ interpreted as HTML. This is something an attacker can use.
 
 If an attacker, can force a JSON response to contain malicious
 HTML/javascript, then anyone loading that JSON response directly would see
-that javascript executed, and some malicious action would happen in their
-session. This execution of user-controlled javascript is a vulnerability
+that JavaScript executed, and some malicious action would happen in their
+session. This execution of user-controlled JavaScript is a vulnerability
 called Cross-Site Scripting (commonly known as XSS).
 
 Here is a URL showcasing that vulnerability:
@@ -246,14 +246,14 @@ Here is a URL showcasing that vulnerability:
 When clicking that link while logged in Dueling Nexus, our mail is changed
 and we receive a JSON response that includes the new mail. Since that
 response's Content-Type is not set to JSON but HTML, by including HTML code
-in our email we are able to reach arbitrary Javascript execution.
+in our email we are able to reach arbitrary JavaScript execution.
 
 The same principle can be applied at other points, such as through deck
 searches. That attack is a bit more involved, so here's a narrative
 description:
 
 * Eve, our attacker, creates an account and creates a deck with the a name
-  containing javascript. For example:
+  containing JavaScript. For example:
 
 .. code:: html
 
@@ -291,11 +291,11 @@ description:
 * Now Eve shares a link to the page above to potential victims, like Alice.
 
 * Alice clicks on Eve's link, loading the malicious page that performs a deck
-  search, and the resulting page executes javascript on
+  search, and the resulting page executes JavaScript on
   https://duelingnexus.com/. In this case a popup appears (in some browser
-  configuration, it may not appear, but the javascript is still executed).
+  configuration, it may not appear, but the JavaScript is still executed).
 
-* This javascript displaying a popup isn't harmful to Alice, but it could be
+* This JavaScript displaying a popup isn't harmful to Alice, but it could be
   more dangerous. Since it is executed in Alice's session, it can do
   anything on the website that Alice can do, including changing Alice's mail
   to allow Eve to take over her account by using the account recovery
@@ -319,7 +319,7 @@ The solution is simple: since the API returns JSON, it must use a content
 type "application/json".
 
 It would also be interesting to have the HttpOnly flag on the PHPSESSID
-cookie, as that would make it unavailable through javascript. This means that
+cookie, as that would make it unavailable through JavaScript. This means that
 an XSS would not be able to steal the cookie. This doesn't make XSS less
 dangerous, but it does make it harder for the attacker to remain in discreet
 control of the account.
@@ -369,7 +369,7 @@ Conclusion
 This was far from a full audit. I limited my tests at things that were easy
 to see simply from navigating the website and didn't test anything that could
 negatively impact other players or jeopardize the availability of the server.
-I also didn't test duels with other players, or the security of Wordpress, a
+I also didn't test duels with other players, or the security of WordPress, a
 popular framework that can easily be misconfigured or include vulnerable
 extensions.
 

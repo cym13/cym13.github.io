@@ -164,13 +164,13 @@ request isn't made from the same website.</p>
 <p>In practice the attack would go as follows :</p>
 <ul class="simple">
 <li><p>Eve prepares a website (something juicy, like some ygo scandal at a YCS).
-In the website, she puts a special bit of javascript that makes a request
+In the website, she puts a special bit of JavaScript that makes a request
 to <a class="reference external" href="https://duelingnexus.com">https://duelingnexus.com</a> that changes the current account's email to
 <a class="reference external" href="mailto:eve&#64;malicious.net">eve&#64;malicious.net</a>.</p></li>
-<li><p>Eve sends her website's adress on the discord</p></li>
+<li><p>Eve sends her website's address on the discord</p></li>
 <li><p>Alice is connected on Dueling Nexus when she sees Eve's message. Intrigued,
 she clicks on the link.</p></li>
-<li><p>Alice loads Eve's website, and the associated javascript. A request is made
+<li><p>Alice loads Eve's website, and the associated JavaScript. A request is made
 to change the current account's email (so Alice's in this case) to one
 owned by Eve. It works because, since Alice is connected, that change
 request is made with Alice's credentials (session cookie).</p></li>
@@ -234,21 +234,21 @@ indicates that the response, despite being in JSON and not HTML, was
 interpreted as HTML. This is something an attacker can use.</p>
 <p>If an attacker, can force a JSON response to contain malicious
 HTML/javascript, then anyone loading that JSON response directly would see
-that javascript executed, and some malicious action would happen in their
-session. This execution of user-controlled javascript is a vulnerability
+that JavaScript executed, and some malicious action would happen in their
+session. This execution of user-controlled JavaScript is a vulnerability
 called Cross-Site Scripting (commonly known as XSS).</p>
 <p>Here is a URL showcasing that vulnerability:</p>
 <pre class="literal-block">https://duelingnexus.com/api/update-email.php?email=%3Cimg%20src%3Dx%20onerror%3Dalert(89827491);%20x%3Da%3E%20a&#64;example.com</pre>
 <p>When clicking that link while logged in Dueling Nexus, our mail is changed
 and we receive a JSON response that includes the new mail. Since that
 response's Content-Type is not set to JSON but HTML, by including HTML code
-in our email we are able to reach arbitrary Javascript execution.</p>
+in our email we are able to reach arbitrary JavaScript execution.</p>
 <p>The same principle can be applied at other points, such as through deck
 searches. That attack is a bit more involved, so here's a narrative
 description:</p>
 <ul class="simple">
 <li><p>Eve, our attacker, creates an account and creates a deck with the a name
-containing javascript. For example:</p></li>
+containing JavaScript. For example:</p></li>
 </ul>
 <pre class="code html literal-block"><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">alert</span><span class="p">(</span><span class="mf">1337</span><span class="p">)&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre>
 <ul class="simple">
@@ -280,10 +280,10 @@ perform the corresponding search. Here is the code she can use:</p></li>
 <ul class="simple">
 <li><p>Now Eve shares a link to the page above to potential victims, like Alice.</p></li>
 <li><p>Alice clicks on Eve's link, loading the malicious page that performs a deck
-search, and the resulting page executes javascript on
+search, and the resulting page executes JavaScript on
 <a class="reference external" href="https://duelingnexus.com/">https://duelingnexus.com/</a>. In this case a popup appears (in some browser
-configuration, it may not appear, but the javascript is still executed).</p></li>
-<li><p>This javascript displaying a popup isn't harmful to Alice, but it could be
+configuration, it may not appear, but the JavaScript is still executed).</p></li>
+<li><p>This JavaScript displaying a popup isn't harmful to Alice, but it could be
 more dangerous. Since it is executed in Alice's session, it can do
 anything on the website that Alice can do, including changing Alice's mail
 to allow Eve to take over her account by using the account recovery
@@ -304,7 +304,7 @@ on your network.</p>
 <p>The solution is simple: since the API returns JSON, it must use a content
 type &quot;application/json&quot;.</p>
 <p>It would also be interesting to have the HttpOnly flag on the PHPSESSID
-cookie, as that would make it unavailable through javascript. This means that
+cookie, as that would make it unavailable through JavaScript. This means that
 an XSS would not be able to steal the cookie. This doesn't make XSS less
 dangerous, but it does make it harder for the attacker to remain in discreet
 control of the account.</p>
@@ -343,7 +343,7 @@ ensure that the user has legitimate access to that cosmetics.</p>
 <p>This was far from a full audit. I limited my tests at things that were easy
 to see simply from navigating the website and didn't test anything that could
 negatively impact other players or jeopardize the availability of the server.
-I also didn't test duels with other players, or the security of Wordpress, a
+I also didn't test duels with other players, or the security of WordPress, a
 popular framework that can easily be misconfigured or include vulnerable
 extensions.</p>
 <p>Now, none of this is really critical. I wouldn't let these issues prevent me

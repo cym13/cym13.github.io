@@ -88,7 +88,7 @@ GET requests even for requests that change state on the server side, where
 modern designs would prefer POST or PUT requests. In practice this means that
 there are too many exploitation points to list them all and that their impact
 is very important.</p>
-<p>This can be reproduced by creating a webpage <em>csrf.html</em> containing the
+<p>This can be reproduced by creating a web page <em>csrf.html</em> containing the
 following:</p>
 <pre class="code html literal-block"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
@@ -142,7 +142,7 @@ necessary.</p>
 <pre class="code bash literal-block"><code><span class="k">if</span><span class="w"> </span><span class="o">(</span><span class="nv">$typeDate</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'rep_end_'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>isset<span class="o">(</span><span class="nv">$_GET</span><span class="o">[</span><span class="s1">'id'</span><span class="o">])){</span><span class="w">
     </span><span class="nv">$res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>grr_sql_query<span class="o">(</span><span class="s2">&quot;SELECT repeat_id FROM &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_entry WHERE id=&quot;</span>.<span class="nv">$_GET</span><span class="o">[</span><span class="s1">'id'</span><span class="o">]</span>.<span class="s2">&quot;;&quot;</span><span class="o">)</span><span class="p">;</span></code></pre>
 <p>Using such an injection, it's possible to extract the entire database,
-including password hashe which are, thankfully, hashed with bcrypt in recent
+including password hashes which are, thankfully, hashed with bcrypt in recent
 versions.</p>
 <p>To reproduce, go to the following URL:</p>
 <pre class="literal-block">http://localhost:8000/app.php?p=editentree&amp;id=11%20AND%20GTID_SUBSET(CONCAT(0x717a627a71,(SELECT%20(ELT(5151=5151,1))),0x716b627671),5151)&amp;edit_type=series&amp;day=14&amp;month=11&amp;year=2025&amp;page=jour</pre>
@@ -152,7 +152,7 @@ versions.</p>
 <section id="v3-sql-injection-in-vuereservation-php-1">
 <h3>V3: SQL injection in vuereservation.php</h3>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
-<p>In <em>reservation/contoleurs/vuereservation.php</em>, if <em>reg_part</em> is set, an
+<p>In <em>reservation/controleurs/vuereservation.php</em>, if <em>reg_part</em> is set, an
 authenticated SQL injection is possible via <em>$_GET[&quot;reg_participants&quot;]</em>.</p>
 <pre class="code bash literal-block"><code><span class="k">if</span><span class="o">(</span>isset<span class="o">(</span><span class="nv">$_GET</span><span class="o">[</span><span class="s2">&quot;reg_part&quot;</span><span class="o">]))</span><span class="w">
 </span><span class="o">{</span><span class="w">
