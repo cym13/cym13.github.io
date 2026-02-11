@@ -4,7 +4,7 @@ A security audit of GRR
 
 In November 2025 I decided to have a look at `GRR
 <https://site.devome.com/fr/grr3>`_, an open-source booking
-management system from a small french team. As is often the case this
+management system from Devome, a small french team. As is often the case this
 lead to the findings of several important vulnerabilities that have since
 been fixed thanks to the great response by its developers in GRR 4.5.0 which
 is available at https://github.com/JeromeDevome/GRR.
