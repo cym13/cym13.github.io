@@ -7,11 +7,12 @@ QTSBAMF
 Who am I?
 =========
 
-My name is Cédric Picard, I am a security consultant currently working in
-Luxembourg.
+My name is Cédric Picard, I am a security engineer currently working as
+pentester in France for a medical sofware editor.
 
 I spend most of my free time auditing free software, reversing malwares,
-developping new GNU/Linux tools and watching animes or My Little Pony.
+developping new GNU/Linux tools, playing role playing games and watching
+animes or My Little Pony.
 
 Where's the girl at the top coming from?
 ========================================
@@ -51,5 +52,4 @@ I'd like to talk, can I contact you?
 Sure, you can mail me at the following address:
 Y3BpY2FyZEBwdXJyZmVjdC5mcg==
 
-If mails aren't for you I usually hang out on irc.freenode.net under the
-nickname "piou". ##security and ##programming are great places to start.
+I'm also very active on reddit under the nickname cym13.
