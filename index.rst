@@ -12,6 +12,11 @@ Recent articles
 February 2026
 -------------
 
+`Vulnerabilities in Dueling Nexus <article/duelingnexus_audit.html>`_
+    Dueling Nexus is a free Yu-Gi-Oh dueling platform, the security of which
+    leaves to be desired. Here are some vulnerabilities that you should be
+    aware of as a duelist.
+
 `★ A Security audit of GRR <article/grr_audit.html>`_
     GRR is a French open-source booking management system. This audit
     revealed many important vulnerabilities that have since been fixed.

