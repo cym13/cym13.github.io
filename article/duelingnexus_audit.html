@@ -237,12 +237,13 @@ HTML/javascript, then anyone loading that JSON response directly would see
 that JavaScript executed, and some malicious action would happen in their
 session. This execution of user-controlled JavaScript is a vulnerability
 called Cross-Site Scripting (commonly known as XSS).</p>
-<p>Here is a URL showcasing that vulnerability:</p>
+<p>Here is a URL showcasing that vulnerability by displaying a harmless popup:</p>
 <pre class="literal-block">https://duelingnexus.com/api/update-email.php?email=%3Cimg%20src%3Dx%20onerror%3Dalert(89827491);%20x%3Da%3E%20a&#64;example.com</pre>
 <p>When clicking that link while logged in Dueling Nexus, our mail is changed
 and we receive a JSON response that includes the new mail. Since that
 response's Content-Type is not set to JSON but HTML, by including HTML code
 in our email we are able to reach arbitrary JavaScript execution.</p>
+<img alt="../image/dueling_nexus_xss.png" src="../image/dueling_nexus_xss.png" style="width: 90%;" />
 <p>The same principle can be applied at other points, such as through deck
 searches. That attack is a bit more involved, so here's a narrative
 description:</p>

@@ -237,7 +237,7 @@ that JavaScript executed, and some malicious action would happen in their
 session. This execution of user-controlled JavaScript is a vulnerability
 called Cross-Site Scripting (commonly known as XSS).
 
-Here is a URL showcasing that vulnerability:
+Here is a URL showcasing that vulnerability by displaying a harmless popup:
 
 ::
 
@@ -247,6 +247,9 @@ When clicking that link while logged in Dueling Nexus, our mail is changed
 and we receive a JSON response that includes the new mail. Since that
 response's Content-Type is not set to JSON but HTML, by including HTML code
 in our email we are able to reach arbitrary JavaScript execution.
+
+.. image:: ../image/dueling_nexus_xss.png
+    :width: 90%
 
 The same principle can be applied at other points, such as through deck
 searches. That attack is a bit more involved, so here's a narrative
