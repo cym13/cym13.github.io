@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head> <meta charset="utf-8" />
-<meta name="generator" content="Docutils 0.22.3: https://docutils.sourceforge.io/" />
+<meta name="generator" content="Docutils 0.22.4: https://docutils.sourceforge.io/" />
 <title>Breakpoint: A security audit of GRR</title>
     <link rel="stylesheet" type="text/css" href="../style/base.css"/>
     <link rel="stylesheet" type="text/css" href="../style/pygments.css"/>
@@ -68,19 +68,20 @@ CSRFs and XSS.</p>
 the present tense, but please keep in mind that all the vulnerabilities have
 since been fixed.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="#v1-cross-site-request-forgery-1">V1: Cross-Site Request Forgery</a></p></li>
-<li><p><a class="reference external" href="#v2-sql-injection-through-editentree-1">V2: SQL injection through editentree</a></p></li>
-<li><p><a class="reference external" href="#v3-sql-injection-in-vuereservation-php-1">V3: SQL injection in vuereservation.php</a></p></li>
-<li><p><a class="reference external" href="#v4-sql-injection-in-session-inc-php-1">V4: SQL injection in session.inc.php</a></p></li>
-<li><p><a class="reference external" href="#v5-reflected-xss-in-editentreetrt-php-1">V5: Reflected XSS in editentreetrt.php</a></p></li>
-<li><p><a class="reference external" href="#v6-reflected-xss-in-maj-php-1">V6: Reflected XSS in maj.php</a></p></li>
-<li><p><a class="reference external" href="#v7-open-redirect-1">V7: Open redirect</a></p></li>
-<li><p><a class="reference external" href="#v8-session-fixation-1">V8: Session Fixation</a></p></li>
-<li><p><a class="reference external" href="#v9-sql-injection-in-report-php-1">V9: SQL injection in report.php</a></p></li>
+<li><p><a class="reference external" href="#v1-cross-site-request-forgery">V1: Cross-Site Request Forgery (CVE-2026-30711)</a></p></li>
+<li><p><a class="reference external" href="#v2-sql-injection-through-editentree">V2: SQL injection through editentree (CVE-2026-30712)</a></p></li>
+<li><p><a class="reference external" href="#v3-sql-injection-in-vuereservation-php">V3: SQL injection in vuereservation.php (CVE-2026-30713)</a></p></li>
+<li><p><a class="reference external" href="#v4-sql-injection-in-session-inc-php">V4: SQL injection in session.inc.php (CVE-2026-30714)</a></p></li>
+<li><p><a class="reference external" href="#v5-reflected-xss-in-editentreetrt-php">V5: Reflected XSS in editentreetrt.php (CVE-2026-30715)</a></p></li>
+<li><p><a class="reference external" href="#v6-reflected-xss-in-maj-php">V6: Reflected XSS in maj.php (CVE-2026-30716)</a></p></li>
+<li><p><a class="reference external" href="#v7-open-redirect">V7: Open redirect (CVE-2026-30717)</a></p></li>
+<li><p><a class="reference external" href="#v8-session-fixation">V8: Session Fixation (CVE-2026-30718)</a></p></li>
+<li><p><a class="reference external" href="#v9-sql-injection-in-report-php">V9: SQL injection in report.php (CVE-2026-30719)</a></p></li>
 </ul>
 </section>
-<section id="v1-cross-site-request-forgery-1">
+<section id="v1-cross-site-request-forgery">
 <h3>V1: Cross-Site Request Forgery</h3>
+<p><strong>CVE-2026-30711</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N">6.9/Medium</a></p>
 <p>The application has no protection against Cross-Site Request Forgeries
 (CSRF). This is made worse by the fact that the application relies heavily on
@@ -131,8 +132,9 @@ automatically redirected and can note that the configuration (and in
 particular the password) changed.</p>
 <img alt="../image/grr_csrf.png" src="../image/grr_csrf.png" style="width: 70%;" />
 </section>
-<section id="v2-sql-injection-through-editentree-1">
+<section id="v2-sql-injection-through-editentree">
 <h3>V2: SQL injection through editentree</h3>
+<p><strong>CVE-2026-30712</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
 <p>A SQL injection is present in <em>functions.inc.php</em>, function
 <em>jQuery_DatePickerTwig</em>, reachable through <em>editentree</em> with the parameter
@@ -149,8 +151,9 @@ versions.</p>
 <p>This displays the following message that demonstrates successful injection:</p>
 <pre class="literal-block">Malformed GTID set specification 'qzbzq1qkbvq'.</pre>
 </section>
-<section id="v3-sql-injection-in-vuereservation-php-1">
+<section id="v3-sql-injection-in-vuereservation-php">
 <h3>V3: SQL injection in vuereservation.php</h3>
+<p><strong>CVE-2026-30713</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
 <p>In <em>reservation/controleurs/vuereservation.php</em>, if <em>reg_part</em> is set, an
 authenticated SQL injection is possible via <em>$_GET[&quot;reg_participants&quot;]</em>.</p>
@@ -173,8 +176,9 @@ authenticated SQL injection is possible via <em>$_GET[&quot;reg_participants&quo
 <p>The consequences are similar to that described in V2.</p>
 <p>I did not take the time to build a POC for that SQL injection.</p>
 </section>
-<section id="v4-sql-injection-in-session-inc-php-1">
+<section id="v4-sql-injection-in-session-inc-php">
 <h3>V4: SQL injection in session.inc.php</h3>
+<p><strong>CVE-2026-30714</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
 <p>In <em>include/session.inc.php</em>, the referer from the login request as well as
 its user-agent are vulnerable to SQL injections.</p>
@@ -213,8 +217,9 @@ consequences are similar to those described in V2.</p>
 vulnerability.</p></li>
 </ul>
 </section>
-<section id="v5-reflected-xss-in-editentreetrt-php-1">
+<section id="v5-reflected-xss-in-editentreetrt-php">
 <h3>V5: Reflected XSS in editentreetrt.php</h3>
+<p><strong>CVE-2026-30715</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N">Score: 6.2/Medium</a></p>
 <p>There's a reflected XSS when editing bookings through <em>/app.php?p=editentreetrt</em>,
 in the conflict management page.</p>
@@ -238,8 +243,9 @@ execution in the victim's web browser using the victim's privileges. The
 attacker can do anything in the application that the victim could. This is
 obviously especially dangerous if administrators are targeted.</p>
 </section>
-<section id="v6-reflected-xss-in-maj-php-1">
+<section id="v6-reflected-xss-in-maj-php">
 <h3>V6: Reflected XSS in maj.php</h3>
+<p><strong>CVE-2026-30716</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N">Score: 6.2/Medium</a></p>
 <p>A reflected XSS is present in <em>forcemaj</em> from <em>/installation/maj.php</em>.</p>
 <pre class="literal-block">http://localhost:8000/installation/maj.php?forcemaj=0400008%27%22%3E%3Cimg%20src%3Dx%20onerror%3Dconfirm%2827892%29%20x%3D</pre>
@@ -247,8 +253,9 @@ obviously especially dangerous if administrators are targeted.</p>
 <p>That XSS can be reached even with unauthenticated users, but it relies on
 setup-related files that may have been removed after deployment.</p>
 </section>
-<section id="v7-open-redirect-1">
+<section id="v7-open-redirect">
 <h3>V7: Open redirect</h3>
+<p><strong>CVE-2026-30717</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N">Score: 5.1/Medium</a></p>
 <p>Open redirects are vulnerabilities where an attacker can manipulate the page
 to which a user is redirected. This is useful for phishing as it provides a
@@ -259,8 +266,9 @@ attacks as the final request comes from the website itself.</p>
 <p>Completing the login process will see the user redirected to the specified
 URL.</p>
 </section>
-<section id="v8-session-fixation-1">
+<section id="v8-session-fixation">
 <h3>V8: Session Fixation</h3>
+<p><strong>CVE-2026-30718</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N">Score: 4.8/Medium</a></p>
 <p>The session cookie is not reset upon login or logout. This allows a session
 fixation attack where the attacker gains knowledge of the session cookie
@@ -285,8 +293,9 @@ unchanged. Eve reloads the page: she's now connected as Bob.</p></li>
 the most common exploitation scenarios imply physical access to the computer
 used by the victim which severely reduces its usability.</p>
 </section>
-<section id="v9-sql-injection-in-report-php-1">
+<section id="v9-sql-injection-in-report-php">
 <h3>V9: SQL injection in report.php</h3>
+<p><strong>CVE-2026-30719</strong></p>
 <p><strong>CVSSv4</strong> <a class="reference external" href="https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N">Score: 7.1/High</a></p>
 <p>In <em>reservation/modeles/report.php</em>, line 247, we can read:</p>
 <pre class="code bash literal-block"><code><span class="nv">$premiere_cellule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>grr_sql_query1<span class="o">(</span><span class="s2">&quot;SELECT fieldname FROM &quot;</span>.TABLE_PREFIX.<span class="s2">&quot;_overload WHERE id='&quot;</span>.<span class="nv">$_GET</span><span class="o">[</span><span class="s2">&quot;sumby&quot;</span><span class="o">]</span>.<span class="s2">&quot;'&quot;</span><span class="o">)</span><span class="p">;</span></code></pre>

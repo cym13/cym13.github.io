@@ -27,18 +27,20 @@ the present tense, but please keep in mind that all the vulnerabilities have
 since been fixed.
 
 
-- `V1: Cross-Site Request Forgery <#v1-cross-site-request-forgery-1>`_
-- `V2: SQL injection through editentree <#v2-sql-injection-through-editentree-1>`_
-- `V3: SQL injection in vuereservation.php <#v3-sql-injection-in-vuereservation-php-1>`_
-- `V4: SQL injection in session.inc.php <#v4-sql-injection-in-session-inc-php-1>`_
-- `V5: Reflected XSS in editentreetrt.php <#v5-reflected-xss-in-editentreetrt-php-1>`_
-- `V6: Reflected XSS in maj.php <#v6-reflected-xss-in-maj-php-1>`_
-- `V7: Open redirect <#v7-open-redirect-1>`_
-- `V8: Session Fixation <#v8-session-fixation-1>`_
-- `V9: SQL injection in report.php <#v9-sql-injection-in-report-php-1>`_
+- `V1: Cross-Site Request Forgery (CVE-2026-30711) <#v1-cross-site-request-forgery>`_
+- `V2: SQL injection through editentree (CVE-2026-30712) <#v2-sql-injection-through-editentree>`_
+- `V3: SQL injection in vuereservation.php (CVE-2026-30713) <#v3-sql-injection-in-vuereservation-php>`_
+- `V4: SQL injection in session.inc.php (CVE-2026-30714) <#v4-sql-injection-in-session-inc-php>`_
+- `V5: Reflected XSS in editentreetrt.php (CVE-2026-30715) <#v5-reflected-xss-in-editentreetrt-php>`_
+- `V6: Reflected XSS in maj.php (CVE-2026-30716) <#v6-reflected-xss-in-maj-php>`_
+- `V7: Open redirect (CVE-2026-30717) <#v7-open-redirect>`_
+- `V8: Session Fixation (CVE-2026-30718) <#v8-session-fixation>`_
+- `V9: SQL injection in report.php (CVE-2026-30719) <#v9-sql-injection-in-report-php>`_
 
 V1: Cross-Site Request Forgery
 ==============================
+
+**CVE-2026-30711**
 
 **CVSSv4** `6.9/Medium <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N>`_
 
@@ -102,6 +104,8 @@ particular the password) changed.
 V2: SQL injection through editentree
 ====================================
 
+**CVE-2026-30712**
+
 **CVSSv4** `Score: 7.1/High <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N>`_
 
 A SQL injection is present in *functions.inc.php*, function
@@ -135,6 +139,8 @@ This displays the following message that demonstrates successful injection:
 V3: SQL injection in vuereservation.php
 =======================================
 
+**CVE-2026-30713**
+
 **CVSSv4** `Score: 7.1/High <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N>`_
 
 In *reservation/controleurs/vuereservation.php*, if *reg_part* is set, an
@@ -165,6 +171,8 @@ I did not take the time to build a POC for that SQL injection.
 
 V4: SQL injection in session.inc.php
 ====================================
+
+**CVE-2026-30714**
 
 **CVSSv4** `Score: 7.1/High <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N>`_
 
@@ -214,6 +222,8 @@ To reproduce:
 V5: Reflected XSS in editentreetrt.php
 ======================================
 
+**CVE-2026-30715**
+
 **CVSSv4** `Score: 6.2/Medium <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N>`_
 
 There's a reflected XSS when editing bookings through */app.php?p=editentreetrt*,
@@ -247,6 +257,8 @@ obviously especially dangerous if administrators are targeted.
 V6: Reflected XSS in maj.php
 ============================
 
+**CVE-2026-30716**
+
 **CVSSv4** `Score: 6.2/Medium <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N>`_
 
 A reflected XSS is present in *forcemaj* from */installation/maj.php*.
@@ -264,6 +276,8 @@ setup-related files that may have been removed after deployment.
 V7: Open redirect
 =================
 
+**CVE-2026-30717**
+
 **CVSSv4** `Score: 5.1/Medium <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N>`_
 
 Open redirects are vulnerabilities where an attacker can manipulate the page
@@ -279,6 +293,8 @@ URL.
 
 V8: Session Fixation
 ====================
+
+**CVE-2026-30718**
 
 **CVSSv4** `Score: 4.8/Medium <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N>`_
 
@@ -312,6 +328,8 @@ used by the victim which severely reduces its usability.
 
 V9: SQL injection in report.php
 ===============================
+
+**CVE-2026-30719**
 
 **CVSSv4** `Score: 7.1/High <https://www.first.org/cvss/calculator/4.0#CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N>`_
 
