@@ -214,6 +214,10 @@ illustrate:
 .. image:: ../image/mam_diagram.png
     :width: 100%
 
+*Did you know that plantuml has a dark mode and embeds the code into the
+image in a way that can be extracted? I didn't! Checkout out --extract-source
+and --dark-mode for more information.*
+
 Analysis
 ========
 
