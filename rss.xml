@@ -4,9 +4,17 @@
   <title>Breakpoint</title>
   <description>Stepping through security</description>
   <link>https://breakpoint.purrfect.fr</link>
-  <lastBuildDate>Wed, 11 Feb 2026 12:37:50 +0100</lastBuildDate>
-  <pubDate>Wed, 11 Feb 2026 12:37:50 +0100</pubDate>
+  <lastBuildDate>Mon, 13 Apr 2026 17:23:39 +0200</lastBuildDate>
+  <pubDate>Mon, 13 Apr 2026 17:23:39 +0200</pubDate>
   <ttl>7200</ttl>
+
+
+  <item>
+    <title>Breaking the Minimalist Authentication Mechanism</title>
+    <description>Where we analyze an IoT authentication protocol from 2016 using Verifpal.</description>
+    <link>https://breakpoint.purrfect.fr/article/breaking_mam.html</link>
+    <pubDate>Mon, 13 Apr 2026 17:23:31 +0200</pubDate>
+  </item>
 
 
   <item>
