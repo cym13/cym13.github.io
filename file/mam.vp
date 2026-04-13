@@ -1,0 +1,72 @@
+attacker[passive]
+
+// Setup
+
+principal client [
+    knows private Asec  // We assume Asec is not a guessable password
+    knows public  time  // time is public knowledge
+]
+
+principal server [
+    knows private Asec
+    knows public  time
+]
+
+// Connection
+
+principal client [
+    generates nonceA1
+
+    n1 = HASH(Asec)
+    nonceA2 = HASH(time, n1, nonceA1)
+]
+
+client -> server: nonceA1, nonceA2
+
+
+principal server [
+    _ = ASSERT(nonceA2, HASH(time, HASH(Asec), nonceA1))?
+
+    generates seed
+    tk0 = HASH(seed, nonceA2)
+    tk1 = HASH(tk0)
+    tk2 = HASH(tk1)
+]
+
+server -> client: seed, tk2
+
+principal client [
+    tk0_c = HASH(seed, nonceA2)
+    tk1_c = HASH(tk0_c)
+    tk2_c = HASH(tk1_c)
+    _ = ASSERT(tk2_c, tk2)?
+]
+
+// Operation
+
+principal client [
+    generates msg
+    auth_tag = MAC(tk1_c, msg)
+]
+
+client -> server: msg,auth_tag
+
+principal server [
+    _ = ASSERT(MAC(tk1, msg), auth_tag)?
+]
+
+queries [
+    // Can the attacker obtain or deduce Asec?
+    confidentiality? Asec
+
+    // Can the attacker obtain or deduce tk0?
+    confidentiality? tk0
+
+    // Can the attacker craft tk2 without the client noticing it's not
+    // from the server?
+    authentication? server -> client: tk2
+
+    // Can the attacker craft msg without the server noticing it's not
+    // from the client?
+    authentication? client -> server: msg
+]

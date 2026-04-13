@@ -9,6 +9,12 @@ with the starred articles!
 Recent articles
 ===============
 
+April 2026
+----------
+
+`Breaking the Minimalist Authentication Mechanism <article/breaking_mam.html>`_
+    Where we analyze an IoT authentication protocol from 2016 using Verifpal.
+
 February 2026
 -------------
 
